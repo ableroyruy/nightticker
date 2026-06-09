@@ -82,7 +82,9 @@ export function useHyperliquidTicker(): UseHyperliquidTickerReturn {
           if (meta.name && ctx?.prevDayPx) {
             const prevDayPx = parseFloat(ctx.prevDayPx);
             if (!isNaN(prevDayPx) && prevDayPx > 0) {
-              newPrevDayPrices[meta.name] = prevDayPx;
+              // Remove 'xyz:' prefix to match component lookups
+              const symbol = meta.name.replace('xyz:', '');
+              newPrevDayPrices[symbol] = prevDayPx;
             }
           }
         });
@@ -119,10 +121,12 @@ export function useHyperliquidTicker(): UseHyperliquidTickerReturn {
     const prevDayPrices = prevDayPricesRef.current;
     const newTickers: Record<string, TickerData> = {};
 
-    for (const [symbol, priceStr] of Object.entries(mids)) {
+    for (const [rawSymbol, priceStr] of Object.entries(mids)) {
       const price = parseFloat(priceStr);
       if (isNaN(price)) continue;
 
+      // Remove 'xyz:' prefix to match component lookups
+      const symbol = rawSymbol.replace('xyz:', '');
       const prevDayPx = prevDayPrices[symbol] || 0;
       let change24h = 0;
       let changePercent24h = 0;
