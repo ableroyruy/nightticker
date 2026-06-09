@@ -1,13 +1,11 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { ConnectionStatus } from '@/lib/types/market';
 
-const WS_URL = 'wss://api.hyperliquid.xyz/ws';
 const API_URL = 'https://api.hyperliquid.xyz/info';
-const RECONNECT_DELAY = 3000;
 const CANDLE_INTERVAL = '5m';
 const CANDLES_6H = 72; // 6 hours / 5 minutes = 72 candles
+const POLLING_INTERVAL = 60000; // 1 minute polling
 const FETCH_DELAY = 300; // Delay between API calls to avoid rate limiting
 
 export interface CandleData {
@@ -37,64 +35,48 @@ interface CandleState {
   error: string | null;
 }
 
-type CandleListener = (state: CandleState) => void;
-
-// Singleton WebSocket manager for candle subscriptions
-class CandleWebSocketManager {
-  private static instance: CandleWebSocketManager | null = null;
-  private ws: WebSocket | null = null;
-  private status: ConnectionStatus = 'disconnected';
-  private subscribedSymbols: Set<string> = new Set();
-  private listeners: Map<string, Set<CandleListener>> = new Map();
-  private candleStates: Map<string, CandleState> = new Map();
-  private reconnectTimeout: NodeJS.Timeout | null = null;
-  private pendingSubscriptions: Set<string> = new Set();
-  private fetchQueue: Array<{ symbol: string; resolve: (data: CandleData[]) => void; reject: (err: Error) => void }> = [];
+// Fetch queue to prevent rate limiting
+class CandleFetchQueue {
+  private static instance: CandleFetchQueue | null = null;
+  private queue: Array<{ symbol: string; resolve: (data: CandleData[]) => void; reject: (err: Error) => void }> = [];
   private isFetching = false;
+  private cache: Map<string, { data: CandleData[]; timestamp: number }> = new Map();
+  private cacheTimeout = 30000; // 30 seconds cache
 
   private constructor() {}
 
-  static getInstance(): CandleWebSocketManager {
-    if (!CandleWebSocketManager.instance) {
-      CandleWebSocketManager.instance = new CandleWebSocketManager();
+  static getInstance(): CandleFetchQueue {
+    if (!CandleFetchQueue.instance) {
+      CandleFetchQueue.instance = new CandleFetchQueue();
     }
-    return CandleWebSocketManager.instance;
+    return CandleFetchQueue.instance;
   }
 
-  private getDefaultState(): CandleState {
-    return {
-      candles: [],
-      currentPrice: null,
-      change24h: null,
-      changePercent24h: null,
-      loading: true,
-      error: null,
-    };
-  }
-
-  private notifyListeners(symbol: string) {
-    const state = this.candleStates.get(symbol);
-    const symbolListeners = this.listeners.get(symbol);
-    if (state && symbolListeners) {
-      symbolListeners.forEach((listener) => listener(state));
-    }
-  }
-
-  private async processFetchQueue() {
-    if (this.isFetching || this.fetchQueue.length === 0) return;
+  private async processQueue() {
+    if (this.isFetching || this.queue.length === 0) return;
 
     this.isFetching = true;
 
-    while (this.fetchQueue.length > 0) {
-      const item = this.fetchQueue.shift()!;
+    while (this.queue.length > 0) {
+      const item = this.queue.shift()!;
+
+      // Check cache first
+      const cached = this.cache.get(item.symbol);
+      if (cached && Date.now() - cached.timestamp < this.cacheTimeout) {
+        item.resolve(cached.data);
+        continue;
+      }
+
       try {
-        const data = await this.doFetchCandles(item.symbol);
+        const data = await this.doFetch(item.symbol);
+        this.cache.set(item.symbol, { data, timestamp: Date.now() });
         item.resolve(data);
       } catch (e) {
         item.reject(e as Error);
       }
-      // Small delay between requests to avoid rate limiting
-      if (this.fetchQueue.length > 0) {
+
+      // Delay between requests
+      if (this.queue.length > 0) {
         await new Promise((r) => setTimeout(r, FETCH_DELAY));
       }
     }
@@ -102,7 +84,7 @@ class CandleWebSocketManager {
     this.isFetching = false;
   }
 
-  private async doFetchCandles(symbol: string): Promise<CandleData[]> {
+  private async doFetch(symbol: string): Promise<CandleData[]> {
     const now = Date.now();
     const startTime = now - 6 * 60 * 60 * 1000; // 6 hours
 
@@ -140,250 +122,32 @@ class CandleWebSocketManager {
     }));
   }
 
-  private fetchInitialCandles(symbol: string): Promise<CandleData[]> {
+  fetch(symbol: string): Promise<CandleData[]> {
     return new Promise((resolve, reject) => {
-      this.fetchQueue.push({ symbol, resolve, reject });
-      this.processFetchQueue();
+      this.queue.push({ symbol, resolve, reject });
+      this.processQueue();
     });
   }
 
-  private calculateChange(candles: CandleData[]): { change24h: number; changePercent24h: number } {
-    if (candles.length < 2) {
-      return { change24h: 0, changePercent24h: 0 };
-    }
-    const firstCandle = candles[0];
-    const lastCandle = candles[candles.length - 1];
-    const change24h = lastCandle.close - firstCandle.close;
-    const changePercent24h = firstCandle.close > 0 ? (change24h / firstCandle.close) * 100 : 0;
-    return { change24h, changePercent24h };
-  }
-
-  private connect() {
-    if (this.ws?.readyState === WebSocket.OPEN || this.ws?.readyState === WebSocket.CONNECTING) {
-      return;
-    }
-
-    this.status = 'connecting';
-
-    try {
-      this.ws = new WebSocket(WS_URL);
-
-      this.ws.onopen = () => {
-        this.status = 'connected';
-        // Subscribe to all pending symbols
-        this.pendingSubscriptions.forEach((symbol) => {
-          this.sendSubscription(symbol);
-        });
-        this.pendingSubscriptions.clear();
-
-        // Re-subscribe existing symbols
-        this.subscribedSymbols.forEach((symbol) => {
-          this.sendSubscription(symbol);
-        });
-      };
-
-      this.ws.onmessage = (event) => {
-        try {
-          const message = JSON.parse(event.data);
-          this.handleMessage(message);
-        } catch (e) {
-          console.error('Failed to parse candle WebSocket message:', e);
-        }
-      };
-
-      this.ws.onerror = (event) => {
-        console.error('Candle WebSocket error:', event);
-      };
-
-      this.ws.onclose = () => {
-        this.status = 'disconnected';
-        this.ws = null;
-
-        // Attempt reconnect if there are still subscribers
-        if (this.subscribedSymbols.size > 0) {
-          this.reconnectTimeout = setTimeout(() => {
-            this.connect();
-          }, RECONNECT_DELAY);
-        }
-      };
-    } catch (e) {
-      console.error('Failed to create candle WebSocket:', e);
-      this.status = 'disconnected';
-
-      this.reconnectTimeout = setTimeout(() => {
-        this.connect();
-      }, RECONNECT_DELAY);
-    }
-  }
-
-  private sendSubscription(symbol: string) {
-    if (this.ws?.readyState === WebSocket.OPEN) {
-      this.ws.send(
-        JSON.stringify({
-          method: 'subscribe',
-          subscription: {
-            type: 'candle',
-            coin: `xyz:${symbol}`,
-            interval: CANDLE_INTERVAL,
-          },
-        })
-      );
-    }
-  }
-
-  private sendUnsubscription(symbol: string) {
-    if (this.ws?.readyState === WebSocket.OPEN) {
-      this.ws.send(
-        JSON.stringify({
-          method: 'unsubscribe',
-          subscription: {
-            type: 'candle',
-            coin: `xyz:${symbol}`,
-            interval: CANDLE_INTERVAL,
-          },
-        })
-      );
-    }
-  }
-
-  private handleMessage(message: { channel?: string; data?: RawCandle }) {
-    if (message.channel?.startsWith('candle') && message.data) {
-      // Extract symbol from channel: "candle:xyz:AAPL:5m" -> "AAPL"
-      const parts = message.channel.split(':');
-      if (parts.length >= 3) {
-        const symbol = parts[2];
-        const candle = message.data;
-
-        const state = this.candleStates.get(symbol);
-        if (!state) return;
-
-        const newCandle: CandleData = {
-          time: Math.floor(candle.t / 1000),
-          open: parseFloat(candle.o),
-          high: parseFloat(candle.h),
-          low: parseFloat(candle.l),
-          close: parseFloat(candle.c),
-          volume: parseFloat(candle.v),
-        };
-
-        let updatedCandles = [...state.candles];
-        const lastCandle = updatedCandles[updatedCandles.length - 1];
-
-        if (lastCandle && lastCandle.time === newCandle.time) {
-          // Update existing candle
-          updatedCandles[updatedCandles.length - 1] = newCandle;
-        } else {
-          // Add new candle
-          updatedCandles.push(newCandle);
-          // Keep only last 72 candles (6 hours)
-          if (updatedCandles.length > CANDLES_6H) {
-            updatedCandles = updatedCandles.slice(-CANDLES_6H);
-          }
-        }
-
-        const { change24h, changePercent24h } = this.calculateChange(updatedCandles);
-
-        this.candleStates.set(symbol, {
-          ...state,
-          candles: updatedCandles,
-          currentPrice: newCandle.close,
-          change24h,
-          changePercent24h,
-        });
-
-        this.notifyListeners(symbol);
-      }
-    }
-  }
-
-  async subscribe(symbol: string, listener: CandleListener): Promise<() => void> {
-    // Add listener
-    if (!this.listeners.has(symbol)) {
-      this.listeners.set(symbol, new Set());
-    }
-    this.listeners.get(symbol)!.add(listener);
-
-    // Initialize state if needed
-    if (!this.candleStates.has(symbol)) {
-      this.candleStates.set(symbol, this.getDefaultState());
-    }
-
-    // Notify with current state
-    listener(this.candleStates.get(symbol)!);
-
-    // Fetch initial data if this is a new subscription
-    if (!this.subscribedSymbols.has(symbol)) {
-      this.subscribedSymbols.add(symbol);
-
-      // Fetch historical candles
-      try {
-        const candles = await this.fetchInitialCandles(symbol);
-        const { change24h, changePercent24h } = this.calculateChange(candles);
-        const lastCandle = candles[candles.length - 1];
-
-        this.candleStates.set(symbol, {
-          candles,
-          currentPrice: lastCandle?.close ?? null,
-          change24h,
-          changePercent24h,
-          loading: false,
-          error: null,
-        });
-
-        this.notifyListeners(symbol);
-      } catch (e) {
-        console.error(`Failed to fetch candles for ${symbol}:`, e);
-        this.candleStates.set(symbol, {
-          ...this.getDefaultState(),
-          loading: false,
-          error: 'Failed to load candle data',
-        });
-        this.notifyListeners(symbol);
-      }
-
-      // Subscribe via WebSocket
-      if (this.ws?.readyState === WebSocket.OPEN) {
-        this.sendSubscription(symbol);
-      } else {
-        this.pendingSubscriptions.add(symbol);
-        this.connect();
-      }
-    }
-
-    // Return unsubscribe function
-    return () => {
-      const symbolListeners = this.listeners.get(symbol);
-      if (symbolListeners) {
-        symbolListeners.delete(listener);
-
-        // If no more listeners for this symbol, unsubscribe
-        if (symbolListeners.size === 0) {
-          this.listeners.delete(symbol);
-          this.subscribedSymbols.delete(symbol);
-          this.pendingSubscriptions.delete(symbol);
-          this.candleStates.delete(symbol);
-          this.sendUnsubscription(symbol);
-
-          // Close WebSocket if no more subscriptions
-          if (this.subscribedSymbols.size === 0) {
-            if (this.reconnectTimeout) {
-              clearTimeout(this.reconnectTimeout);
-              this.reconnectTimeout = null;
-            }
-            this.ws?.close();
-            this.ws = null;
-          }
-        }
-      }
-    };
-  }
-
-  getStatus(): ConnectionStatus {
-    return this.status;
+  // Force refresh bypassing cache
+  async refresh(symbol: string): Promise<CandleData[]> {
+    this.cache.delete(symbol);
+    return this.fetch(symbol);
   }
 }
 
-export function useCandleData(symbol: string): CandleState & { status: ConnectionStatus } {
+function calculateChange(candles: CandleData[]): { change24h: number; changePercent24h: number } {
+  if (candles.length < 2) {
+    return { change24h: 0, changePercent24h: 0 };
+  }
+  const firstCandle = candles[0];
+  const lastCandle = candles[candles.length - 1];
+  const change24h = lastCandle.close - firstCandle.close;
+  const changePercent24h = firstCandle.close > 0 ? (change24h / firstCandle.close) * 100 : 0;
+  return { change24h, changePercent24h };
+}
+
+export function useCandleData(symbol: string): CandleState {
   const [state, setState] = useState<CandleState>({
     candles: [],
     currentPrice: null,
@@ -392,34 +156,57 @@ export function useCandleData(symbol: string): CandleState & { status: Connectio
     loading: true,
     error: null,
   });
-  const [status, setStatus] = useState<ConnectionStatus>('connecting');
-  const unsubscribeRef = useRef<(() => void) | null>(null);
+  const mountedRef = useRef(true);
+  const pollingRef = useRef<NodeJS.Timeout | null>(null);
 
-  const handleUpdate = useCallback((newState: CandleState) => {
-    setState(newState);
-  }, []);
+  const fetchData = useCallback(async (isRefresh = false) => {
+    try {
+      const queue = CandleFetchQueue.getInstance();
+      const candles = isRefresh ? await queue.refresh(symbol) : await queue.fetch(symbol);
+
+      if (!mountedRef.current) return;
+
+      const { change24h, changePercent24h } = calculateChange(candles);
+      const lastCandle = candles[candles.length - 1];
+
+      setState({
+        candles,
+        currentPrice: lastCandle?.close ?? null,
+        change24h,
+        changePercent24h,
+        loading: false,
+        error: null,
+      });
+    } catch (e) {
+      if (!mountedRef.current) return;
+
+      setState((prev) => ({
+        ...prev,
+        loading: false,
+        error: 'Failed to load candle data',
+      }));
+    }
+  }, [symbol]);
 
   useEffect(() => {
-    const manager = CandleWebSocketManager.getInstance();
+    mountedRef.current = true;
 
-    // Subscribe and store unsubscribe function
-    manager.subscribe(symbol, handleUpdate).then((unsub) => {
-      unsubscribeRef.current = unsub;
-    });
+    // Initial fetch
+    fetchData(false);
 
-    // Poll status
-    const statusInterval = setInterval(() => {
-      setStatus(manager.getStatus());
-    }, 1000);
+    // Set up polling (1 minute interval)
+    pollingRef.current = setInterval(() => {
+      fetchData(true);
+    }, POLLING_INTERVAL);
 
     return () => {
-      clearInterval(statusInterval);
-      if (unsubscribeRef.current) {
-        unsubscribeRef.current();
-        unsubscribeRef.current = null;
+      mountedRef.current = false;
+      if (pollingRef.current) {
+        clearInterval(pollingRef.current);
+        pollingRef.current = null;
       }
     };
-  }, [symbol, handleUpdate]);
+  }, [fetchData]);
 
-  return { ...state, status };
+  return state;
 }
