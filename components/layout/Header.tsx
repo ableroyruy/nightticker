@@ -17,7 +17,6 @@ export function Header() {
   const navLinks = [
     { href: `${prefix}/overnight-prices`, label: t('overnightPrices') },
     { href: `${prefix}/weekend-prices`, label: t('weekendPrices') },
-    { href: `${prefix}/market-status`, label: t('marketStatus') },
   ];
 
   return (

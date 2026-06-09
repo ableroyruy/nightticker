@@ -4,14 +4,13 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { PriceDisplay } from '@/components/market/PriceDisplay';
-import { MarketStatusBadge } from '@/components/market/MarketStatusBadge';
 import { WatchlistButton } from '@/components/market/WatchlistButton';
 import { HyperliquidBadge } from '@/components/common/HyperliquidBadge';
 import { ComplianceNotice } from '@/components/common/ComplianceNotice';
 import { SourceMarketLink } from '@/components/common/SourceMarketLink';
 import { getMarketData } from '@/lib/providers/market-data-provider';
 import { getStockBySymbol, getAllSymbols } from '@/lib/markets/stocks';
-import { isMarketOpen, US_MARKET, KR_MARKET, formatLastUpdated } from '@/lib/markets/hours';
+import { formatLastUpdated } from '@/lib/markets/hours';
 
 type Props = {
   params: Promise<{ locale: string; symbol: string }>;
@@ -82,8 +81,6 @@ export default async function MarketPage({ params }: Props) {
   const faq = await getTranslations('faq');
 
   const marketData = await getMarketData(symbol);
-  const market = stock.category === 'KR' ? KR_MARKET : US_MARKET;
-  const marketOpen = isMarketOpen(market);
 
   const displayName = locale === 'ko' ? stock.nameKo : stock.name;
 
@@ -114,24 +111,17 @@ export default async function MarketPage({ params }: Props) {
             size="lg"
           />
 
-          <div className="flex items-center gap-4 text-sm text-muted-foreground">
-            <div className="flex items-center gap-2">
-              <span>{t('marketStatus')}:</span>
-              <MarketStatusBadge isOpen={marketOpen} />
+          {marketData?.price?.lastUpdated && (
+            <div className="text-sm text-muted-foreground">
+              <span>{t('lastUpdated')}: </span>
+              <span>
+                {formatLastUpdated(
+                  new Date(marketData.price.lastUpdated),
+                  locale
+                )}
+              </span>
             </div>
-
-            {marketData?.price?.lastUpdated && (
-              <div>
-                <span>{t('lastUpdated')}: </span>
-                <span>
-                  {formatLastUpdated(
-                    new Date(marketData.price.lastUpdated),
-                    locale
-                  )}
-                </span>
-              </div>
-            )}
-          </div>
+          )}
         </CardContent>
       </Card>
 

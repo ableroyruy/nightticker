@@ -18,10 +18,11 @@ export class HyperliquidProvider implements MarketDataProvider {
     }
 
     try {
+      // Use XYZ DEX for stock markets (HIP-3 builder markets)
       const response = await fetch(HYPERLIQUID_API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'allMids' }),
+        body: JSON.stringify({ type: 'allMids', dex: 'xyz' }),
         next: { revalidate: 30 },
       });
 
@@ -45,13 +46,14 @@ export class HyperliquidProvider implements MarketDataProvider {
       this.lastFetch = now;
       return this.cache;
     } catch (error) {
-      console.error('Failed to fetch Hyperliquid prices:', error);
+      console.error('Failed to fetch Hyperliquid XYZ prices:', error);
       return this.cache; // Return stale cache on error
     }
   }
 
   async getPrice(symbol: string): Promise<MarketPrice | null> {
     const prices = await this.getAllPrices();
+    // Symbol should be in format "xyz:AAPL"
     return prices[symbol] || null;
   }
 
@@ -60,7 +62,7 @@ export class HyperliquidProvider implements MarketDataProvider {
       const response = await fetch(HYPERLIQUID_API_URL, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'allMids' }),
+        body: JSON.stringify({ type: 'allMids', dex: 'xyz' }),
       });
       return response.ok;
     } catch {

@@ -13,7 +13,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/overnight-prices',
     '/weekend-prices',
     '/holiday-prices',
-    '/market-status',
     '/us-market-hours',
     '/korea-market-hours',
     '/how-data-works',
