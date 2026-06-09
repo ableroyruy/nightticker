@@ -1,15 +1,22 @@
 'use client';
 
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { useLocale } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { MarketAsset, MarketType } from '@/lib/types/market';
 import { PriceDisplay, PriceChange } from '@/components/ui/price-change';
 import { FavoriteButton } from '@/components/ui/favorite-button';
 import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useFavorites } from '@/lib/context/FavoritesContext';
 import { useCandleData } from '@/lib/hooks/useCandleData';
-import { MiniChart } from './MiniChart';
+
+// Dynamic import to avoid SSR issues with lightweight-charts
+const MiniChart = dynamic(() => import('./MiniChart').then((mod) => mod.MiniChart), {
+  ssr: false,
+  loading: () => <Skeleton className="w-full h-12 rounded" />,
+});
 
 interface AssetCardProps {
   asset: MarketAsset;
@@ -37,7 +44,11 @@ export function AssetCard({
   const displayChangePercent24h = changePercent24h ?? asset.changePercent24h;
   const isPositive = (displayChangePercent24h ?? 0) >= 0;
 
-  const displayName = locale === 'ko' && asset.nameKo ? asset.nameKo : asset.name;
+  const displayName = locale === 'ko' && asset.nameKo
+    ? asset.nameKo
+    : locale === 'ja' && asset.nameJa
+      ? asset.nameJa
+      : asset.name;
   const isFav = isFavorite(asset.symbol, asset.market);
 
   const marketBadgeColors: Record<MarketType, string> = {
@@ -52,18 +63,18 @@ export function AssetCard({
   };
 
   const marketLabels: Record<MarketType, string> = {
-    KR: locale === 'ko' ? '한국' : 'KR',
-    US: locale === 'ko' ? '미국' : 'US',
-    JP: locale === 'ko' ? '일본' : 'JP',
-    INDEX: locale === 'ko' ? '지수' : 'Index',
+    KR: locale === 'ko' ? '한국' : locale === 'ja' ? '韓国' : 'KR',
+    US: locale === 'ko' ? '미국' : locale === 'ja' ? '米国' : 'US',
+    JP: locale === 'ko' ? '일본' : locale === 'ja' ? '日本' : 'JP',
+    INDEX: locale === 'ko' ? '지수' : locale === 'ja' ? '指数' : 'Index',
     ETF: 'ETF',
-    COMMODITY: locale === 'ko' ? '원자재' : 'Commodity',
-    FX: locale === 'ko' ? '통화' : 'FX',
-    SPECIAL: locale === 'ko' ? '특별' : 'Special',
+    COMMODITY: locale === 'ko' ? '원자재' : locale === 'ja' ? '商品' : 'Commodity',
+    FX: locale === 'ko' ? '통화' : locale === 'ja' ? '通貨' : 'FX',
+    SPECIAL: locale === 'ko' ? '특별' : locale === 'ja' ? '特別' : 'Special',
   };
 
   const href = `/stock/${asset.slug}`;
-  const prefix = locale === 'ko' ? '/ko' : '';
+  const prefix = locale === 'en' ? '' : `/${locale}`;
 
   return (
     <Link href={`${prefix}${href}`} className="block">

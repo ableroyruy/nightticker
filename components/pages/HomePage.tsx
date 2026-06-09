@@ -26,6 +26,7 @@ export function HomePage() {
       symbol: stock.symbol,
       name: stock.name,
       nameKo: stock.nameKo,
+      nameJa: stock.nameJa,
       slug: stock.slug,
       market: stock.category as MarketType,
       price: ticker?.price ?? null,

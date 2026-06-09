@@ -1,0 +1,217 @@
+{
+  "site": {
+    "name": "NightTicker",
+    "tagline": "マーケットは眠らない",
+    "description": "伝統的な取引所が閉まっている時に株価をモニタリングするプレミアム金融ダッシュボード。"
+  },
+  "hero": {
+    "title": "NightTicker",
+    "subtitle": "マーケットは眠らない",
+    "description": "伝統的な取引所が閉まっている時にリアルタイムの市場活動をモニタリング。夜間、週末、祝日の価格を追跡。",
+    "timing": "夜間。週末。祝日。",
+    "source": "Hyperliquid Market Prices.",
+    "disclaimer": "参考情報のみ。"
+  },
+  "nav": {
+    "home": "ホーム",
+    "favorites": "お気に入り",
+    "topGainers": "値上がり",
+    "topLosers": "値下がり",
+    "overnightPrices": "夜間価格",
+    "weekendPrices": "週末価格",
+    "holidayPrices": "祝日価格",
+    "usMarketHours": "米国市場時間",
+    "koreaMarketHours": "韓国市場時間",
+    "howDataWorks": "データの仕組み",
+    "whatIsHyperliquid": "Hyperliquidとは",
+    "about": "概要",
+    "disclaimer": "免責事項",
+    "privacy": "プライバシー",
+    "terms": "利用規約"
+  },
+  "favorites": {
+    "title": "お気に入り",
+    "empty": "お気に入りがありません",
+    "emptyHint": "銘柄の星アイコンをクリックしてお気に入りに追加してください",
+    "filter": {
+      "all": "すべて",
+      "kr": "韓国",
+      "us": "米国",
+      "crypto": "仮想通貨"
+    },
+    "sort": {
+      "added": "追加順",
+      "gainers": "上昇率順",
+      "losers": "下落率順",
+      "name": "名前順"
+    }
+  },
+  "sections": {
+    "topGainers": "値上がり銘柄",
+    "topLosers": "値下がり銘柄",
+    "viewAll": "すべて見る",
+    "noGainers": "現在、上昇銘柄はありません",
+    "noLosers": "現在、下落銘柄はありません",
+    "popularStocks": "人気銘柄",
+    "usStocks": "米国株",
+    "koreanStocks": "韓国株",
+    "indexMarkets": "指数",
+    "yourWatchlist": "ウォッチリスト"
+  },
+  "categories": {
+    "all": "すべて",
+    "US": "米国株",
+    "KR": "韓国株",
+    "JP": "日本株",
+    "INDEX": "指数",
+    "ETF": "ETF",
+    "COMMODITY": "コモディティ",
+    "FX": "通貨",
+    "SPECIAL": "特別"
+  },
+  "market": {
+    "nightPrice": "夜間価格",
+    "overnightPrice": "夜間参考価格",
+    "weekendPrice": "週末価格",
+    "marketClosedPrice": "市場閉場時参考価格",
+    "currentPrice": "現在のHyperliquid Market Price",
+    "lastUpdated": "最終更新",
+    "open": "開場",
+    "closed": "閉場",
+    "viewSourceMarket": "ソース市場を見る",
+    "viewOnHyperliquid": "Hyperliquidで見る",
+    "exploreDetails": "詳細を見る",
+    "priceUnavailable": "価格情報なし",
+    "loading": "読み込み中..."
+  },
+  "table": {
+    "name": "銘柄名",
+    "market": "市場",
+    "price": "価格",
+    "change24h": "24時間変動",
+    "volume": "出来高",
+    "noData": "データなし"
+  },
+  "connection": {
+    "connected": "リアルタイム",
+    "connecting": "接続中",
+    "disconnected": "オフライン"
+  },
+  "watchlist": {
+    "title": "ウォッチリスト",
+    "add": "ウォッチリストに追加",
+    "remove": "ウォッチリストから削除",
+    "empty": "ウォッチリストは空です"
+  },
+  "compliance": {
+    "badge": "Hyperliquid Market Prices",
+    "referralDisclosure": "Hyperliquidへのリンクにはリファラル属性が含まれる場合があります。",
+    "forReference": "参考情報のみ。",
+    "notOfficial": "公式取引所価格ではありません。",
+    "mayDiffer": "伝統的な取引所価格と大きく異なる場合があります。",
+    "noReliance": "投資または取引の判断にこの情報を使用しないでください。",
+    "fullNotice": "このページは参考のためにHyperliquid Market Pricesを表示しています。Hyperliquid Market Pricesは公式取引所価格ではありません。価格は伝統的な取引所価格と大きく異なる場合があります。表示される情報には遅延、不正確さ、脱落、またはエラーが含まれる場合があります。NightTickerは市場データの正確性を検証しません。投資または取引の判断に表示される情報を使用しないでください。"
+  },
+  "footer": {
+    "disclaimer": "NightTickerは独立した情報提供ウェブサイトです。NightTickerはブローカー、取引所、証券会社、取引プラットフォーム、ファイナンシャルアドバイザー、または投資サービスではありません。すべての情報は参考のみに提供されます。投資または取引の判断に表示される情報を使用しないでください。",
+    "copyright": "NightTicker"
+  },
+  "faq": {
+    "title": "よくある質問",
+    "q1": "Hyperliquid Market Pricesとは何ですか？",
+    "a1": "Hyperliquid Market PricesはHyperliquid市場の参考価格です。公式取引所価格ではなく、伝統的な取引所価格と大きく異なる場合があります。",
+    "q2": "NightTickerは公式取引所価格を表示していますか？",
+    "a2": "いいえ。NightTickerは参考のためにHyperliquid Market Pricesのみを表示しています。これらは公式取引所価格ではありません。",
+    "q3": "Hyperliquid価格が取引所価格と異なる理由は何ですか？",
+    "a3": "Hyperliquidは伝統的な取引所とは独立して運営されています。価格はHyperliquidプラットフォーム上の市場活動を反映し、流動性、タイミング、市場状況などの様々な要因により異なる場合があります。",
+    "q4": "NightTickerの価格を投資判断に使用すべきですか？",
+    "a4": "いいえ。NightTickerは参考情報のみを提供しています。投資または取引の判断にこの情報を使用しないでください。常に公式ソースとファイナンシャルアドバイザーを参照してください。",
+    "q5": "夜間価格とは何ですか？",
+    "a5": "夜間価格は、夜間、週末、祝日など伝統的な取引所が閉まっている時の現在のHyperliquid Market Priceを指します。参考価格のみです。",
+    "q6": "詳細なチャートはどこで見られますか？",
+    "a6": "詳細なチャート、過去データ、高度な市場情報については、Hyperliquidを直接ご覧ください。"
+  },
+  "pages": {
+    "gainers": {
+      "title": "値上がり銘柄",
+      "description": "24時間で最も上昇した銘柄"
+    },
+    "losers": {
+      "title": "値下がり銘柄",
+      "description": "24時間で最も下落した銘柄"
+    },
+    "favorites": {
+      "title": "お気に入り",
+      "description": "お気に入りの銘柄"
+    },
+    "overnight": {
+      "title": "夜間価格",
+      "description": "伝統的な株式市場が閉まっている夜間の参考価格を確認。",
+      "content": "伝統的な取引所が夜間に閉まると、Hyperliquid Market Pricesは引き続き市場活動を反映する可能性があります。NightTickerはこれらの夜間参考価格を情報提供目的のみで表示しています。"
+    },
+    "weekend": {
+      "title": "週末価格",
+      "description": "伝統的な株式市場が閉まっている週末の参考価格を確認。",
+      "content": "伝統的な取引所は通常、週末は閉まっています。しかし、Hyperliquid Market Pricesは動き続ける可能性があります。NightTickerはこれらの週末参考価格を情報提供目的のみで表示しています。"
+    },
+    "holiday": {
+      "title": "祝日価格",
+      "description": "伝統的な株式市場が閉まっている祝日の参考価格を確認。",
+      "content": "市場の祝日中、伝統的な取引所は閉まっている可能性があります。この期間中もHyperliquid Market Pricesは利用可能な場合があります。NightTickerはこれらの祝日参考価格を情報提供目的のみで表示しています。"
+    },
+    "usMarketHours": {
+      "title": "米国市場時間",
+      "description": "米国株式市場の取引時間とスケジュール情報。"
+    },
+    "koreaMarketHours": {
+      "title": "韓国市場時間",
+      "description": "韓国株式市場の取引時間とスケジュール情報。"
+    },
+    "howDataWorks": {
+      "title": "データの仕組み",
+      "description": "NightTickerがHyperliquid Market Pricesを表示する方法について。"
+    },
+    "whatIsHyperliquid": {
+      "title": "Hyperliquidとは",
+      "description": "NightTickerに表示される市場価格のソースであるHyperliquidについて。"
+    },
+    "about": {
+      "title": "NightTickerについて",
+      "description": "NightTickerとミッションについて。"
+    },
+    "disclaimer": {
+      "title": "免責事項",
+      "description": "重要な免責事項と法的情報。"
+    },
+    "privacy": {
+      "title": "プライバシーポリシー",
+      "description": "NightTickerがプライバシーを取り扱う方法。"
+    },
+    "terms": {
+      "title": "利用規約",
+      "description": "NightTicker利用規約。"
+    }
+  },
+  "search": {
+    "placeholder": "銘柄を検索...",
+    "noResults": "検索結果がありません"
+  },
+  "common": {
+    "language": "言語",
+    "english": "English",
+    "korean": "한국어",
+    "japanese": "日本語",
+    "loading": "読み込み中...",
+    "error": "エラーが発生しました",
+    "retry": "再試行"
+  },
+  "marketClock": {
+    "localTime": "現地時間",
+    "usMarket": "米国市場",
+    "koreaMarket": "韓国市場",
+    "open": "開場",
+    "closed": "閉場",
+    "opens": "開場",
+    "closes": "閉場"
+  }
+}

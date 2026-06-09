@@ -10,6 +10,7 @@ import { cn } from '@/lib/utils';
 const languages = [
   { code: 'en', label: 'English', flag: 'EN' },
   { code: 'ko', label: '한국어', flag: 'KO' },
+  { code: 'ja', label: '日本語', flag: 'JA' },
 ] as const;
 
 export function LanguageSwitcher() {
@@ -45,11 +46,15 @@ export function LanguageSwitcher() {
       newPath = pathname.slice(3) || '/';
     } else if (pathname.startsWith('/en')) {
       newPath = pathname.slice(3) || '/';
+    } else if (pathname.startsWith('/ja')) {
+      newPath = pathname.slice(3) || '/';
     }
 
     // Add new locale prefix (en is default, no prefix needed)
     if (newLocale === 'ko') {
       newPath = `/ko${newPath}`;
+    } else if (newLocale === 'ja') {
+      newPath = `/ja${newPath}`;
     }
 
     setIsOpen(false);

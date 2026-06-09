@@ -19,6 +19,7 @@ export interface Stock {
   symbol: string;
   name: string;
   nameKo: string;
+  nameJa?: string;
   slug: string;
   category: StockCategory;
   hyperliquidSymbol: string;

@@ -4,6 +4,7 @@ export interface MarketAsset {
   symbol: string;
   name: string;
   nameKo?: string;
+  nameJa?: string;
   slug: string;
   market: MarketType;
   price: number | null;
