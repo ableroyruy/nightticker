@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { ConnectionStatus } from '@/lib/types/market';
 
 const CACHED_CANDLES_URL = '/api/market/candles';
@@ -28,6 +28,36 @@ interface CandleState {
 const globalCache = new Map<string, { data: CandleData[]; timestamp: number }>();
 const CACHE_TTL = 300000; // 5분
 
+// 진행 중인 요청 (중복 방지)
+const pendingRequests = new Map<string, Promise<CandleData[]>>();
+
+// 요청 큐 (순차 처리)
+const requestQueue: Array<() => Promise<void>> = [];
+let isProcessingQueue = false;
+const MAX_CONCURRENT = 3; // 동시 요청 최대 수
+let activeRequests = 0;
+
+async function processQueue() {
+  if (isProcessingQueue) return;
+  isProcessingQueue = true;
+
+  while (requestQueue.length > 0 && activeRequests < MAX_CONCURRENT) {
+    const task = requestQueue.shift();
+    if (task) {
+      activeRequests++;
+      task().finally(() => {
+        activeRequests--;
+        // 다음 작업 처리
+        if (requestQueue.length > 0) {
+          processQueue();
+        }
+      });
+    }
+  }
+
+  isProcessingQueue = false;
+}
+
 function calculateChange(candles: CandleData[]) {
   if (candles.length < 2) return { change24h: 0, changePercent24h: 0 };
   const first = candles[0];
@@ -37,8 +67,38 @@ function calculateChange(candles: CandleData[]) {
   return { change24h, changePercent24h };
 }
 
+// 단일 심볼 fetch (중복 요청 방지)
+async function fetchCandlesForSymbol(symbol: string): Promise<CandleData[]> {
+  // 이미 진행 중인 요청이 있으면 그 결과를 기다림
+  const pending = pendingRequests.get(symbol);
+  if (pending) {
+    return pending;
+  }
+
+  const fetchPromise = (async () => {
+    try {
+      const res = await fetch(`${CACHED_CANDLES_URL}?symbol=${symbol}`);
+      if (!res.ok) throw new Error('Failed');
+
+      const data: CandleData[] = await res.json();
+
+      if (Array.isArray(data) && data.length > 0) {
+        globalCache.set(symbol, { data, timestamp: Date.now() });
+        return data;
+      }
+      return [];
+    } catch {
+      return [];
+    } finally {
+      pendingRequests.delete(symbol);
+    }
+  })();
+
+  pendingRequests.set(symbol, fetchPromise);
+  return fetchPromise;
+}
+
 export function useCandleData(symbol: string): CandleState & { status: ConnectionStatus } {
-  // 심볼 정규화
   const normalizedSymbol = symbol.toUpperCase();
 
   // 캐시에서 초기값 가져오기
@@ -72,59 +132,50 @@ export function useCandleData(symbol: string): CandleState & { status: Connectio
   const [status, setStatus] = useState<ConnectionStatus>(initialData ? 'connected' : 'connecting');
   const mountedRef = useRef(true);
 
+  const updateState = useCallback((data: CandleData[]) => {
+    if (!mountedRef.current) return;
+
+    if (data.length > 0) {
+      const { change24h, changePercent24h } = calculateChange(data);
+      setState({
+        candles: data,
+        currentPrice: data[data.length - 1]?.close ?? null,
+        change24h,
+        changePercent24h,
+        loading: false,
+        error: null,
+      });
+    } else {
+      setState(prev => ({ ...prev, loading: false }));
+    }
+    setStatus('connected');
+  }, []);
+
   useEffect(() => {
     mountedRef.current = true;
 
-    const fetchData = async () => {
+    const fetchData = () => {
       // 캐시 확인
       const cached = globalCache.get(normalizedSymbol);
       if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
-        if (mountedRef.current && cached.data.length > 0) {
-          const { change24h, changePercent24h } = calculateChange(cached.data);
-          setState({
-            candles: cached.data,
-            currentPrice: cached.data[cached.data.length - 1]?.close ?? null,
-            change24h,
-            changePercent24h,
-            loading: false,
-            error: null,
-          });
-          setStatus('connected');
-        }
+        updateState(cached.data);
         return;
       }
 
-      try {
-        const res = await fetch(`${CACHED_CANDLES_URL}?symbol=${normalizedSymbol}`);
-        if (!res.ok) throw new Error('Failed');
-
-        const data: CandleData[] = await res.json();
-
-        if (!mountedRef.current) return;
-
-        if (Array.isArray(data) && data.length > 0) {
-          // 캐시 저장
-          globalCache.set(normalizedSymbol, { data, timestamp: Date.now() });
-
-          const { change24h, changePercent24h } = calculateChange(data);
-          setState({
-            candles: data,
-            currentPrice: data[data.length - 1]?.close ?? null,
-            change24h,
-            changePercent24h,
-            loading: false,
-            error: null,
-          });
-        } else {
-          setState(prev => ({ ...prev, loading: false }));
+      // 큐에 추가
+      requestQueue.push(async () => {
+        // 다시 캐시 확인 (큐 대기 중에 다른 요청이 완료했을 수 있음)
+        const cachedAgain = globalCache.get(normalizedSymbol);
+        if (cachedAgain && Date.now() - cachedAgain.timestamp < CACHE_TTL) {
+          updateState(cachedAgain.data);
+          return;
         }
-        setStatus('connected');
-      } catch {
-        if (mountedRef.current) {
-          setState(prev => ({ ...prev, loading: false }));
-          setStatus('connected');
-        }
-      }
+
+        const data = await fetchCandlesForSymbol(normalizedSymbol);
+        updateState(data);
+      });
+
+      processQueue();
     };
 
     fetchData();
@@ -134,7 +185,7 @@ export function useCandleData(symbol: string): CandleState & { status: Connectio
       mountedRef.current = false;
       clearInterval(interval);
     };
-  }, [normalizedSymbol]);
+  }, [normalizedSymbol, updateState]);
 
   return { ...state, status };
 }
