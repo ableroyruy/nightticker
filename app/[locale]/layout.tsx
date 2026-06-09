@@ -4,7 +4,6 @@ import { notFound } from 'next/navigation';
 import { locales, Locale } from '@/lib/i18n';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
-import { TimeOfDayProvider } from '@/components/providers/TimeOfDayProvider';
 
 type Props = {
   children: React.ReactNode;
@@ -29,11 +28,9 @@ export default async function LocaleLayout({ children, params }: Props) {
     <html lang={locale} className="dark" suppressHydrationWarning>
       <body className="min-h-screen flex flex-col">
         <NextIntlClientProvider messages={messages}>
-          <TimeOfDayProvider>
-            <Header />
-            <main className="flex-1">{children}</main>
-            <Footer />
-          </TimeOfDayProvider>
+          <Header />
+          <main className="flex-1">{children}</main>
+          <Footer />
         </NextIntlClientProvider>
       </body>
     </html>

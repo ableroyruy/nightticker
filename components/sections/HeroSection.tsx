@@ -1,10 +1,11 @@
 'use client';
 
 import { useTranslations, useLocale } from 'next-intl';
-import { Moon, Clock } from 'lucide-react';
+import { Moon } from 'lucide-react';
 import { ConnectionStatus } from '@/components/ui/connection-status';
+import { TimeIcon } from '@/components/ui/time-icon';
+import { StockSearch } from '@/components/market/StockSearch';
 import { ConnectionStatus as ConnectionStatusType } from '@/lib/types/market';
-import { useTimeOfDay } from '@/lib/hooks/useTimeOfDay';
 
 interface HeroSectionProps {
   connectionStatus: ConnectionStatusType;
@@ -14,7 +15,6 @@ interface HeroSectionProps {
 export function HeroSection({ connectionStatus, lastUpdate }: HeroSectionProps) {
   const t = useTranslations('hero');
   const locale = useLocale();
-  const timeInfo = useTimeOfDay(locale);
 
   return (
     <section className="relative overflow-hidden">
@@ -28,6 +28,7 @@ export function HeroSection({ connectionStatus, lastUpdate }: HeroSectionProps) 
             <div className="p-3 glass-card rounded-2xl">
               <Moon className="h-10 w-10 text-primary" />
             </div>
+            <TimeIcon size="lg" locale={locale} />
           </div>
 
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight">
@@ -42,22 +43,17 @@ export function HeroSection({ connectionStatus, lastUpdate }: HeroSectionProps) 
             {t('description')}
           </p>
 
+          {/* Search Bar */}
+          <div className="flex justify-center pt-4">
+            <StockSearch />
+          </div>
+
           {/* Status Bar */}
           <div className="flex flex-wrap items-center justify-center gap-4 md:gap-6 pt-4">
             <ConnectionStatus
               status={connectionStatus}
               lastUpdate={lastUpdate}
             />
-
-            <div className="flex items-center gap-2 text-xs text-muted-foreground">
-              <Clock className="h-3.5 w-3.5" />
-              <span className="tabular-nums font-medium">
-                {timeInfo.localTime}
-              </span>
-              <span className="text-muted-foreground/60">
-                {timeInfo.timezone}
-              </span>
-            </div>
           </div>
 
           {/* Tagline pills */}

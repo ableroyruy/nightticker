@@ -185,31 +185,6 @@
     radial-gradient(ellipse at 50% 50%, oklch(0.15 0.04 260 / 0.1) 0%, transparent 70%);
 }
 
-/* Time-of-day theme accents - Premium & Subtle */
-.time-morning {
-  --time-accent: oklch(0.7 0.1 80);
-  --time-bg-accent: oklch(0.2 0.04 80 / 0.1);
-}
-
-.time-day {
-  --time-accent: oklch(0.65 0.12 240);
-  --time-bg-accent: oklch(0.2 0.04 240 / 0.1);
-}
-
-.time-evening {
-  --time-accent: oklch(0.6 0.14 280);
-  --time-bg-accent: oklch(0.18 0.05 280 / 0.15);
-}
-
-.time-night {
-  --time-accent: oklch(0.55 0.1 260);
-  --time-bg-accent: oklch(0.15 0.04 260 / 0.2);
-}
-
-/* Apply time-based accents */
-:root:is(.time-morning, .time-day, .time-evening, .time-night) {
-  --primary: var(--time-accent);
-}
 
 /* Connection status indicators */
 .status-connected {
