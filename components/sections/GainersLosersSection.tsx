@@ -51,53 +51,53 @@ export function GainersLosersSection({
   return (
     <div className="space-y-8">
       {/* Market Header */}
-      <div className="flex items-center gap-3">
-        <div
-          className={cn(
-            'h-8 w-1 rounded-full',
-            market === 'KR' && 'bg-blue-500',
-            market === 'US' && 'bg-purple-500',
-            market === 'JP' && 'bg-red-500',
-            market === 'INDEX' && 'bg-emerald-500',
-            market === 'ETF' && 'bg-teal-500',
-            market === 'COMMODITY' && 'bg-amber-500',
-            market === 'FX' && 'bg-cyan-500',
-            market === 'SPECIAL' && 'bg-pink-500',
-            market === 'SEMICONDUCTOR' && 'bg-violet-500'
-          )}
-        />
-        <h2 className="text-2xl font-bold">{marketLabel}</h2>
-        {/* Gainer/Loser count indicators */}
-        <div className="flex items-center gap-2 text-sm">
-          {gainersCount > 0 && (
-            <span className="flex items-center gap-1 text-gain">
-              <TrendingUp className="h-3.5 w-3.5" />
-              {gainersCount}
-            </span>
-          )}
-          {losersCount > 0 && (
-            <span className="flex items-center gap-1 text-loss">
-              <TrendingDown className="h-3.5 w-3.5" />
-              {losersCount}
-            </span>
-          )}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div
+            className={cn(
+              'h-8 w-1 rounded-full',
+              market === 'KR' && 'bg-blue-500',
+              market === 'US' && 'bg-purple-500',
+              market === 'JP' && 'bg-red-500',
+              market === 'INDEX' && 'bg-emerald-500',
+              market === 'ETF' && 'bg-teal-500',
+              market === 'COMMODITY' && 'bg-amber-500',
+              market === 'FX' && 'bg-cyan-500',
+              market === 'SPECIAL' && 'bg-pink-500',
+              market === 'SEMICONDUCTOR' && 'bg-violet-500'
+            )}
+          />
+          <h2 className="text-2xl font-bold">{marketLabel}</h2>
+          {/* Gainer/Loser count indicators */}
+          <div className="flex items-center gap-2 text-sm">
+            {gainersCount > 0 && (
+              <span className="flex items-center gap-1 text-gain">
+                <TrendingUp className="h-3.5 w-3.5" />
+                {gainersCount}
+              </span>
+            )}
+            {losersCount > 0 && (
+              <span className="flex items-center gap-1 text-loss">
+                <TrendingDown className="h-3.5 w-3.5" />
+                {losersCount}
+              </span>
+            )}
+          </div>
         </div>
+        <Link href={`/category/${market.toLowerCase()}`}>
+          <Button variant="ghost" size="sm" className="gap-1">
+            {t('viewAll')}
+            <ArrowRight className="h-4 w-4" />
+          </Button>
+        </Link>
       </div>
 
       {/* Gainers */}
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold flex items-center gap-2">
-            <TrendingUp className="h-5 w-5 text-gain" />
-            {t('topGainers')}
-          </h3>
-          <Link href={`/gainers?market=${market.toLowerCase()}`}>
-            <Button variant="ghost" size="sm" className="gap-1">
-              {t('viewAll')}
-              <ArrowRight className="h-4 w-4" />
-            </Button>
-          </Link>
-        </div>
+        <h3 className="text-lg font-semibold flex items-center gap-2">
+          <TrendingUp className="h-5 w-5 text-gain" />
+          {t('topGainers')}
+        </h3>
 
         {displayGainers.length > 0 ? (
           <AnimatedAssetGrid
@@ -115,18 +115,10 @@ export function GainersLosersSection({
 
       {/* Losers */}
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <h3 className="text-lg font-semibold flex items-center gap-2">
-            <TrendingDown className="h-5 w-5 text-loss" />
-            {t('topLosers')}
-          </h3>
-          <Link href={`/losers?market=${market.toLowerCase()}`}>
-            <Button variant="ghost" size="sm" className="gap-1">
-              {t('viewAll')}
-              <ArrowRight className="h-4 w-4" />
-            </Button>
-          </Link>
-        </div>
+        <h3 className="text-lg font-semibold flex items-center gap-2">
+          <TrendingDown className="h-5 w-5 text-loss" />
+          {t('topLosers')}
+        </h3>
 
         {displayLosers.length > 0 ? (
           <AnimatedAssetGrid

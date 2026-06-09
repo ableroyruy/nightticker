@@ -37,6 +37,8 @@ export interface Stock {
   nameKo: string;
   nameJa?: string;
   nameZh?: string;
+  namePt?: string;
+  nameEs?: string;
   slug: string;
   category: StockCategory;
   sector?: StockSector;

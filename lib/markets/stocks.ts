@@ -189,16 +189,16 @@ export function getPopularByCategory(category: StockCategory, limit: number = 5)
     .slice(0, limit);
 }
 
-export const categoryNames: Record<StockCategory, { en: string; ko: string; ja: string; zh: string }> = {
-  US: { en: 'US Stocks', ko: '미국주식', ja: '米国株', zh: '美股' },
-  KR: { en: 'Korean Stocks', ko: '한국주식', ja: '韓国株', zh: '韩股' },
-  JP: { en: 'Japanese Stocks', ko: '일본주식', ja: '日本株', zh: '日股' },
-  INDEX: { en: 'Indices', ko: '지수', ja: '指数', zh: '指数' },
-  ETF: { en: 'ETFs', ko: 'ETF', ja: 'ETF', zh: 'ETF' },
-  COMMODITY: { en: 'Commodities', ko: '원자재', ja: '商品', zh: '大宗商品' },
-  FX: { en: 'Currencies', ko: '환율', ja: '為替', zh: '外汇' },
-  SPECIAL: { en: 'Special Assets', ko: '특수 자산', ja: '特別資産', zh: '特殊资产' },
-  SEMICONDUCTOR: { en: 'Semiconductors', ko: '반도체', ja: '半導体', zh: '半导体' },
+export const categoryNames: Record<StockCategory, { en: string; ko: string; ja: string; zh: string; pt: string; es: string }> = {
+  US: { en: 'US Stocks', ko: '미국주식', ja: '米国株', zh: '美股', pt: 'Acoes EUA', es: 'Acciones EEUU' },
+  KR: { en: 'Korean Stocks', ko: '한국주식', ja: '韓国株', zh: '韩股', pt: 'Acoes Coreanas', es: 'Acciones Coreanas' },
+  JP: { en: 'Japanese Stocks', ko: '일본주식', ja: '日本株', zh: '日股', pt: 'Acoes Japonesas', es: 'Acciones Japonesas' },
+  INDEX: { en: 'Indices', ko: '지수', ja: '指数', zh: '指数', pt: 'Indices', es: 'Indices' },
+  ETF: { en: 'ETFs', ko: 'ETF', ja: 'ETF', zh: 'ETF', pt: 'ETFs', es: 'ETFs' },
+  COMMODITY: { en: 'Commodities', ko: '원자재', ja: '商品', zh: '大宗商品', pt: 'Commodities', es: 'Materias Primas' },
+  FX: { en: 'Currencies', ko: '환율', ja: '為替', zh: '外汇', pt: 'Moedas', es: 'Divisas' },
+  SPECIAL: { en: 'Special Assets', ko: '특수 자산', ja: '特別資産', zh: '特殊资产', pt: 'Ativos Especiais', es: 'Activos Especiales' },
+  SEMICONDUCTOR: { en: 'Semiconductors', ko: '반도체', ja: '半導体', zh: '半导体', pt: 'Semicondutores', es: 'Semiconductores' },
 };
 
 // Get stocks by sector (for cross-category views like Semiconductors)
@@ -206,19 +206,19 @@ export function getStocksBySectorForCategory(sector: StockSector): Stock[] {
   return stocks.filter((s) => s.sector === sector);
 }
 
-export const sectorNames: Record<StockSector, { en: string; ko: string; ja: string; zh: string }> = {
-  BigTech: { en: 'Big Tech', ko: '빅테크', ja: 'ビッグテック', zh: '科技巨头' },
-  Semiconductors: { en: 'Semiconductors', ko: '반도체', ja: '半導体', zh: '半导体' },
-  EV: { en: 'EV & Auto', ko: '전기차', ja: 'EV・自動車', zh: '电动汽车' },
-  Fintech: { en: 'Fintech', ko: '핀테크', ja: 'フィンテック', zh: '金融科技' },
-  AI: { en: 'AI & Data', ko: 'AI', ja: 'AI', zh: '人工智能' },
-  Retail: { en: 'Retail', ko: '유통', ja: '小売', zh: '零售' },
-  Healthcare: { en: 'Healthcare', ko: '헬스케어', ja: 'ヘルスケア', zh: '医疗健康' },
-  Space: { en: 'Space & Defense', ko: '우주', ja: '宇宙', zh: '航天' },
-  Entertainment: { en: 'Entertainment', ko: '엔터테인먼트', ja: 'エンタメ', zh: '娱乐' },
-  Energy: { en: 'Energy', ko: '에너지', ja: 'エネルギー', zh: '能源' },
-  Metals: { en: 'Metals', ko: '금속', ja: '金属', zh: '金属' },
-  Agriculture: { en: 'Agriculture', ko: '농산물', ja: '農産物', zh: '农产品' },
-  Currency: { en: 'Currency', ko: '통화', ja: '通貨', zh: '货币' },
-  Other: { en: 'Other', ko: '기타', ja: 'その他', zh: '其他' },
+export const sectorNames: Record<StockSector, { en: string; ko: string; ja: string; zh: string; pt: string; es: string }> = {
+  BigTech: { en: 'Big Tech', ko: '빅테크', ja: 'ビッグテック', zh: '科技巨头', pt: 'Big Tech', es: 'Big Tech' },
+  Semiconductors: { en: 'Semiconductors', ko: '반도체', ja: '半導体', zh: '半导体', pt: 'Semicondutores', es: 'Semiconductores' },
+  EV: { en: 'EV & Auto', ko: '전기차', ja: 'EV・自動車', zh: '电动汽车', pt: 'EV & Auto', es: 'EV & Auto' },
+  Fintech: { en: 'Fintech', ko: '핀테크', ja: 'フィンテック', zh: '金融科技', pt: 'Fintech', es: 'Fintech' },
+  AI: { en: 'AI & Data', ko: 'AI', ja: 'AI', zh: '人工智能', pt: 'IA & Dados', es: 'IA & Datos' },
+  Retail: { en: 'Retail', ko: '유통', ja: '小売', zh: '零售', pt: 'Varejo', es: 'Comercio' },
+  Healthcare: { en: 'Healthcare', ko: '헬스케어', ja: 'ヘルスケア', zh: '医疗健康', pt: 'Saude', es: 'Salud' },
+  Space: { en: 'Space & Defense', ko: '우주', ja: '宇宙', zh: '航天', pt: 'Espaco & Defesa', es: 'Espacio & Defensa' },
+  Entertainment: { en: 'Entertainment', ko: '엔터테인먼트', ja: 'エンタメ', zh: '娱乐', pt: 'Entretenimento', es: 'Entretenimiento' },
+  Energy: { en: 'Energy', ko: '에너지', ja: 'エネルギー', zh: '能源', pt: 'Energia', es: 'Energia' },
+  Metals: { en: 'Metals', ko: '금속', ja: '金属', zh: '金属', pt: 'Metais', es: 'Metales' },
+  Agriculture: { en: 'Agriculture', ko: '농산물', ja: '農産物', zh: '农产品', pt: 'Agricultura', es: 'Agricultura' },
+  Currency: { en: 'Currency', ko: '통화', ja: '通貨', zh: '货币', pt: 'Moeda', es: 'Moneda' },
+  Other: { en: 'Other', ko: '기타', ja: 'その他', zh: '其他', pt: 'Outros', es: 'Otros' },
 };

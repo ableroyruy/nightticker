@@ -1,0 +1,222 @@
+{
+  "site": {
+    "name": "NightTicker",
+    "tagline": "O Mercado Nunca Dorme",
+    "description": "Painel financeiro premium para monitorar precos de acoes quando as bolsas tradicionais estao fechadas."
+  },
+  "hero": {
+    "title": "NightTicker",
+    "subtitle": "O Mercado Nunca Dorme",
+    "description": "Monitore a atividade do mercado em tempo real quando as bolsas de valores tradicionais estao fechadas. Acompanhe precos noturnos, de fim de semana e feriados.",
+    "timing": "Noturno. Fim de semana. Feriado.",
+    "source": "Hyperliquid Market Prices.",
+    "disclaimer": "Apenas para fins de referencia."
+  },
+  "nav": {
+    "home": "Inicio",
+    "favorites": "Favoritos",
+    "topGainers": "Maiores Altas",
+    "topLosers": "Maiores Baixas",
+    "overnightPrices": "Precos Noturnos",
+    "weekendPrices": "Precos de Fim de Semana",
+    "holidayPrices": "Precos de Feriado",
+    "usMarketHours": "Horario do Mercado EUA",
+    "koreaMarketHours": "Horario do Mercado Coreia",
+    "howDataWorks": "Como os Dados Funcionam",
+    "whatIsHyperliquid": "O que e Hyperliquid",
+    "about": "Sobre",
+    "disclaimer": "Aviso Legal",
+    "privacy": "Privacidade",
+    "terms": "Termos"
+  },
+  "favorites": {
+    "title": "Favoritos",
+    "empty": "Nenhum favorito ainda",
+    "emptyHint": "Clique no icone de estrela em qualquer ativo para adiciona-lo aos favoritos",
+    "filter": {
+      "all": "Todos",
+      "kr": "Coreia",
+      "us": "EUA",
+      "jp": "Japao",
+      "crypto": "Cripto"
+    },
+    "sort": {
+      "added": "Adicionados Recentemente",
+      "gainers": "Maiores Altas",
+      "losers": "Maiores Baixas",
+      "name": "Nome"
+    }
+  },
+  "sections": {
+    "topGainers": "Maiores Altas",
+    "topLosers": "Maiores Baixas",
+    "viewAll": "Ver Todos",
+    "noGainers": "Nenhuma alta no momento",
+    "noLosers": "Nenhuma baixa no momento",
+    "popularStocks": "Acoes Populares",
+    "usStocks": "Acoes dos EUA",
+    "koreanStocks": "Acoes Coreanas",
+    "indexMarkets": "Indices",
+    "yourWatchlist": "Sua Lista"
+  },
+  "categories": {
+    "all": "Todos os Mercados",
+    "US": "Acoes EUA",
+    "KR": "Acoes Coreanas",
+    "JP": "Acoes Japonesas",
+    "INDEX": "Indices",
+    "ETF": "ETFs",
+    "COMMODITY": "Commodities",
+    "FX": "Moedas",
+    "SPECIAL": "Especial",
+    "SEMICONDUCTOR": "Semicondutores"
+  },
+  "market": {
+    "nightPrice": "Preco Noturno",
+    "overnightPrice": "Preco Noturno",
+    "weekendPrice": "Preco de Fim de Semana",
+    "marketClosedPrice": "Preco com Mercado Fechado",
+    "currentPrice": "Preco Atual Hyperliquid Market",
+    "lastUpdated": "Ultima Atualizacao",
+    "open": "Aberto",
+    "closed": "Fechado",
+    "viewSourceMarket": "Ver Mercado de Origem",
+    "viewOnHyperliquid": "Ver no Hyperliquid",
+    "exploreDetails": "Explorar Detalhes",
+    "priceUnavailable": "Preco indisponivel",
+    "loading": "Carregando..."
+  },
+  "table": {
+    "name": "Nome",
+    "market": "Mercado",
+    "price": "Preco",
+    "change24h": "Variacao 24h",
+    "volume": "Volume",
+    "noData": "Nenhum dado disponivel"
+  },
+  "connection": {
+    "connected": "Ao Vivo",
+    "connecting": "Conectando",
+    "disconnected": "Offline"
+  },
+  "watchlist": {
+    "title": "Lista de Observacao",
+    "add": "Adicionar a Lista",
+    "remove": "Remover da Lista",
+    "empty": "Sua lista esta vazia"
+  },
+  "compliance": {
+    "badge": "Hyperliquid Market Prices",
+    "referralDisclosure": "Links para Hyperliquid podem conter atribuicao de referencia.",
+    "forReference": "Apenas para fins de referencia.",
+    "notOfficial": "Nao sao precos oficiais de bolsa de valores.",
+    "mayDiffer": "Podem diferir significativamente dos precos das bolsas tradicionais.",
+    "noReliance": "Nao confie nestas informacoes para decisoes de investimento ou negociacao.",
+    "fullNotice": "Esta pagina exibe Hyperliquid Market Prices apenas para fins de referencia. Hyperliquid Market Prices nao sao precos oficiais de bolsa de valores. Os precos podem diferir significativamente dos precos nas bolsas de valores tradicionais. As informacoes exibidas podem conter atrasos, imprecisoes, omissoes ou erros. NightTicker nao verifica a precisao dos dados de mercado. Nao confie nas informacoes exibidas para decisoes de investimento ou negociacao."
+  },
+  "footer": {
+    "disclaimer": "NightTicker e um site informativo independente. NightTicker nao e uma corretora, bolsa, empresa de valores mobiliarios, plataforma de negociacao, consultor financeiro ou servico de investimento. Todas as informacoes sao fornecidas apenas para fins de referencia. NightTicker exibe Hyperliquid Market Prices, nao precos oficiais de bolsa de valores. Nao confie nas informacoes exibidas para decisoes de investimento ou negociacao.",
+    "copyright": "NightTicker"
+  },
+  "faq": {
+    "title": "Perguntas Frequentes",
+    "q1": "O que sao Hyperliquid Market Prices?",
+    "a1": "Hyperliquid Market Prices sao precos de referencia do mercado Hyperliquid. Nao sao precos oficiais de bolsa de valores e podem diferir significativamente dos precos das bolsas tradicionais.",
+    "q2": "O NightTicker mostra precos oficiais de bolsa de valores?",
+    "a2": "Nao. NightTicker exibe Hyperliquid Market Prices apenas para fins de referencia. Estes nao sao precos oficiais de bolsa de valores.",
+    "q3": "Por que os precos Hyperliquid podem diferir dos precos da bolsa?",
+    "a3": "Hyperliquid opera independentemente das bolsas de valores tradicionais. Os precos refletem a atividade do mercado na plataforma Hyperliquid e podem diferir devido a varios fatores, incluindo liquidez, timing e condicoes de mercado.",
+    "q4": "Devo usar os precos do NightTicker para decisoes de investimento?",
+    "a4": "Nao. NightTicker fornece apenas informacoes de referencia. Nao confie nestas informacoes para decisoes de investimento ou negociacao. Sempre consulte fontes oficiais e consultores financeiros.",
+    "q5": "O que significa Preco Noturno?",
+    "a5": "Preco Noturno refere-se ao preco atual do Hyperliquid Market quando as bolsas de valores tradicionais estao fechadas, como durante a noite, fins de semana ou feriados. E apenas um preco de referencia.",
+    "q6": "Onde posso ver graficos detalhados?",
+    "a6": "Para graficos detalhados, dados historicos e informacoes avancadas de mercado, visite diretamente o Hyperliquid."
+  },
+  "pages": {
+    "gainers": {
+      "title": "Maiores Altas",
+      "description": "Ativos com os maiores ganhos nas ultimas 24 horas"
+    },
+    "losers": {
+      "title": "Maiores Baixas",
+      "description": "Ativos com as maiores perdas nas ultimas 24 horas"
+    },
+    "favorites": {
+      "title": "Favoritos",
+      "description": "Seus ativos favoritos"
+    },
+    "overnight": {
+      "title": "Precos Noturnos",
+      "description": "Verifique os precos de referencia atuais durante a noite quando os mercados de acoes tradicionais estao fechados.",
+      "content": "Quando as bolsas de valores tradicionais fecham durante a noite, os Hyperliquid Market Prices podem continuar a refletir a atividade do mercado. NightTicker exibe esses precos de referencia noturnos apenas para fins informativos."
+    },
+    "weekend": {
+      "title": "Precos de Fim de Semana",
+      "description": "Verifique os precos de referencia atuais nos fins de semana quando os mercados de acoes tradicionais estao fechados.",
+      "content": "As bolsas de valores tradicionais normalmente estao fechadas nos fins de semana. No entanto, os Hyperliquid Market Prices podem continuar a se mover. NightTicker exibe esses precos de referencia de fim de semana apenas para fins informativos."
+    },
+    "holiday": {
+      "title": "Precos de Feriado",
+      "description": "Verifique os precos de referencia atuais durante feriados quando os mercados de acoes tradicionais estao fechados.",
+      "content": "Durante feriados de mercado, as bolsas de valores tradicionais podem estar fechadas. Os Hyperliquid Market Prices ainda podem estar disponiveis durante esses periodos. NightTicker exibe esses precos de referencia de feriado apenas para fins informativos."
+    },
+    "usMarketHours": {
+      "title": "Horario do Mercado EUA",
+      "description": "Informacoes sobre horario de negociacao e calendario do mercado de acoes dos EUA."
+    },
+    "koreaMarketHours": {
+      "title": "Horario do Mercado Coreia",
+      "description": "Informacoes sobre horario de negociacao e calendario do mercado de acoes coreano."
+    },
+    "howDataWorks": {
+      "title": "Como os Dados Funcionam",
+      "description": "Saiba como o NightTicker exibe Hyperliquid Market Prices."
+    },
+    "whatIsHyperliquid": {
+      "title": "O que e Hyperliquid",
+      "description": "Saiba mais sobre Hyperliquid, a fonte dos precos de mercado exibidos no NightTicker."
+    },
+    "about": {
+      "title": "Sobre NightTicker",
+      "description": "Saiba mais sobre o NightTicker e nossa missao."
+    },
+    "disclaimer": {
+      "title": "Aviso Legal",
+      "description": "Aviso legal importante e informacoes juridicas."
+    },
+    "privacy": {
+      "title": "Politica de Privacidade",
+      "description": "Como o NightTicker lida com sua privacidade."
+    },
+    "terms": {
+      "title": "Termos de Servico",
+      "description": "Termos e condicoes para usar o NightTicker."
+    }
+  },
+  "search": {
+    "placeholder": "Pesquisar acoes...",
+    "noResults": "Nenhum resultado encontrado"
+  },
+  "common": {
+    "language": "Idioma",
+    "english": "English",
+    "korean": "한국어",
+    "japanese": "日本語",
+    "chinese": "简体中文",
+    "portuguese": "Portugues",
+    "spanish": "Espanol",
+    "loading": "Carregando...",
+    "error": "Ocorreu um erro",
+    "retry": "Tentar novamente"
+  },
+  "marketClock": {
+    "localTime": "Hora Local",
+    "usMarket": "Mercado EUA",
+    "koreaMarket": "Mercado Coreia",
+    "open": "Aberto",
+    "closed": "Fechado",
+    "opens": "Abre",
+    "closes": "Fecha"
+  }
+}

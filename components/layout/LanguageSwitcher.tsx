@@ -12,6 +12,8 @@ const languages = [
   { code: 'ko', label: '한국어', flag: 'KO' },
   { code: 'ja', label: '日本語', flag: 'JA' },
   { code: 'zh', label: '简体中文', flag: 'ZH' },
+  { code: 'pt', label: 'Portugues', flag: 'PT' },
+  { code: 'es', label: 'Espanol', flag: 'ES' },
 ] as const;
 
 export function LanguageSwitcher() {
@@ -43,23 +45,17 @@ export function LanguageSwitcher() {
     let newPath = pathname;
 
     // Remove existing locale prefix
-    if (pathname.startsWith('/ko')) {
-      newPath = pathname.slice(3) || '/';
-    } else if (pathname.startsWith('/en')) {
-      newPath = pathname.slice(3) || '/';
-    } else if (pathname.startsWith('/ja')) {
-      newPath = pathname.slice(3) || '/';
-    } else if (pathname.startsWith('/zh')) {
-      newPath = pathname.slice(3) || '/';
+    const localePatterns = ['/ko', '/en', '/ja', '/zh', '/pt', '/es'];
+    for (const pattern of localePatterns) {
+      if (pathname.startsWith(pattern)) {
+        newPath = pathname.slice(3) || '/';
+        break;
+      }
     }
 
     // Add new locale prefix (en is default, no prefix needed)
-    if (newLocale === 'ko') {
-      newPath = `/ko${newPath}`;
-    } else if (newLocale === 'ja') {
-      newPath = `/ja${newPath}`;
-    } else if (newLocale === 'zh') {
-      newPath = `/zh${newPath}`;
+    if (newLocale !== 'en') {
+      newPath = `/${newLocale}${newPath}`;
     }
 
     setIsOpen(false);

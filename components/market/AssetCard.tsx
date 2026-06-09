@@ -43,11 +43,13 @@ function AssetCardInner({
   const displayChange24h = asset.change24h;
   const displayChangePercent24h = asset.changePercent24h;
 
-  const displayName = locale === 'ko' && asset.nameKo
-    ? asset.nameKo
-    : locale === 'ja' && asset.nameJa
-      ? asset.nameJa
-      : asset.name;
+  const displayName =
+    locale === 'ko' && asset.nameKo ? asset.nameKo :
+    locale === 'ja' && asset.nameJa ? asset.nameJa :
+    locale === 'zh' && asset.nameZh ? asset.nameZh :
+    locale === 'pt' && asset.namePt ? asset.namePt :
+    locale === 'es' && asset.nameEs ? asset.nameEs :
+    asset.name;
   const isFav = isFavorite(asset.symbol, asset.market);
 
   const marketBadgeColors: Record<MarketType, string> = {

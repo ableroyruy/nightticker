@@ -5,6 +5,9 @@ export interface MarketAsset {
   name: string;
   nameKo?: string;
   nameJa?: string;
+  nameZh?: string;
+  namePt?: string;
+  nameEs?: string;
   slug: string;
   market: MarketType;
   price: number | null;

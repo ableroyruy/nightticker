@@ -11,6 +11,7 @@ import { cn } from '@/lib/utils';
 interface CategorySectionProps {
   market: MarketType;
   assets: MarketAsset[];
+  limit?: number;
 }
 
 const marketIcons: Record<string, React.ElementType> = {
@@ -22,7 +23,7 @@ const marketIcons: Record<string, React.ElementType> = {
   SEMICONDUCTOR: Cpu,
 };
 
-export function CategorySection({ market, assets }: CategorySectionProps) {
+export function CategorySection({ market, assets, limit = 10 }: CategorySectionProps) {
   const t = useTranslations('categories');
   const locale = useLocale();
 
@@ -51,6 +52,8 @@ export function CategorySection({ market, assets }: CategorySectionProps) {
     if (b.changePercent24h == null) return -1;
     return b.changePercent24h - a.changePercent24h;
   });
+
+  const displayAssets = sortedAssets.slice(0, limit);
 
   const Icon = marketIcons[market] || BarChart3;
 
@@ -103,9 +106,9 @@ export function CategorySection({ market, assets }: CategorySectionProps) {
       </div>
 
       {/* All Assets Grid - Sorted by Change % */}
-      {sortedAssets.length > 0 ? (
+      {displayAssets.length > 0 ? (
         <AnimatedAssetGrid
-          assets={sortedAssets}
+          assets={displayAssets}
           showRank={false}
           showMarketBadge={false}
           gridId={`${market}-all`}

@@ -18,7 +18,7 @@ type Props = {
 
 export async function generateStaticParams() {
   const slugs = getAllSlugs();
-  const locales = ['en', 'ko', 'ja', 'zh'];
+  const locales = ['en', 'ko', 'ja', 'zh', 'pt', 'es'];
 
   return locales.flatMap((locale) =>
     slugs.map((slug) => ({
@@ -60,6 +60,24 @@ function getAssetType(stock: Stock, locale: string): { term: string; typeName: s
     return { term: '行情', typeName: '资产' };
   }
 
+  if (locale === 'pt') {
+    if (isStock) return { term: 'Preco', typeName: 'Acao' };
+    if (stock.category === 'INDEX') return { term: 'Indice', typeName: 'Indice' };
+    if (stock.category === 'ETF') return { term: 'ETF', typeName: 'ETF' };
+    if (stock.category === 'COMMODITY') return { term: 'Commodity', typeName: 'Commodity' };
+    if (stock.category === 'FX') return { term: 'Taxa', typeName: 'Moeda' };
+    return { term: 'Preco', typeName: 'Ativo' };
+  }
+
+  if (locale === 'es') {
+    if (isStock) return { term: 'Precio', typeName: 'Accion' };
+    if (stock.category === 'INDEX') return { term: 'Indice', typeName: 'Indice' };
+    if (stock.category === 'ETF') return { term: 'ETF', typeName: 'ETF' };
+    if (stock.category === 'COMMODITY') return { term: 'Commodity', typeName: 'Commodity' };
+    if (stock.category === 'FX') return { term: 'Tasa', typeName: 'Divisa' };
+    return { term: 'Precio', typeName: 'Activo' };
+  }
+
   // English - use "Overnight" terminology
   if (isStock) return { term: 'Stock Price', typeName: 'Stock' };
   if (stock.category === 'INDEX') return { term: 'Index', typeName: 'Index' };
@@ -77,10 +95,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     return { title: 'Not Found' };
   }
 
-  const isKo = locale === 'ko';
-  const isJa = locale === 'ja';
-  const isZh = locale === 'zh';
-  const name = isZh ? (stock.nameZh ?? stock.name) : isKo ? stock.nameKo : isJa ? (stock.nameJa ?? stock.name) : stock.name;
+  const name =
+    locale === 'ko' ? stock.nameKo :
+    locale === 'ja' ? (stock.nameJa ?? stock.name) :
+    locale === 'zh' ? (stock.nameZh ?? stock.name) :
+    locale === 'pt' ? (stock.namePt ?? stock.name) :
+    locale === 'es' ? (stock.nameEs ?? stock.name) :
+    stock.name;
   const { term } = getAssetType(stock, locale);
   const isStock = ['US', 'KR', 'JP'].includes(stock.category);
 
@@ -137,9 +158,31 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         'NightTicker',
       ],
     },
+    pt: {
+      title: `${name} (${stock.symbol}) ${term} Noturno | Fim de Semana e Feriado | NightTicker`,
+      description: `Confira ${name} ${term.toLowerCase()} noturno. Monitore precos de fim de semana e feriado. Powered by Hyperliquid.`,
+      keywords: [
+        `${name} preco noturno`,
+        `${stock.symbol} overnight`,
+        `${name} preco fim de semana`,
+        isStock ? 'preco acoes noturno' : `${term.toLowerCase()} noturno`,
+        'NightTicker',
+      ],
+    },
+    es: {
+      title: `${name} (${stock.symbol}) ${term} Nocturno | Fin de Semana y Festivo | NightTicker`,
+      description: `Consulta ${name} ${term.toLowerCase()} nocturno. Monitorea precios de fin de semana y festivos. Powered by Hyperliquid.`,
+      keywords: [
+        `${name} precio nocturno`,
+        `${stock.symbol} overnight`,
+        `${name} precio fin de semana`,
+        isStock ? 'precio acciones nocturno' : `${term.toLowerCase()} nocturno`,
+        'NightTicker',
+      ],
+    },
   };
 
-  type MetaKey = 'en' | 'ko' | 'ja' | 'zh';
+  type MetaKey = 'en' | 'ko' | 'ja' | 'zh' | 'pt' | 'es';
   const current = meta[locale as MetaKey] ?? meta.en;
   const canonicalUrl = locale === 'en' ? `${BASE_URL}/stock/${slug}` : `${BASE_URL}/${locale}/stock/${slug}`;
 
@@ -147,6 +190,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     ko: '나이트티커',
     ja: 'ナイトティッカー',
     zh: 'NightTicker',
+    pt: 'NightTicker',
+    es: 'NightTicker',
     en: 'NightTicker',
   };
 
@@ -154,6 +199,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     ko: 'ko_KR',
     ja: 'ja_JP',
     zh: 'zh_CN',
+    pt: 'pt_BR',
+    es: 'es_ES',
     en: 'en_US',
   };
 
@@ -168,6 +215,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         ko: `${BASE_URL}/ko/stock/${slug}`,
         ja: `${BASE_URL}/ja/stock/${slug}`,
         zh: `${BASE_URL}/zh/stock/${slug}`,
+        pt: `${BASE_URL}/pt/stock/${slug}`,
+        es: `${BASE_URL}/es/stock/${slug}`,
       },
     },
     openGraph: {
@@ -188,7 +237,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 // FAQ data for structured data
 function getFAQData(stock: Stock, locale: string) {
-  const name = locale === 'zh' ? (stock.nameZh ?? stock.name) : locale === 'ko' ? stock.nameKo : locale === 'ja' ? (stock.nameJa ?? stock.name) : stock.name;
+  const name =
+    locale === 'ko' ? stock.nameKo :
+    locale === 'ja' ? (stock.nameJa ?? stock.name) :
+    locale === 'zh' ? (stock.nameZh ?? stock.name) :
+    locale === 'pt' ? (stock.namePt ?? stock.name) :
+    locale === 'es' ? (stock.nameEs ?? stock.name) :
+    stock.name;
   const { term } = getAssetType(stock, locale);
 
   if (locale === 'ko') {
@@ -222,6 +277,26 @@ function getFAQData(stock: Stock, locale: string) {
     ];
   }
 
+  if (locale === 'pt') {
+    return [
+      { q: 'O que sao precos noturnos de acoes?', a: 'Precos noturnos sao precos de referencia quando as bolsas tradicionais estao fechadas. NightTicker fornece precos de referencia noturnos baseados em Hyperliquid Market Prices.' },
+      { q: 'Posso verificar precos nos fins de semana?', a: 'Sim, voce pode verificar precos de referencia nos fins de semana via NightTicker, alimentado por Hyperliquid Market Prices.' },
+      { q: 'Ha precos em feriados?', a: 'Sim, voce pode verificar precos de referencia em feriados atraves de Hyperliquid Market Prices.' },
+      { q: 'O que sao precos Hyperliquid?', a: 'Hyperliquid e a fonte dos precos de mercado exibidos no NightTicker. Esses precos sao apenas para referencia e podem diferir dos precos oficiais da bolsa.' },
+      { q: 'Sao precos oficiais da bolsa?', a: 'Nao, os precos exibidos no NightTicker sao Hyperliquid Market Prices, nao precos oficiais da bolsa. Nao use para decisoes de investimento.' },
+    ];
+  }
+
+  if (locale === 'es') {
+    return [
+      { q: 'Que son los precios nocturnos de acciones?', a: 'Los precios nocturnos son precios de referencia cuando las bolsas tradicionales estan cerradas. NightTicker proporciona precios de referencia nocturnos basados en Hyperliquid Market Prices.' },
+      { q: 'Puedo verificar precios los fines de semana?', a: 'Si, puedes verificar precios de referencia los fines de semana via NightTicker, impulsado por Hyperliquid Market Prices.' },
+      { q: 'Hay precios en dias festivos?', a: 'Si, puedes verificar precios de referencia en dias festivos a traves de Hyperliquid Market Prices.' },
+      { q: 'Que son los precios de Hyperliquid?', a: 'Hyperliquid es la fuente de los precios de mercado mostrados en NightTicker. Estos precios son solo de referencia y pueden diferir de los precios oficiales de la bolsa.' },
+      { q: 'Son precios oficiales de la bolsa?', a: 'No, los precios mostrados en NightTicker son Hyperliquid Market Prices, no precios oficiales de la bolsa. No uses para decisiones de inversion.' },
+    ];
+  }
+
   return [
     { q: 'What are overnight stock prices?', a: 'Overnight stock prices are reference prices during hours when traditional exchanges are closed. NightTicker provides overnight reference prices based on Hyperliquid Market Prices.' },
     { q: 'Can I check prices on weekends?', a: 'Yes, you can check reference prices on weekends via NightTicker, powered by Hyperliquid Market Prices.' },
@@ -240,18 +315,24 @@ export default async function StockPage({ params }: Props) {
     notFound();
   }
 
-  const displayName = locale === 'zh' ? (stock.nameZh ?? stock.name) : locale === 'ko' ? stock.nameKo : locale === 'ja' ? (stock.nameJa ?? stock.name) : stock.name;
+  const displayName =
+    locale === 'ko' ? stock.nameKo :
+    locale === 'ja' ? (stock.nameJa ?? stock.name) :
+    locale === 'zh' ? (stock.nameZh ?? stock.name) :
+    locale === 'pt' ? (stock.namePt ?? stock.name) :
+    locale === 'es' ? (stock.nameEs ?? stock.name) :
+    stock.name;
   const { term, typeName } = getAssetType(stock, locale);
   const isStock = ['US', 'KR', 'JP'].includes(stock.category);
   const faqData = getFAQData(stock, locale);
 
   // Labels by locale
   const labels = {
-    overnightPrice: locale === 'ko' ? '야간' : locale === 'ja' ? '夜間' : locale === 'zh' ? '夜间' : 'Overnight',
-    weekendPrice: locale === 'ko' ? '주말' : locale === 'ja' ? '週末' : locale === 'zh' ? '周末' : 'Weekend',
-    holidayPrice: locale === 'ko' ? '휴일' : locale === 'ja' ? '休日' : locale === 'zh' ? '节假日' : 'Holiday',
-    relatedStocks: locale === 'ko' ? '관련 종목' : locale === 'ja' ? '関連銘柄' : locale === 'zh' ? '相关标的' : 'Related',
-    faq: locale === 'ko' ? 'FAQ' : locale === 'ja' ? 'よくある質問' : locale === 'zh' ? '常见问题' : 'FAQ',
+    overnightPrice: locale === 'ko' ? '야간' : locale === 'ja' ? '夜間' : locale === 'zh' ? '夜间' : locale === 'pt' ? 'Noturno' : locale === 'es' ? 'Nocturno' : 'Overnight',
+    weekendPrice: locale === 'ko' ? '주말' : locale === 'ja' ? '週末' : locale === 'zh' ? '周末' : locale === 'pt' ? 'Fim de Semana' : locale === 'es' ? 'Fin de Semana' : 'Weekend',
+    holidayPrice: locale === 'ko' ? '휴일' : locale === 'ja' ? '休日' : locale === 'zh' ? '节假日' : locale === 'pt' ? 'Feriado' : locale === 'es' ? 'Festivo' : 'Holiday',
+    relatedStocks: locale === 'ko' ? '관련 종목' : locale === 'ja' ? '関連銘柄' : locale === 'zh' ? '相关标的' : locale === 'pt' ? 'Relacionados' : locale === 'es' ? 'Relacionados' : 'Related',
+    faq: locale === 'ko' ? 'FAQ' : locale === 'ja' ? 'よくある質問' : locale === 'zh' ? '常见问题' : locale === 'pt' ? 'FAQ' : locale === 'es' ? 'FAQ' : 'FAQ',
   };
 
   // JSON-LD for FAQ Schema
@@ -276,7 +357,7 @@ export default async function StockPage({ params }: Props) {
       {
         '@type': 'ListItem',
         position: 1,
-        name: locale === 'ko' ? '홈' : locale === 'ja' ? 'ホーム' : 'Home',
+        name: locale === 'ko' ? '홈' : locale === 'ja' ? 'ホーム' : locale === 'zh' ? '首页' : locale === 'pt' ? 'Inicio' : locale === 'es' ? 'Inicio' : 'Home',
         item: locale === 'en' ? BASE_URL : `${BASE_URL}/${locale}`,
       },
       {

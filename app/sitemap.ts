@@ -8,7 +8,7 @@ const categories = ['us', 'kr', 'jp', 'index', 'etf', 'commodity', 'fx', 'specia
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const slugs = getAllSlugs();
-  const locales = ['en', 'ko', 'ja', 'zh'];
+  const locales = ['en', 'ko', 'ja', 'zh', 'pt', 'es'];
 
   // Static pages
   const staticPages = [
@@ -46,6 +46,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
             ko: `${baseUrl}/ko${page}`,
             ja: `${baseUrl}/ja${page}`,
             zh: `${baseUrl}/zh${page}`,
+            pt: `${baseUrl}/pt${page}`,
+            es: `${baseUrl}/es${page}`,
           },
         },
       });
@@ -67,6 +69,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
             ko: `${baseUrl}/ko/category/${category}`,
             ja: `${baseUrl}/ja/category/${category}`,
             zh: `${baseUrl}/zh/category/${category}`,
+            pt: `${baseUrl}/pt/category/${category}`,
+            es: `${baseUrl}/es/category/${category}`,
           },
         },
       });
@@ -88,6 +92,8 @@ export default function sitemap(): MetadataRoute.Sitemap {
             ko: `${baseUrl}/ko/stock/${slug}`,
             ja: `${baseUrl}/ja/stock/${slug}`,
             zh: `${baseUrl}/zh/stock/${slug}`,
+            pt: `${baseUrl}/pt/stock/${slug}`,
+            es: `${baseUrl}/es/stock/${slug}`,
           },
         },
       });
