@@ -53,6 +53,41 @@ export function useHyperliquidTicker(): UseHyperliquidTickerReturn {
   const prevDayPricesRef = useRef<Record<string, number>>({});
   const tickersRef = useRef<Record<string, TickerData>>({});
 
+  // Process WebSocket price updates
+  const processPriceUpdate = useCallback((mids: Record<string, string>) => {
+    if (!mountedRef.current) return;
+
+    const prevDayPrices = prevDayPricesRef.current;
+    const newTickers: Record<string, TickerData> = {};
+
+    for (const [rawSymbol, priceStr] of Object.entries(mids)) {
+      const price = parseFloat(priceStr);
+      if (isNaN(price)) continue;
+
+      // Remove 'xyz:' prefix to match component lookups
+      const symbol = rawSymbol.replace('xyz:', '');
+      const prevDayPx = prevDayPrices[symbol] || 0;
+      let change24h = 0;
+      let changePercent24h = 0;
+
+      if (prevDayPx > 0) {
+        change24h = price - prevDayPx;
+        changePercent24h = (change24h / prevDayPx) * 100;
+      }
+
+      newTickers[symbol] = {
+        price,
+        prevDayPx,
+        change24h,
+        changePercent24h,
+      };
+    }
+
+    tickersRef.current = newTickers;
+    setTickers(newTickers);
+    setLastUpdate(new Date());
+  }, []);
+
   // Fetch initial prices from our cached API (fast)
   const fetchCachedPrices = useCallback(async () => {
     if (!mountedRef.current) return;
@@ -156,41 +191,6 @@ export function useHyperliquidTicker(): UseHyperliquidTickerReturn {
     } catch (e) {
       console.error('Failed to fetch meta:', e);
     }
-  }, []);
-
-  // Process WebSocket price updates
-  const processPriceUpdate = useCallback((mids: Record<string, string>) => {
-    if (!mountedRef.current) return;
-
-    const prevDayPrices = prevDayPricesRef.current;
-    const newTickers: Record<string, TickerData> = {};
-
-    for (const [rawSymbol, priceStr] of Object.entries(mids)) {
-      const price = parseFloat(priceStr);
-      if (isNaN(price)) continue;
-
-      // Remove 'xyz:' prefix to match component lookups
-      const symbol = rawSymbol.replace('xyz:', '');
-      const prevDayPx = prevDayPrices[symbol] || 0;
-      let change24h = 0;
-      let changePercent24h = 0;
-
-      if (prevDayPx > 0) {
-        change24h = price - prevDayPx;
-        changePercent24h = (change24h / prevDayPx) * 100;
-      }
-
-      newTickers[symbol] = {
-        price,
-        prevDayPx,
-        change24h,
-        changePercent24h,
-      };
-    }
-
-    tickersRef.current = newTickers;
-    setTickers(newTickers);
-    setLastUpdate(new Date());
   }, []);
 
   // Connect to WebSocket
