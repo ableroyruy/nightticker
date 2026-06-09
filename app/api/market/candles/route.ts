@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const API_URL = 'https://api.hyperliquid.xyz/info';
 const CANDLE_INTERVAL = '5m';
-const CACHE_REVALIDATE = 60; // 60 seconds (5분봉이라 길어도 됨)
+const FIVE_MINUTES_MS = 5 * 60 * 1000;
 
 interface RawCandle {
   t: number;
@@ -22,11 +22,41 @@ interface CandleData {
   volume: number;
 }
 
+interface CacheEntry {
+  data: CandleData[];
+  timestamp: number;
+}
+
+// 서버 인메모리 캐시 (심볼별)
+const serverCache = new Map<string, CacheEntry>();
+const CACHE_TTL = 60000; // 60초
+
+function getCachedCandles(symbol: string): CandleData[] | null {
+  const cached = serverCache.get(symbol);
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+    return cached.data;
+  }
+  return null;
+}
+
+function setCachedCandles(symbol: string, data: CandleData[]) {
+  serverCache.set(symbol, {
+    data,
+    timestamp: Date.now(),
+  });
+}
+
 async function fetchCandles(symbol: string): Promise<CandleData[]> {
-  const now = Date.now();
+  // 서버 캐시 확인
+  const cached = getCachedCandles(symbol);
+  if (cached) {
+    return cached;
+  }
+
+  // 타임스탬프를 5분 단위로 반올림 (캐시 키 안정화)
+  const now = Math.floor(Date.now() / FIVE_MINUTES_MS) * FIVE_MINUTES_MS;
   const startTime = now - 6 * 60 * 60 * 1000; // 6 hours
 
-  // Use Next.js fetch cache with revalidation
   const response = await fetch(API_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -39,7 +69,6 @@ async function fetchCandles(symbol: string): Promise<CandleData[]> {
         endTime: now,
       },
     }),
-    next: { revalidate: CACHE_REVALIDATE, tags: [`candles-${symbol}`] },
   });
 
   if (!response.ok) {
@@ -52,7 +81,7 @@ async function fetchCandles(symbol: string): Promise<CandleData[]> {
     return [];
   }
 
-  return rawData.map((c) => ({
+  const candles = rawData.map((c) => ({
     time: Math.floor(c.t / 1000),
     open: parseFloat(c.o),
     high: parseFloat(c.h),
@@ -60,6 +89,11 @@ async function fetchCandles(symbol: string): Promise<CandleData[]> {
     close: parseFloat(c.c),
     volume: parseFloat(c.v),
   }));
+
+  // 서버 캐시 저장
+  setCachedCandles(symbol, candles);
+
+  return candles;
 }
 
 export async function GET(request: NextRequest) {
