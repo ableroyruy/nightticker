@@ -1,13 +1,11 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { setRequestLocale } from 'next-intl/server';
-import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { MarketPriceCard } from '@/components/market/MarketPriceCard';
 import { WatchlistButton } from '@/components/market/WatchlistButton';
 import { HyperliquidBadge } from '@/components/common/HyperliquidBadge';
 import { ComplianceNotice } from '@/components/common/ComplianceNotice';
-import { SourceMarketLink } from '@/components/common/SourceMarketLink';
 import { InternalLinks } from '@/components/stock/InternalLinks';
 import { getStockBySlug, getAllSlugs, categoryNames } from '@/lib/markets/stocks';
 import { Stock } from '@/lib/providers/types';
@@ -455,13 +453,6 @@ export default async function StockPage({ params }: Props) {
         </section>
 
         <Separator />
-
-        {/* Source Market Link */}
-        <Card>
-          <CardContent className="py-6">
-            <SourceMarketLink symbol={stock.hyperliquidSymbol} />
-          </CardContent>
-        </Card>
 
         {/* Compliance Notice (compact) */}
         <ComplianceNotice variant="compact" />
