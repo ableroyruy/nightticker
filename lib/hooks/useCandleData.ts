@@ -1,6 +1,6 @@
 'use client';
 
-import { useSyncExternalStore, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { ConnectionStatus } from '@/lib/types/market';
 
 const CANDLES_API = '/api/market/candles';
@@ -28,15 +28,10 @@ interface CandleState {
 interface CacheEntry {
   data: CandleData[];
   timestamp: number;
-  loading: boolean;
-  error: string | null;
 }
 
-// 전역 스토어
-const store = new Map<string, CacheEntry>();
-const subscribers = new Map<string, Set<() => void>>();
-const fetchPromises = new Map<string, Promise<void>>();
-const pollIntervals = new Map<string, NodeJS.Timeout>();
+// 전역 캐시
+const cache = new Map<string, CacheEntry>();
 
 function getChange(candles: CandleData[]) {
   if (candles.length < 2) return { change24h: 0, changePercent24h: 0 };
@@ -47,178 +42,125 @@ function getChange(candles: CandleData[]) {
   return { change24h, changePercent24h };
 }
 
-function notifySubscribers(symbol: string) {
-  const subs = subscribers.get(symbol);
-  if (subs) {
-    subs.forEach(cb => cb());
-  }
+function isCacheValid(symbol: string): boolean {
+  const entry = cache.get(symbol);
+  return !!(entry && Date.now() - entry.timestamp < CACHE_TTL && entry.data.length > 0);
 }
 
-function subscribe(symbol: string, callback: () => void) {
-  if (!subscribers.has(symbol)) {
-    subscribers.set(symbol, new Set());
+function getCachedData(symbol: string): CandleData[] | null {
+  if (isCacheValid(symbol)) {
+    return cache.get(symbol)!.data;
   }
-  subscribers.get(symbol)!.add(callback);
-
-  // 첫 구독자면 fetch 시작
-  if (subscribers.get(symbol)!.size === 1) {
-    startFetching(symbol);
-  }
-
-  return () => {
-    const subs = subscribers.get(symbol);
-    if (subs) {
-      subs.delete(callback);
-      // 마지막 구독자가 떠나면 polling 중지
-      if (subs.size === 0) {
-        stopPolling(symbol);
-        subscribers.delete(symbol);
-      }
-    }
-  };
+  return null;
 }
 
-function getSnapshot(symbol: string): CacheEntry {
-  const cached = store.get(symbol);
-  if (cached) return cached;
-
-  // 기본값 반환 (loading 상태)
-  return {
-    data: [],
-    timestamp: 0,
-    loading: true,
-    error: null,
-  };
-}
-
-async function fetchCandles(symbol: string): Promise<CandleData[]> {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 10000);
-
+async function fetchFromAPI(symbol: string): Promise<CandleData[]> {
   try {
     const res = await fetch(`${CANDLES_API}?symbol=${symbol}`, {
-      signal: controller.signal,
-      cache: 'no-store', // 브라우저 캐시 사용 안함
+      cache: 'no-store',
     });
-    clearTimeout(timeoutId);
 
     if (!res.ok) return [];
 
     const data = await res.json();
     if (Array.isArray(data) && data.length > 0) {
+      cache.set(symbol, { data, timestamp: Date.now() });
       return data;
     }
     return [];
   } catch {
-    clearTimeout(timeoutId);
     return [];
-  }
-}
-
-async function startFetching(symbol: string) {
-  // 이미 fetch 중이면 스킵
-  if (fetchPromises.has(symbol)) return;
-
-  // 캐시가 유효하면 스킵
-  const cached = store.get(symbol);
-  if (cached && Date.now() - cached.timestamp < CACHE_TTL && cached.data.length > 0) {
-    return;
-  }
-
-  const fetchPromise = (async () => {
-    // loading 상태로 업데이트
-    store.set(symbol, {
-      data: cached?.data ?? [],
-      timestamp: cached?.timestamp ?? 0,
-      loading: true,
-      error: null,
-    });
-    notifySubscribers(symbol);
-
-    const data = await fetchCandles(symbol);
-
-    // 데이터 저장
-    store.set(symbol, {
-      data,
-      timestamp: Date.now(),
-      loading: false,
-      error: data.length === 0 ? 'No data' : null,
-    });
-    notifySubscribers(symbol);
-
-    fetchPromises.delete(symbol);
-  })();
-
-  fetchPromises.set(symbol, fetchPromise);
-  await fetchPromise;
-
-  // polling 시작
-  startPolling(symbol);
-}
-
-function startPolling(symbol: string) {
-  if (pollIntervals.has(symbol)) return;
-
-  const interval = setInterval(async () => {
-    // 구독자가 없으면 중지
-    if (!subscribers.has(symbol) || subscribers.get(symbol)!.size === 0) {
-      stopPolling(symbol);
-      return;
-    }
-
-    const data = await fetchCandles(symbol);
-    if (data.length > 0) {
-      store.set(symbol, {
-        data,
-        timestamp: Date.now(),
-        loading: false,
-        error: null,
-      });
-      notifySubscribers(symbol);
-    }
-  }, POLL_INTERVAL);
-
-  pollIntervals.set(symbol, interval);
-}
-
-function stopPolling(symbol: string) {
-  const interval = pollIntervals.get(symbol);
-  if (interval) {
-    clearInterval(interval);
-    pollIntervals.delete(symbol);
   }
 }
 
 export function useCandleData(symbol: string): CandleState & { status: ConnectionStatus } {
   const sym = symbol.toUpperCase();
 
-  const subscribeToSymbol = useCallback(
-    (callback: () => void) => subscribe(sym, callback),
-    [sym]
-  );
+  // 초기 상태: 캐시 확인
+  const [state, setState] = useState<CandleState>(() => {
+    const cached = getCachedData(sym);
+    if (cached) {
+      const { change24h, changePercent24h } = getChange(cached);
+      return {
+        candles: cached,
+        currentPrice: cached[cached.length - 1]?.close ?? null,
+        change24h,
+        changePercent24h,
+        loading: false,
+        error: null,
+      };
+    }
+    return {
+      candles: [],
+      currentPrice: null,
+      change24h: null,
+      changePercent24h: null,
+      loading: true,
+      error: null,
+    };
+  });
 
-  const getSnapshotForSymbol = useCallback(
-    () => getSnapshot(sym),
-    [sym]
-  );
+  const [status, setStatus] = useState<ConnectionStatus>('connecting');
 
-  const entry = useSyncExternalStore(
-    subscribeToSymbol,
-    getSnapshotForSymbol,
-    getSnapshotForSymbol // SSR용
-  );
+  useEffect(() => {
+    let active = true;
 
-  const { change24h, changePercent24h } = entry.data.length > 0
-    ? getChange(entry.data)
-    : { change24h: null, changePercent24h: null };
+    async function load() {
+      // 캐시 확인
+      const cached = getCachedData(sym);
+      if (cached) {
+        if (active) {
+          const { change24h, changePercent24h } = getChange(cached);
+          setState({
+            candles: cached,
+            currentPrice: cached[cached.length - 1]?.close ?? null,
+            change24h,
+            changePercent24h,
+            loading: false,
+            error: null,
+          });
+          setStatus('connected');
+        }
+        return;
+      }
 
-  return {
-    candles: entry.data,
-    currentPrice: entry.data.length > 0 ? entry.data[entry.data.length - 1]?.close ?? null : null,
-    change24h,
-    changePercent24h,
-    loading: entry.loading,
-    error: entry.error,
-    status: entry.loading ? 'connecting' : 'connected',
-  };
+      // API 호출
+      const data = await fetchFromAPI(sym);
+
+      if (active) {
+        if (data.length > 0) {
+          const { change24h, changePercent24h } = getChange(data);
+          setState({
+            candles: data,
+            currentPrice: data[data.length - 1]?.close ?? null,
+            change24h,
+            changePercent24h,
+            loading: false,
+            error: null,
+          });
+        } else {
+          setState(prev => ({
+            ...prev,
+            loading: false,
+            error: 'No data',
+          }));
+        }
+        setStatus('connected');
+      }
+    }
+
+    load();
+
+    // 폴링
+    const interval = setInterval(() => {
+      if (active) load();
+    }, POLL_INTERVAL);
+
+    return () => {
+      active = false;
+      clearInterval(interval);
+    };
+  }, [sym]);
+
+  return { ...state, status };
 }
