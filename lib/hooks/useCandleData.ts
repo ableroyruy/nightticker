@@ -6,6 +6,8 @@ import { ConnectionStatus } from '@/lib/types/market';
 const CANDLES_API = '/api/market/candles';
 const CACHE_TTL = 120000; // 2분
 const POLL_INTERVAL = 300000; // 5분
+const BATCH_DELAY = 50; // 배치 수집 대기 시간 (ms)
+const MAX_BATCH_SIZE = 10; // 서버 배치 API 최대 크기
 
 export interface CandleData {
   time: number;
@@ -30,10 +32,20 @@ interface CacheEntry {
   timestamp: number;
 }
 
-// 전역 캐시
+// ========== 전역 캐시 ==========
 const cache = new Map<string, CacheEntry>();
-// 진행 중인 요청
-const pendingRequests = new Map<string, Promise<CandleData[]>>();
+
+// ========== 배치 요청 코디네이터 ==========
+type Resolver = (data: CandleData[]) => void;
+
+interface PendingRequest {
+  symbol: string;
+  resolve: Resolver;
+}
+
+let batchQueue: PendingRequest[] = [];
+let batchTimer: NodeJS.Timeout | null = null;
+let batchPromise: Promise<void> | null = null;
 
 function getChange(candles: CandleData[]) {
   if (candles.length < 2) return { change24h: 0, changePercent24h: 0 };
@@ -52,18 +64,78 @@ function getCachedData(symbol: string): CandleData[] | null {
   return null;
 }
 
-async function fetchFromServer(symbol: string): Promise<CandleData[]> {
+// 배치 API 호출
+async function fetchBatch(symbols: string[]): Promise<Record<string, CandleData[]>> {
   try {
-    const res = await fetch(`${CANDLES_API}?symbol=${symbol}`);
-    if (!res.ok) return [];
+    const res = await fetch(`${CANDLES_API}?symbols=${symbols.join(',')}`);
+    if (!res.ok) return {};
     const data = await res.json();
-    return Array.isArray(data) && data.length > 0 ? data : [];
+    return typeof data === 'object' && data !== null ? data : {};
   } catch {
-    return [];
+    return {};
   }
 }
 
-// 데이터 가져오기 (캐시 + 요청 중복 방지)
+// 배치 처리 실행
+async function processBatch() {
+  const requests = [...batchQueue];
+  batchQueue = [];
+  batchTimer = null;
+  batchPromise = null;
+
+  if (requests.length === 0) return;
+
+  // 캐시에서 해결 가능한 것들 먼저 처리
+  const needFetch: PendingRequest[] = [];
+  for (const req of requests) {
+    const cached = getCachedData(req.symbol);
+    if (cached) {
+      req.resolve(cached);
+    } else {
+      needFetch.push(req);
+    }
+  }
+
+  if (needFetch.length === 0) return;
+
+  // 중복 제거
+  const uniqueSymbols = [...new Set(needFetch.map(r => r.symbol))];
+
+  // 배치 크기 제한에 맞춰 나눠서 요청
+  const results: Record<string, CandleData[]> = {};
+
+  for (let i = 0; i < uniqueSymbols.length; i += MAX_BATCH_SIZE) {
+    const batch = uniqueSymbols.slice(i, i + MAX_BATCH_SIZE);
+    const batchResult = await fetchBatch(batch);
+    Object.assign(results, batchResult);
+  }
+
+  // 캐시 저장 및 결과 전달
+  const now = Date.now();
+  for (const req of needFetch) {
+    const data = results[req.symbol] || [];
+    if (data.length > 0) {
+      cache.set(req.symbol, { data, timestamp: now });
+    }
+    req.resolve(data);
+  }
+}
+
+// 배치 큐에 추가
+function queueRequest(symbol: string): Promise<CandleData[]> {
+  return new Promise<CandleData[]>((resolve) => {
+    batchQueue.push({ symbol, resolve });
+
+    // 타이머가 없으면 새로 시작
+    if (!batchTimer) {
+      batchTimer = setTimeout(() => {
+        batchPromise = processBatch();
+      }, BATCH_DELAY);
+    }
+  });
+}
+
+// 데이터 가져오기 (캐시 → 배치 큐)
 async function fetchCandles(symbol: string): Promise<CandleData[]> {
   // 캐시 확인
   const cached = getCachedData(symbol);
@@ -71,26 +143,8 @@ async function fetchCandles(symbol: string): Promise<CandleData[]> {
     return cached;
   }
 
-  // 진행 중인 요청 확인
-  const pending = pendingRequests.get(symbol);
-  if (pending) {
-    return pending;
-  }
-
-  // 새 요청
-  const request = fetchFromServer(symbol).then(data => {
-    if (data.length > 0) {
-      cache.set(symbol, { data, timestamp: Date.now() });
-    }
-    pendingRequests.delete(symbol);
-    return data;
-  }).catch(() => {
-    pendingRequests.delete(symbol);
-    return [] as CandleData[];
-  });
-
-  pendingRequests.set(symbol, request);
-  return request;
+  // 배치 큐에 추가
+  return queueRequest(symbol);
 }
 
 export function useCandleData(symbol: string): CandleState & { status: ConnectionStatus } {
@@ -151,7 +205,7 @@ export function useCandleData(symbol: string): CandleState & { status: Connectio
   useEffect(() => {
     mountedRef.current = true;
 
-    // 즉시 로드
+    // 즉시 로드 (배치로 묶임)
     loadData();
 
     // 폴링 설정

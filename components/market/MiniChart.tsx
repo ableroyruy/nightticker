@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef } from 'react';
 import {
   createChart,
   IChartApi,
@@ -37,22 +37,23 @@ export function MiniChart({
   const containerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const seriesRef = useRef<CandlestickSeriesApi | null>(null);
-  // 차트 준비 상태를 state로 추적
-  const [chartReady, setChartReady] = useState(false);
 
-  // Initialize chart - 한 번만 실행
+  // 차트 생성 및 데이터 설정을 하나의 effect로 통합
   useEffect(() => {
-    if (!containerRef.current) return;
+    if (!containerRef.current || !candles.length) return;
 
-    // 이미 차트가 있으면 스킵
-    if (chartRef.current) return;
+    // 기존 차트 정리
+    if (chartRef.current) {
+      chartRef.current.remove();
+      chartRef.current = null;
+      seriesRef.current = null;
+    }
 
     const chartWidth = autoResize ? containerRef.current.clientWidth : width;
-    const chartHeight = height;
 
     const chart = createChart(containerRef.current, {
       width: chartWidth,
-      height: chartHeight,
+      height,
       layout: {
         background: { type: ColorType.Solid, color: 'transparent' },
         textColor: 'transparent',
@@ -94,22 +95,7 @@ export function MiniChart({
       lastValueVisible: false,
     });
 
-    chartRef.current = chart;
-    seriesRef.current = series;
-    setChartReady(true);
-
-    return () => {
-      chart.remove();
-      chartRef.current = null;
-      seriesRef.current = null;
-      setChartReady(false);
-    };
-  }, [width, height, autoResize]);
-
-  // Update chart data - chartReady 상태에 의존
-  useEffect(() => {
-    if (!chartReady || !seriesRef.current || !candles.length) return;
-
+    // 데이터 설정
     const chartData: CandlestickData<Time>[] = candles.map((c) => ({
       time: c.time as Time,
       open: c.open,
@@ -118,35 +104,37 @@ export function MiniChart({
       close: c.close,
     }));
 
-    seriesRef.current.setData(chartData);
+    series.setData(chartData);
+    chart.timeScale().fitContent();
 
-    if (chartRef.current) {
-      chartRef.current.timeScale().fitContent();
-    }
-  }, [candles, chartReady]);
+    chartRef.current = chart;
+    seriesRef.current = series;
 
-  // Resize chart
+    return () => {
+      chart.remove();
+      chartRef.current = null;
+      seriesRef.current = null;
+    };
+  }, [candles, width, height, autoResize]);
+
+  // Resize observer (autoResize 전용)
   useEffect(() => {
-    if (!chartRef.current || !containerRef.current) return;
+    if (!autoResize || !containerRef.current || !chartRef.current) return;
 
-    if (autoResize) {
-      const resizeObserver = new ResizeObserver((entries) => {
-        const entry = entries[0];
-        if (entry && chartRef.current) {
-          const newWidth = entry.contentRect.width;
-          if (newWidth > 0) {
-            chartRef.current.resize(newWidth, height);
-            chartRef.current.timeScale().fitContent();
-          }
+    const resizeObserver = new ResizeObserver((entries) => {
+      const entry = entries[0];
+      if (entry && chartRef.current) {
+        const newWidth = entry.contentRect.width;
+        if (newWidth > 0) {
+          chartRef.current.resize(newWidth, height);
+          chartRef.current.timeScale().fitContent();
         }
-      });
+      }
+    });
 
-      resizeObserver.observe(containerRef.current);
-      return () => resizeObserver.disconnect();
-    } else {
-      chartRef.current.resize(width, height);
-    }
-  }, [width, height, autoResize]);
+    resizeObserver.observe(containerRef.current);
+    return () => resizeObserver.disconnect();
+  }, [autoResize, height]);
 
   const containerStyle = autoResize
     ? { height, width: '100%' }
