@@ -10,6 +10,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
   // Static pages
   const staticPages = [
     '',
+    '/favorites',
+    '/gainers',
+    '/losers',
     '/overnight-prices',
     '/weekend-prices',
     '/holiday-prices',

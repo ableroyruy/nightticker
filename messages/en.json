@@ -2,22 +2,24 @@
   "site": {
     "name": "NightTicker",
     "tagline": "The Market Never Sleeps",
-    "description": "Monitor stock-related market activity when traditional exchanges are closed."
+    "description": "Premium financial dashboard for monitoring stock prices when traditional exchanges are closed."
   },
   "hero": {
     "title": "NightTicker",
     "subtitle": "The Market Never Sleeps",
-    "description": "Monitor stock-related market activity when traditional exchanges are closed.",
+    "description": "Monitor real-time market activity when traditional stock exchanges are closed. Track overnight, weekend, and holiday prices.",
     "timing": "Overnight. Weekend. Holiday.",
     "source": "Hyperliquid Market Prices.",
     "disclaimer": "For reference purposes only."
   },
   "nav": {
     "home": "Home",
+    "favorites": "Favorites",
+    "topGainers": "Top Gainers",
+    "topLosers": "Top Losers",
     "overnightPrices": "Overnight Prices",
     "weekendPrices": "Weekend Prices",
     "holidayPrices": "Holiday Prices",
-    "marketStatus": "Market Status",
     "usMarketHours": "US Market Hours",
     "koreaMarketHours": "Korea Market Hours",
     "howDataWorks": "How Data Works",
@@ -27,6 +29,35 @@
     "privacy": "Privacy",
     "terms": "Terms"
   },
+  "favorites": {
+    "title": "Favorites",
+    "empty": "No favorites yet",
+    "emptyHint": "Click the star icon on any asset to add it to your favorites",
+    "filter": {
+      "all": "All",
+      "kr": "Korea",
+      "us": "US",
+      "crypto": "Crypto"
+    },
+    "sort": {
+      "added": "Recently Added",
+      "gainers": "Top Gainers",
+      "losers": "Top Losers",
+      "name": "Name"
+    }
+  },
+  "sections": {
+    "topGainers": "Top Gainers",
+    "topLosers": "Top Losers",
+    "viewAll": "View All",
+    "noGainers": "No gainers at this time",
+    "noLosers": "No losers at this time",
+    "popularStocks": "Popular Stocks",
+    "usStocks": "US Stocks",
+    "koreanStocks": "Korean Stocks",
+    "indexMarkets": "Index Markets",
+    "yourWatchlist": "Your Watchlist"
+  },
   "market": {
     "nightPrice": "Night Price",
     "overnightPrice": "Overnight Price",
@@ -34,7 +65,6 @@
     "marketClosedPrice": "Market Closed Price",
     "currentPrice": "Current Hyperliquid Market Price",
     "lastUpdated": "Last Updated",
-    "marketStatus": "Market Status",
     "open": "Open",
     "closed": "Closed",
     "viewSourceMarket": "View Source Market",
@@ -43,18 +73,24 @@
     "priceUnavailable": "Price unavailable",
     "loading": "Loading..."
   },
+  "table": {
+    "name": "Name",
+    "market": "Market",
+    "price": "Price",
+    "change24h": "24h Change",
+    "volume": "Volume",
+    "noData": "No data available"
+  },
+  "connection": {
+    "connected": "Live",
+    "connecting": "Connecting",
+    "disconnected": "Offline"
+  },
   "watchlist": {
     "title": "Watchlist",
     "add": "Add to Watchlist",
     "remove": "Remove from Watchlist",
     "empty": "Your watchlist is empty"
-  },
-  "sections": {
-    "popularStocks": "Popular Stocks",
-    "usStocks": "US Stocks",
-    "koreanStocks": "Korean Stocks",
-    "indexMarkets": "Index Markets",
-    "yourWatchlist": "Your Watchlist"
   },
   "compliance": {
     "badge": "Hyperliquid Market Prices",
@@ -66,7 +102,7 @@
     "fullNotice": "This page displays Hyperliquid Market Prices for reference purposes only. Hyperliquid Market Prices are not official stock exchange prices. Prices may differ significantly from prices on traditional stock exchanges. Displayed information may contain delays, inaccuracies, omissions, or errors. NightTicker does not verify market data accuracy. Do not rely on displayed information for investment or trading decisions."
   },
   "footer": {
-    "disclaimer": "NightTicker is an independent informational website. NightTicker is not a broker, exchange, securities firm, trading platform, financial advisor, or investment service. All information is provided for reference purposes only. NightTicker displays Hyperliquid Market Prices, not official stock exchange prices. Hyperliquid Market Prices may differ significantly from prices on traditional stock exchanges. Displayed information may contain delays, inaccuracies, omissions, or errors. NightTicker makes no representation regarding the accuracy, completeness, availability, or timeliness of displayed information. Do not rely on displayed information for investment or trading decisions.",
+    "disclaimer": "NightTicker is an independent informational website. NightTicker is not a broker, exchange, securities firm, trading platform, financial advisor, or investment service. All information is provided for reference purposes only. NightTicker displays Hyperliquid Market Prices, not official stock exchange prices. Do not rely on displayed information for investment or trading decisions.",
     "copyright": "NightTicker"
   },
   "faq": {
@@ -85,6 +121,18 @@
     "a6": "For detailed charts, historical data, and advanced market information, please visit Hyperliquid directly."
   },
   "pages": {
+    "gainers": {
+      "title": "Top Gainers",
+      "description": "Assets with the highest gains in the last 24 hours"
+    },
+    "losers": {
+      "title": "Top Losers",
+      "description": "Assets with the largest losses in the last 24 hours"
+    },
+    "favorites": {
+      "title": "Favorites",
+      "description": "Your favorite assets"
+    },
     "overnight": {
       "title": "Overnight Prices",
       "description": "Check current reference prices overnight when traditional stock markets are closed.",
@@ -99,10 +147,6 @@
       "title": "Holiday Prices",
       "description": "Check current reference prices during holidays when traditional stock markets are closed.",
       "content": "During market holidays, traditional stock exchanges may be closed. Hyperliquid Market Prices may still be available during these periods. NightTicker displays these holiday reference prices for informational purposes only."
-    },
-    "marketStatus": {
-      "title": "Market Status",
-      "description": "Check current market status for US and Korean stock exchanges."
     },
     "usMarketHours": {
       "title": "US Market Hours",
@@ -144,7 +188,10 @@
   "common": {
     "language": "Language",
     "english": "English",
-    "korean": "Korean"
+    "korean": "한국어",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "retry": "Retry"
   },
   "marketClock": {
     "localTime": "Your Local Time",

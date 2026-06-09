@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
-import { HomePage } from '@/components/pages/HomePage';
+import { LosersPage } from '@/components/pages/LosersPage';
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -8,16 +8,16 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: 'site' });
+  const t = await getTranslations({ locale, namespace: 'pages.losers' });
 
   return {
-    title: `${t('name')} - ${t('tagline')}`,
+    title: t('title'),
     description: t('description'),
     alternates: {
-      canonical: '/',
+      canonical: '/losers',
       languages: {
-        en: '/',
-        ko: '/ko',
+        en: '/losers',
+        ko: '/ko/losers',
       },
     },
   };
@@ -27,5 +27,5 @@ export default async function Page({ params }: Props) {
   const { locale } = await params;
   setRequestLocale(locale);
 
-  return <HomePage />;
+  return <LosersPage />;
 }
