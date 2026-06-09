@@ -8,6 +8,8 @@ import { PriceDisplay, PriceChange } from '@/components/ui/price-change';
 import { FavoriteButton } from '@/components/ui/favorite-button';
 import { Badge } from '@/components/ui/badge';
 import { useFavorites } from '@/lib/context/FavoritesContext';
+import { useCandleData } from '@/lib/hooks/useCandleData';
+import { MiniChart } from './MiniChart';
 
 interface AssetCardProps {
   asset: MarketAsset;
@@ -24,6 +26,16 @@ export function AssetCard({
 }: AssetCardProps) {
   const locale = useLocale();
   const { isFavorite, toggleFavorite } = useFavorites();
+
+  // Use candle-based data for real-time price and 24h change
+  const candleSymbol = asset.hyperliquidSymbol?.replace('xyz:', '') ?? asset.symbol;
+  const { candles, currentPrice, change24h, changePercent24h, loading, error } = useCandleData(candleSymbol);
+
+  // Use candle data if available, fallback to asset props
+  const displayPrice = currentPrice ?? asset.price;
+  const displayChange24h = change24h ?? asset.change24h;
+  const displayChangePercent24h = changePercent24h ?? asset.changePercent24h;
+  const isPositive = (displayChangePercent24h ?? 0) >= 0;
 
   const displayName = locale === 'ko' && asset.nameKo ? asset.nameKo : asset.name;
   const isFav = isFavorite(asset.symbol, asset.market);
@@ -101,25 +113,39 @@ export function AssetCard({
           />
         </div>
 
+        {/* Mini Chart */}
+        <div className="mb-3">
+          <MiniChart
+            candles={candles}
+            loading={loading}
+            error={error}
+            width={120}
+            height={48}
+            isPositive={isPositive}
+            className="w-full"
+          />
+        </div>
+
+        {/* Price and Change */}
         <div className="space-y-2">
           <PriceDisplay
-            price={asset.price}
-            change={asset.change24h}
-            changePercent={asset.changePercent24h}
+            price={displayPrice}
+            change={displayChange24h}
+            changePercent={displayChangePercent24h}
             size="md"
             showChange={false}
           />
 
           <div className="flex items-center gap-2">
             <PriceChange
-              value={asset.changePercent24h ?? null}
+              value={displayChangePercent24h ?? null}
               type="percent"
               size="sm"
               showBackground
             />
-            {asset.change24h != null && (
+            {displayChange24h != null && (
               <PriceChange
-                value={asset.change24h}
+                value={displayChange24h}
                 type="amount"
                 size="sm"
                 showIcon={false}
