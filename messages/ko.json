@@ -1,0 +1,149 @@
+{
+  "site": {
+    "name": "NightTicker",
+    "tagline": "시장은 잠들지 않는다",
+    "description": "전통적인 거래소가 닫혀 있을 때 주식 관련 시장 활동을 확인하세요."
+  },
+  "hero": {
+    "title": "NightTicker",
+    "subtitle": "시장은 잠들지 않는다",
+    "description": "전통적인 거래소가 닫혀 있을 때 주식 관련 시장 활동을 확인하세요.",
+    "timing": "야간. 주말. 휴일.",
+    "source": "Hyperliquid Market Prices.",
+    "disclaimer": "참고용 정보입니다."
+  },
+  "nav": {
+    "home": "홈",
+    "overnightPrices": "야간 가격",
+    "weekendPrices": "주말 가격",
+    "holidayPrices": "휴일 가격",
+    "marketStatus": "마켓 상태",
+    "usMarketHours": "미국 마켓 시간",
+    "koreaMarketHours": "한국 마켓 시간",
+    "howDataWorks": "데이터 작동 방식",
+    "whatIsHyperliquid": "Hyperliquid란",
+    "about": "소개",
+    "disclaimer": "면책조항",
+    "privacy": "개인정보처리방침",
+    "terms": "이용약관"
+  },
+  "market": {
+    "nightPrice": "야간 가격",
+    "overnightPrice": "야간 시세",
+    "weekendPrice": "주말 가격",
+    "marketClosedPrice": "장 마감 후 참고가격",
+    "currentPrice": "현재 Hyperliquid Market Price",
+    "lastUpdated": "최종 업데이트",
+    "marketStatus": "마켓 상태",
+    "open": "개장",
+    "closed": "폐장",
+    "viewSourceMarket": "소스 마켓 보기",
+    "viewOnHyperliquid": "Hyperliquid에서 보기",
+    "exploreDetails": "상세 정보 보기",
+    "priceUnavailable": "가격 정보 없음",
+    "loading": "로딩 중..."
+  },
+  "watchlist": {
+    "title": "관심 종목",
+    "add": "관심 종목에 추가",
+    "remove": "관심 종목에서 제거",
+    "empty": "관심 종목이 비어 있습니다"
+  },
+  "sections": {
+    "popularStocks": "인기 종목",
+    "usStocks": "미국 종목",
+    "koreanStocks": "한국 종목",
+    "indexMarkets": "지수 마켓",
+    "yourWatchlist": "내 관심 종목"
+  },
+  "compliance": {
+    "badge": "Hyperliquid Market Prices",
+    "referralDisclosure": "Hyperliquid 링크에는 레퍼럴 속성이 포함될 수 있습니다.",
+    "forReference": "참고용 정보입니다.",
+    "notOfficial": "공식 거래소 가격이 아닙니다.",
+    "mayDiffer": "전통적인 거래소 가격과 크게 다를 수 있습니다.",
+    "noReliance": "투자 또는 거래 결정에 이 정보를 사용하지 마세요.",
+    "fullNotice": "이 페이지는 참고용으로만 Hyperliquid Market Prices를 표시합니다. Hyperliquid Market Prices는 공식 거래소 가격이 아닙니다. 가격은 전통적인 거래소 가격과 크게 다를 수 있습니다. 표시된 정보에는 지연, 부정확성, 누락 또는 오류가 포함될 수 있습니다. NightTicker는 시장 데이터의 정확성을 검증하지 않습니다. 투자 또는 거래 결정에 표시된 정보를 사용하지 마세요."
+  },
+  "footer": {
+    "disclaimer": "NightTicker는 독립적인 정보 제공 웹사이트입니다. NightTicker는 브로커, 거래소, 증권사, 거래 플랫폼, 재정 고문 또는 투자 서비스가 아닙니다. 모든 정보는 참고용으로만 제공됩니다. NightTicker는 공식 거래소 가격이 아닌 Hyperliquid Market Prices를 표시합니다. Hyperliquid Market Prices는 전통적인 거래소 가격과 크게 다를 수 있습니다. 표시된 정보에는 지연, 부정확성, 누락 또는 오류가 포함될 수 있습니다. NightTicker는 표시된 정보의 정확성, 완전성, 가용성 또는 적시성에 대해 어떠한 보장도 하지 않습니다. 투자 또는 거래 결정에 표시된 정보를 사용하지 마세요.",
+    "copyright": "NightTicker"
+  },
+  "faq": {
+    "title": "자주 묻는 질문",
+    "q1": "Hyperliquid Market Prices란 무엇인가요?",
+    "a1": "Hyperliquid Market Prices는 Hyperliquid 마켓의 참고 가격입니다. 공식 거래소 가격이 아니며 전통적인 거래소 가격과 크게 다를 수 있습니다.",
+    "q2": "NightTicker가 공식 거래소 가격을 보여주나요?",
+    "a2": "아니요. NightTicker는 참고용으로만 Hyperliquid Market Prices를 표시합니다. 이는 공식 거래소 가격이 아닙니다.",
+    "q3": "Hyperliquid 가격이 거래소 가격과 다를 수 있는 이유는 무엇인가요?",
+    "a3": "Hyperliquid는 전통적인 거래소와 독립적으로 운영됩니다. 가격은 Hyperliquid 플랫폼의 시장 활동을 반영하며 유동성, 타이밍, 시장 상황 등 다양한 요인으로 인해 다를 수 있습니다.",
+    "q4": "NightTicker 가격을 투자 결정에 사용해야 하나요?",
+    "a4": "아니요. NightTicker는 참고 정보만 제공합니다. 투자 또는 거래 결정에 이 정보를 사용하지 마세요. 항상 공식 소스와 재정 고문을 참조하세요.",
+    "q5": "야간 가격이란 무엇인가요?",
+    "a5": "야간 가격은 야간, 주말 또는 휴일과 같이 전통적인 거래소가 닫혀 있을 때의 현재 Hyperliquid Market Price를 말합니다. 참고 가격일 뿐입니다.",
+    "q6": "상세한 차트는 어디서 볼 수 있나요?",
+    "a6": "상세한 차트, 과거 데이터 및 고급 시장 정보는 Hyperliquid를 직접 방문해 주세요."
+  },
+  "pages": {
+    "overnight": {
+      "title": "야간 가격",
+      "description": "전통적인 주식 시장이 닫혀 있는 야간에 현재 참고 가격을 확인하세요.",
+      "content": "전통적인 거래소가 야간에 닫히면 Hyperliquid Market Prices는 계속해서 시장 활동을 반영할 수 있습니다. NightTicker는 이러한 야간 참고 가격을 정보 제공 목적으로만 표시합니다."
+    },
+    "weekend": {
+      "title": "주말 가격",
+      "description": "전통적인 주식 시장이 닫혀 있는 주말에 현재 참고 가격을 확인하세요.",
+      "content": "전통적인 거래소는 일반적으로 주말에 닫혀 있습니다. 그러나 Hyperliquid Market Prices는 계속 움직일 수 있습니다. NightTicker는 이러한 주말 참고 가격을 정보 제공 목적으로만 표시합니다."
+    },
+    "holiday": {
+      "title": "휴일 가격",
+      "description": "전통적인 주식 시장이 닫혀 있는 휴일에 현재 참고 가격을 확인하세요.",
+      "content": "시장 휴일 동안 전통적인 거래소는 닫혀 있을 수 있습니다. 이 기간에도 Hyperliquid Market Prices는 사용 가능할 수 있습니다. NightTicker는 이러한 휴일 참고 가격을 정보 제공 목적으로만 표시합니다."
+    },
+    "marketStatus": {
+      "title": "마켓 상태",
+      "description": "미국 및 한국 주식 거래소의 현재 마켓 상태를 확인하세요."
+    },
+    "usMarketHours": {
+      "title": "미국 마켓 시간",
+      "description": "미국 주식 시장 거래 시간 및 일정 정보."
+    },
+    "koreaMarketHours": {
+      "title": "한국 마켓 시간",
+      "description": "한국 주식 시장 거래 시간 및 일정 정보."
+    },
+    "howDataWorks": {
+      "title": "데이터 작동 방식",
+      "description": "NightTicker가 Hyperliquid Market Prices를 표시하는 방법을 알아보세요."
+    },
+    "whatIsHyperliquid": {
+      "title": "Hyperliquid란",
+      "description": "NightTicker에 표시되는 시장 가격의 소스인 Hyperliquid에 대해 알아보세요."
+    },
+    "about": {
+      "title": "NightTicker 소개",
+      "description": "NightTicker와 우리의 미션에 대해 알아보세요."
+    },
+    "disclaimer": {
+      "title": "면책조항",
+      "description": "중요한 면책조항 및 법적 정보."
+    },
+    "privacy": {
+      "title": "개인정보처리방침",
+      "description": "NightTicker가 개인정보를 처리하는 방법."
+    },
+    "terms": {
+      "title": "이용약관",
+      "description": "NightTicker 이용 약관."
+    }
+  },
+  "search": {
+    "placeholder": "종목 검색...",
+    "noResults": "검색 결과가 없습니다"
+  },
+  "common": {
+    "language": "언어",
+    "english": "English",
+    "korean": "한국어"
+  }
+}

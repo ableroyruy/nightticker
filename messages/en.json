@@ -1,0 +1,149 @@
+{
+  "site": {
+    "name": "NightTicker",
+    "tagline": "The Market Never Sleeps",
+    "description": "Monitor stock-related market activity when traditional exchanges are closed."
+  },
+  "hero": {
+    "title": "NightTicker",
+    "subtitle": "The Market Never Sleeps",
+    "description": "Monitor stock-related market activity when traditional exchanges are closed.",
+    "timing": "Overnight. Weekend. Holiday.",
+    "source": "Hyperliquid Market Prices.",
+    "disclaimer": "For reference purposes only."
+  },
+  "nav": {
+    "home": "Home",
+    "overnightPrices": "Overnight Prices",
+    "weekendPrices": "Weekend Prices",
+    "holidayPrices": "Holiday Prices",
+    "marketStatus": "Market Status",
+    "usMarketHours": "US Market Hours",
+    "koreaMarketHours": "Korea Market Hours",
+    "howDataWorks": "How Data Works",
+    "whatIsHyperliquid": "What is Hyperliquid",
+    "about": "About",
+    "disclaimer": "Disclaimer",
+    "privacy": "Privacy",
+    "terms": "Terms"
+  },
+  "market": {
+    "nightPrice": "Night Price",
+    "overnightPrice": "Overnight Price",
+    "weekendPrice": "Weekend Price",
+    "marketClosedPrice": "Market Closed Price",
+    "currentPrice": "Current Hyperliquid Market Price",
+    "lastUpdated": "Last Updated",
+    "marketStatus": "Market Status",
+    "open": "Open",
+    "closed": "Closed",
+    "viewSourceMarket": "View Source Market",
+    "viewOnHyperliquid": "View Market on Hyperliquid",
+    "exploreDetails": "Explore Market Details",
+    "priceUnavailable": "Price unavailable",
+    "loading": "Loading..."
+  },
+  "watchlist": {
+    "title": "Watchlist",
+    "add": "Add to Watchlist",
+    "remove": "Remove from Watchlist",
+    "empty": "Your watchlist is empty"
+  },
+  "sections": {
+    "popularStocks": "Popular Stocks",
+    "usStocks": "US Stocks",
+    "koreanStocks": "Korean Stocks",
+    "indexMarkets": "Index Markets",
+    "yourWatchlist": "Your Watchlist"
+  },
+  "compliance": {
+    "badge": "Hyperliquid Market Prices",
+    "referralDisclosure": "Links to Hyperliquid may contain referral attribution.",
+    "forReference": "For reference purposes only.",
+    "notOfficial": "Not official stock exchange prices.",
+    "mayDiffer": "May differ significantly from traditional exchange prices.",
+    "noReliance": "Do not rely on this information for investment or trading decisions.",
+    "fullNotice": "This page displays Hyperliquid Market Prices for reference purposes only. Hyperliquid Market Prices are not official stock exchange prices. Prices may differ significantly from prices on traditional stock exchanges. Displayed information may contain delays, inaccuracies, omissions, or errors. NightTicker does not verify market data accuracy. Do not rely on displayed information for investment or trading decisions."
+  },
+  "footer": {
+    "disclaimer": "NightTicker is an independent informational website. NightTicker is not a broker, exchange, securities firm, trading platform, financial advisor, or investment service. All information is provided for reference purposes only. NightTicker displays Hyperliquid Market Prices, not official stock exchange prices. Hyperliquid Market Prices may differ significantly from prices on traditional stock exchanges. Displayed information may contain delays, inaccuracies, omissions, or errors. NightTicker makes no representation regarding the accuracy, completeness, availability, or timeliness of displayed information. Do not rely on displayed information for investment or trading decisions.",
+    "copyright": "NightTicker"
+  },
+  "faq": {
+    "title": "Frequently Asked Questions",
+    "q1": "What are Hyperliquid Market Prices?",
+    "a1": "Hyperliquid Market Prices are reference prices from the Hyperliquid market. They are not official stock exchange prices and may differ significantly from traditional exchange prices.",
+    "q2": "Is NightTicker showing official stock exchange prices?",
+    "a2": "No. NightTicker displays Hyperliquid Market Prices for reference purposes only. These are not official stock exchange prices.",
+    "q3": "Why can Hyperliquid prices differ from stock exchange prices?",
+    "a3": "Hyperliquid operates independently from traditional stock exchanges. Prices reflect market activity on the Hyperliquid platform and may differ due to various factors including liquidity, timing, and market conditions.",
+    "q4": "Should I use NightTicker prices for investment decisions?",
+    "a4": "No. NightTicker provides reference information only. Do not rely on this information for investment or trading decisions. Always consult official sources and financial advisors.",
+    "q5": "What does Night Price mean?",
+    "a5": "Night Price refers to the current Hyperliquid Market Price when traditional stock exchanges are closed, such as overnight, weekends, or holidays. It is a reference price only.",
+    "q6": "Where can I view detailed charts?",
+    "a6": "For detailed charts, historical data, and advanced market information, please visit Hyperliquid directly."
+  },
+  "pages": {
+    "overnight": {
+      "title": "Overnight Prices",
+      "description": "Check current reference prices overnight when traditional stock markets are closed.",
+      "content": "When traditional stock exchanges close for the night, Hyperliquid Market Prices may continue to reflect market activity. NightTicker displays these overnight reference prices for informational purposes only."
+    },
+    "weekend": {
+      "title": "Weekend Prices",
+      "description": "Check current reference prices on weekends when traditional stock markets are closed.",
+      "content": "Traditional stock exchanges are typically closed on weekends. However, Hyperliquid Market Prices may continue to move. NightTicker displays these weekend reference prices for informational purposes only."
+    },
+    "holiday": {
+      "title": "Holiday Prices",
+      "description": "Check current reference prices during holidays when traditional stock markets are closed.",
+      "content": "During market holidays, traditional stock exchanges may be closed. Hyperliquid Market Prices may still be available during these periods. NightTicker displays these holiday reference prices for informational purposes only."
+    },
+    "marketStatus": {
+      "title": "Market Status",
+      "description": "Check current market status for US and Korean stock exchanges."
+    },
+    "usMarketHours": {
+      "title": "US Market Hours",
+      "description": "US stock market trading hours and schedule information."
+    },
+    "koreaMarketHours": {
+      "title": "Korea Market Hours",
+      "description": "Korean stock market trading hours and schedule information."
+    },
+    "howDataWorks": {
+      "title": "How Data Works",
+      "description": "Learn how NightTicker displays Hyperliquid Market Prices."
+    },
+    "whatIsHyperliquid": {
+      "title": "What is Hyperliquid",
+      "description": "Learn about Hyperliquid, the source of market prices displayed on NightTicker."
+    },
+    "about": {
+      "title": "About NightTicker",
+      "description": "Learn about NightTicker and our mission."
+    },
+    "disclaimer": {
+      "title": "Disclaimer",
+      "description": "Important disclaimer and legal information."
+    },
+    "privacy": {
+      "title": "Privacy Policy",
+      "description": "How NightTicker handles your privacy."
+    },
+    "terms": {
+      "title": "Terms of Service",
+      "description": "Terms and conditions for using NightTicker."
+    }
+  },
+  "search": {
+    "placeholder": "Search stocks...",
+    "noResults": "No results found"
+  },
+  "common": {
+    "language": "Language",
+    "english": "English",
+    "korean": "Korean"
+  }
+}
