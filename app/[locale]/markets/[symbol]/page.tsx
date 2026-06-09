@@ -26,6 +26,8 @@ export async function generateStaticParams() {
   );
 }
 
+const BASE_URL = 'https://nightticker.com';
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale, symbol } = await params;
   const stock = getStockBySymbol(symbol);
@@ -47,21 +49,47 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       ? `Hyperliquid Market Prices 기준 ${name} 야간 참고가격을 확인하세요. 공식 거래소 가격이 아니며 참고용 정보입니다.`
       : `Check the current ${name} Night Price using Hyperliquid Market Prices. For reference purposes only. Not an official stock exchange price.`;
 
+  const canonicalUrl =
+    locale === 'ko' ? `${BASE_URL}/ko/markets/${symbol}` : `${BASE_URL}/markets/${symbol}`;
+
   return {
     title,
     description,
-    keywords: [
-      `${stock.name.toLowerCase()} night price`,
-      `${stock.name.toLowerCase()} overnight price`,
-      `${stock.symbol} price`,
-      'hyperliquid',
-    ],
+    keywords:
+      locale === 'ko'
+        ? [
+            `${name} 야간 가격`,
+            `${name} 주말 가격`,
+            `${stock.symbol} 시세`,
+            `${stock.name.toLowerCase()} night price`,
+            'hyperliquid',
+          ]
+        : [
+            `${stock.name.toLowerCase()} night price`,
+            `${stock.name.toLowerCase()} overnight price`,
+            `${stock.name.toLowerCase()} weekend price`,
+            `${stock.symbol} price`,
+            'hyperliquid',
+          ],
     alternates: {
-      canonical: `/markets/${symbol}`,
+      canonical: canonicalUrl,
       languages: {
-        en: `/markets/${symbol}`,
-        ko: `/ko/markets/${symbol}`,
+        en: `${BASE_URL}/markets/${symbol}`,
+        ko: `${BASE_URL}/ko/markets/${symbol}`,
       },
+    },
+    openGraph: {
+      title,
+      description,
+      url: canonicalUrl,
+      siteName: 'NightTicker',
+      locale: locale === 'ko' ? 'ko_KR' : 'en_US',
+      type: 'website',
+    },
+    twitter: {
+      card: 'summary_large_image',
+      title,
+      description,
     },
   };
 }

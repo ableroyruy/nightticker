@@ -1,11 +1,10 @@
 'use client';
 
 import { useLocale } from 'next-intl';
-import { usePathname, useRouter } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { useState, useRef, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Globe, Check } from 'lucide-react';
-import { saveLanguage, SupportedLanguage } from '@/lib/utils/getPreferredMarketOrder';
 import { cn } from '@/lib/utils';
 
 const languages = [
@@ -16,7 +15,6 @@ const languages = [
 export function LanguageSwitcher() {
   const locale = useLocale();
   const pathname = usePathname();
-  const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -30,29 +28,32 @@ export function LanguageSwitcher() {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const switchLocale = (newLocale: SupportedLanguage) => {
+  const switchLocale = (newLocale: string) => {
     if (newLocale === locale) {
       setIsOpen(false);
       return;
     }
 
-    // Save to localStorage
-    saveLanguage(newLocale);
+    // Set cookie to override locale detection
+    document.cookie = `NEXT_LOCALE=${newLocale};path=/;max-age=31536000`;
 
-    // Update URL
+    // Build new path
     let newPath = pathname;
+
+    // Remove existing locale prefix
+    if (pathname.startsWith('/ko')) {
+      newPath = pathname.slice(3) || '/';
+    } else if (pathname.startsWith('/en')) {
+      newPath = pathname.slice(3) || '/';
+    }
+
+    // Add new locale prefix (en is default, no prefix needed)
     if (newLocale === 'ko') {
-      if (!pathname.startsWith('/ko')) {
-        newPath = `/ko${pathname}`;
-      }
-    } else {
-      if (pathname.startsWith('/ko')) {
-        newPath = pathname.replace('/ko', '') || '/';
-      }
+      newPath = `/ko${newPath}`;
     }
 
     setIsOpen(false);
-    router.push(newPath);
+    window.location.href = newPath;
   };
 
   const currentLang = languages.find((l) => l.code === locale) || languages[0];
@@ -70,7 +71,7 @@ export function LanguageSwitcher() {
       </Button>
 
       {isOpen && (
-        <div className="absolute right-0 top-full mt-2 w-40 glass-card border border-border/50 rounded-xl shadow-2xl z-50 overflow-hidden">
+        <div className="absolute right-0 top-full mt-2 w-40 bg-popover border border-border rounded-xl shadow-2xl z-50 overflow-hidden">
           {languages.map((lang) => (
             <button
               key={lang.code}

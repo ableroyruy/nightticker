@@ -1,9 +1,21 @@
 import { NextIntlClientProvider } from 'next-intl';
 import { getMessages, setRequestLocale } from 'next-intl/server';
 import { notFound } from 'next/navigation';
+import { Geist, Geist_Mono } from 'next/font/google';
 import { locales, Locale } from '@/lib/i18n';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
+import { JsonLd } from '@/components/seo/JsonLd';
+
+const geistSans = Geist({
+  variable: '--font-geist-sans',
+  subsets: ['latin'],
+});
+
+const geistMono = Geist_Mono({
+  variable: '--font-geist-mono',
+  subsets: ['latin'],
+});
 
 type Props = {
   children: React.ReactNode;
@@ -26,8 +38,12 @@ export default async function LocaleLayout({ children, params }: Props) {
 
   return (
     <html lang={locale} className="dark" suppressHydrationWarning>
-      <body className="min-h-screen flex flex-col">
-        <NextIntlClientProvider messages={messages}>
+      <head>
+        <JsonLd type="website" locale={locale} />
+        <JsonLd type="organization" locale={locale} />
+      </head>
+      <body className={`${geistSans.variable} ${geistMono.variable} min-h-screen flex flex-col antialiased`}>
+        <NextIntlClientProvider messages={messages} locale={locale}>
           <Header />
           <main className="flex-1">{children}</main>
           <Footer />
