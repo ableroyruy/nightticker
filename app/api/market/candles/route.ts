@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 const API_URL = 'https://api.hyperliquid.xyz/info';
-const CACHE_TTL = 30000; // 30 seconds cache
 const CANDLE_INTERVAL = '5m';
+const CACHE_REVALIDATE = 30; // 30 seconds
 
 interface RawCandle {
   t: number;
@@ -22,27 +22,11 @@ interface CandleData {
   volume: number;
 }
 
-interface CacheEntry {
-  data: CandleData[];
-  timestamp: number;
-}
-
-// In-memory cache for candle data
-const candleCache = new Map<string, CacheEntry>();
-
 async function fetchCandles(symbol: string): Promise<CandleData[]> {
-  const cacheKey = symbol.toUpperCase();
-
-  // Check cache
-  const cached = candleCache.get(cacheKey);
-  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
-    return cached.data;
-  }
-
-  // Fetch from Hyperliquid
   const now = Date.now();
   const startTime = now - 6 * 60 * 60 * 1000; // 6 hours
 
+  // Use Next.js fetch cache with revalidation
   const response = await fetch(API_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -55,6 +39,7 @@ async function fetchCandles(symbol: string): Promise<CandleData[]> {
         endTime: now,
       },
     }),
+    next: { revalidate: CACHE_REVALIDATE, tags: [`candles-${symbol}`] },
   });
 
   if (!response.ok) {
@@ -67,7 +52,7 @@ async function fetchCandles(symbol: string): Promise<CandleData[]> {
     return [];
   }
 
-  const candles: CandleData[] = rawData.map((c) => ({
+  return rawData.map((c) => ({
     time: Math.floor(c.t / 1000),
     open: parseFloat(c.o),
     high: parseFloat(c.h),
@@ -75,14 +60,6 @@ async function fetchCandles(symbol: string): Promise<CandleData[]> {
     close: parseFloat(c.c),
     volume: parseFloat(c.v),
   }));
-
-  // Update cache
-  candleCache.set(cacheKey, {
-    data: candles,
-    timestamp: Date.now(),
-  });
-
-  return candles;
 }
 
 export async function GET(request: NextRequest) {
@@ -97,7 +74,7 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const candles = await fetchCandles(symbol);
+    const candles = await fetchCandles(symbol.toUpperCase());
 
     return NextResponse.json(candles, {
       headers: {

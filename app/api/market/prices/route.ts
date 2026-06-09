@@ -1,41 +1,22 @@
 import { NextResponse } from 'next/server';
 
 const API_URL = 'https://api.hyperliquid.xyz/info';
-const CACHE_TTL = 5000; // 5 seconds cache
-
-interface CacheEntry {
-  data: Record<string, string>;
-  timestamp: number;
-}
-
-let priceCache: CacheEntry | null = null;
+const CACHE_REVALIDATE = 5; // 5 seconds
 
 async function fetchPrices(): Promise<Record<string, string>> {
-  // Check cache
-  if (priceCache && Date.now() - priceCache.timestamp < CACHE_TTL) {
-    return priceCache.data;
-  }
-
-  // Fetch from Hyperliquid
+  // Use Next.js fetch cache with revalidation
   const response = await fetch(API_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ type: 'allMids' }),
+    next: { revalidate: CACHE_REVALIDATE, tags: ['all-prices'] },
   });
 
   if (!response.ok) {
     throw new Error(`Hyperliquid API error: ${response.status}`);
   }
 
-  const data = await response.json();
-
-  // Update cache
-  priceCache = {
-    data,
-    timestamp: Date.now(),
-  };
-
-  return data;
+  return response.json();
 }
 
 export async function GET() {
