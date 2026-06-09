@@ -5,7 +5,9 @@ import { ConnectionStatus } from '@/lib/types/market';
 
 const CACHED_CANDLES_URL = '/api/market/candles';
 const POLL_INTERVAL = 60000; // 60초마다 폴링
-const CLIENT_CACHE_TTL = 30000; // 클라이언트 캐시 30초
+const CLIENT_CACHE_TTL = 300000; // 클라이언트 캐시 5분
+const MAX_CONCURRENT = 4; // 동시 요청 최대 4개
+const REQUEST_DELAY = 50; // 요청 간 딜레이 50ms
 
 export interface CandleData {
   time: number;
@@ -30,8 +32,38 @@ interface CacheEntry {
   timestamp: number;
 }
 
-// 클라이언트 메모리 캐시 (컴포넌트 unmount/remount 시에도 유지)
+// 클라이언트 메모리 캐시
 const clientCache = new Map<string, CacheEntry>();
+
+// 요청 큐
+const requestQueue: Array<() => void> = [];
+let activeRequests = 0;
+
+function processQueue() {
+  while (activeRequests < MAX_CONCURRENT && requestQueue.length > 0) {
+    const next = requestQueue.shift();
+    if (next) {
+      activeRequests++;
+      next();
+    }
+  }
+}
+
+function queueRequest(fn: () => Promise<void>): Promise<void> {
+  return new Promise((resolve) => {
+    const execute = async () => {
+      try {
+        await fn();
+      } finally {
+        activeRequests--;
+        setTimeout(processQueue, REQUEST_DELAY);
+        resolve();
+      }
+    };
+    requestQueue.push(execute);
+    processQueue();
+  });
+}
 
 function calculateChange(candles: CandleData[]): { change24h: number; changePercent24h: number } {
   if (candles.length < 2) {
@@ -61,7 +93,6 @@ function setCachedData(symbol: string, data: CandleData[]) {
 
 export function useCandleData(symbol: string): CandleState & { status: ConnectionStatus } {
   const [state, setState] = useState<CandleState>(() => {
-    // 초기 상태: 캐시가 있으면 바로 사용
     const cached = getCachedData(symbol);
     if (cached && cached.length > 0) {
       const { change24h, changePercent24h } = calculateChange(cached);
@@ -84,15 +115,17 @@ export function useCandleData(symbol: string): CandleState & { status: Connectio
       error: null,
     };
   });
-  const [status, setStatus] = useState<ConnectionStatus>('connecting');
+  const [status, setStatus] = useState<ConnectionStatus>(() => {
+    const cached = getCachedData(symbol);
+    return cached ? 'connected' : 'connecting';
+  });
   const mountedRef = useRef(true);
   const fetchingRef = useRef(false);
 
   const fetchCandles = useCallback(async (force = false) => {
-    // 이미 fetch 중이면 스킵
     if (fetchingRef.current) return;
 
-    // 캐시 확인 (force가 아닐 때만)
+    // 캐시 확인
     if (!force) {
       const cached = getCachedData(symbol);
       if (cached && cached.length > 0) {
@@ -113,70 +146,80 @@ export function useCandleData(symbol: string): CandleState & { status: Connectio
 
     fetchingRef.current = true;
 
-    try {
-      const response = await fetch(`${CACHED_CANDLES_URL}?symbol=${symbol}`);
+    // 큐에 추가해서 순차 처리
+    await queueRequest(async () => {
+      try {
+        const response = await fetch(`${CACHED_CANDLES_URL}?symbol=${symbol}`);
 
-      if (!response.ok) {
-        throw new Error(`HTTP error: ${response.status}`);
+        if (!response.ok) {
+          throw new Error(`HTTP error: ${response.status}`);
+        }
+
+        const data: CandleData[] = await response.json();
+
+        if (!mountedRef.current) return;
+
+        if (Array.isArray(data) && data.length > 0) {
+          setCachedData(symbol, data);
+
+          const { change24h, changePercent24h } = calculateChange(data);
+          const lastCandle = data[data.length - 1];
+
+          setState({
+            candles: data,
+            currentPrice: lastCandle?.close ?? null,
+            change24h,
+            changePercent24h,
+            loading: false,
+            error: null,
+          });
+          setStatus('connected');
+        } else {
+          setState(prev => ({
+            ...prev,
+            loading: false,
+            error: 'No data',
+          }));
+          setStatus('connected');
+        }
+      } catch (e) {
+        console.error(`Failed to fetch candles for ${symbol}:`, e);
+        if (!mountedRef.current) return;
+
+        // 에러 시 캐시라도 있으면 사용
+        const cached = clientCache.get(symbol);
+        if (cached?.data?.length) {
+          const { change24h, changePercent24h } = calculateChange(cached.data);
+          const lastCandle = cached.data[cached.data.length - 1];
+          setState({
+            candles: cached.data,
+            currentPrice: lastCandle?.close ?? null,
+            change24h,
+            changePercent24h,
+            loading: false,
+            error: null,
+          });
+          setStatus('connected');
+        } else {
+          setState(prev => ({
+            ...prev,
+            loading: false,
+            error: 'Failed to load',
+          }));
+          setStatus('disconnected');
+        }
       }
+    });
 
-      const data: CandleData[] = await response.json();
-
-      if (!mountedRef.current) {
-        fetchingRef.current = false;
-        return;
-      }
-
-      if (Array.isArray(data) && data.length > 0) {
-        // 캐시 저장
-        setCachedData(symbol, data);
-
-        const { change24h, changePercent24h } = calculateChange(data);
-        const lastCandle = data[data.length - 1];
-
-        setState({
-          candles: data,
-          currentPrice: lastCandle?.close ?? null,
-          change24h,
-          changePercent24h,
-          loading: false,
-          error: null,
-        });
-        setStatus('connected');
-      } else {
-        setState(prev => ({
-          ...prev,
-          loading: false,
-          error: 'No data',
-        }));
-        setStatus('connected');
-      }
-    } catch (e) {
-      console.error(`Failed to fetch candles for ${symbol}:`, e);
-      if (!mountedRef.current) {
-        fetchingRef.current = false;
-        return;
-      }
-
-      setState(prev => ({
-        ...prev,
-        loading: false,
-        error: 'Failed to load',
-      }));
-      setStatus('disconnected');
-    } finally {
-      fetchingRef.current = false;
-    }
+    fetchingRef.current = false;
   }, [symbol]);
 
   useEffect(() => {
     mountedRef.current = true;
     fetchingRef.current = false;
 
-    // 초기 로드
     fetchCandles();
 
-    // 60초마다 폴링 (강제 새로고침)
     const interval = setInterval(() => fetchCandles(true), POLL_INTERVAL);
 
     return () => {
