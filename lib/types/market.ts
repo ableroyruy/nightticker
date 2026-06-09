@@ -1,4 +1,4 @@
-export type MarketType = 'KR' | 'US' | 'INDEX';
+export type MarketType = 'US' | 'KR' | 'JP' | 'INDEX' | 'ETF' | 'COMMODITY' | 'FX' | 'SPECIAL';
 
 export interface MarketAsset {
   symbol: string;

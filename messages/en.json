@@ -58,6 +58,17 @@
     "indexMarkets": "Index Markets",
     "yourWatchlist": "Your Watchlist"
   },
+  "categories": {
+    "all": "All Markets",
+    "US": "US Stocks",
+    "KR": "Korean Stocks",
+    "JP": "Japanese Stocks",
+    "INDEX": "Indices",
+    "ETF": "ETFs",
+    "COMMODITY": "Commodities",
+    "FX": "Currencies",
+    "SPECIAL": "Special"
+  },
   "market": {
     "nightPrice": "Night Price",
     "overnightPrice": "Overnight Price",

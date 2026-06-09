@@ -27,7 +27,12 @@ export function GainersLosersSection({
   const marketLabels: Record<MarketType, { en: string; ko: string }> = {
     KR: { en: 'Korea Market', ko: '한국시장' },
     US: { en: 'US Market', ko: '미국시장' },
+    JP: { en: 'Japan Market', ko: '일본시장' },
     INDEX: { en: 'Index', ko: '지수' },
+    ETF: { en: 'ETF', ko: 'ETF' },
+    COMMODITY: { en: 'Commodities', ko: '원자재' },
+    FX: { en: 'Currencies', ko: '통화' },
+    SPECIAL: { en: 'Special', ko: '특별' },
   };
 
   const marketLabel =
@@ -45,7 +50,12 @@ export function GainersLosersSection({
             'h-8 w-1 rounded-full',
             market === 'KR' && 'bg-blue-500',
             market === 'US' && 'bg-purple-500',
-            market === 'INDEX' && 'bg-emerald-500'
+            market === 'JP' && 'bg-red-500',
+            market === 'INDEX' && 'bg-emerald-500',
+            market === 'ETF' && 'bg-teal-500',
+            market === 'COMMODITY' && 'bg-amber-500',
+            market === 'FX' && 'bg-cyan-500',
+            market === 'SPECIAL' && 'bg-pink-500'
           )}
         />
         <h2 className="text-2xl font-bold">{marketLabel}</h2>

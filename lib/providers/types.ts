@@ -13,11 +13,13 @@ export interface MarketDataProvider {
   isAvailable(): Promise<boolean>;
 }
 
+export type StockCategory = 'US' | 'KR' | 'JP' | 'INDEX' | 'ETF' | 'COMMODITY' | 'FX' | 'SPECIAL';
+
 export interface Stock {
   symbol: string;
   name: string;
   nameKo: string;
   slug: string;
-  category: 'US' | 'KR' | 'INDEX';
+  category: StockCategory;
   hyperliquidSymbol: string;
 }

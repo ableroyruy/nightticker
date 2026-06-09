@@ -42,6 +42,18 @@ export default async function LocaleLayout({ children, params }: Props) {
       <head>
         <JsonLd type="website" locale={locale} />
         <JsonLd type="organization" locale={locale} />
+        {/* Google Analytics */}
+        <script async src="https://www.googletagmanager.com/gtag/js?id=G-880N7J6MBW" />
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+              gtag('config', 'G-880N7J6MBW');
+            `,
+          }}
+        />
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} min-h-screen flex flex-col antialiased`}>
         <NextIntlClientProvider messages={messages} locale={locale}>

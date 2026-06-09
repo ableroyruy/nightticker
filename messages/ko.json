@@ -58,6 +58,17 @@
     "indexMarkets": "지수 마켓",
     "yourWatchlist": "내 관심 종목"
   },
+  "categories": {
+    "all": "전체",
+    "US": "미국 주식",
+    "KR": "한국 주식",
+    "JP": "일본 주식",
+    "INDEX": "지수",
+    "ETF": "ETF",
+    "COMMODITY": "원자재",
+    "FX": "통화",
+    "SPECIAL": "특별"
+  },
   "market": {
     "nightPrice": "야간 가격",
     "overnightPrice": "야간 시세",

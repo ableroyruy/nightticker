@@ -4,13 +4,34 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTranslations, useLocale } from 'next-intl';
 import { LanguageSwitcher } from './LanguageSwitcher';
-import { Moon, Menu, X, Home, Star, TrendingUp, TrendingDown } from 'lucide-react';
+import { Moon, Menu, X, Home, Star, TrendingUp, TrendingDown, ChevronDown, BarChart3, Coins, Globe, Cpu, Building2, DollarSign } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  DropdownMenuSeparator,
+} from '@/components/ui/dropdown-menu';
 import { useState } from 'react';
 import { cn } from '@/lib/utils';
+import { StockCategory } from '@/lib/providers/types';
+
+const categoryIcons: Record<StockCategory | 'all', React.ElementType> = {
+  all: Globe,
+  US: Building2,
+  KR: Building2,
+  JP: Building2,
+  INDEX: BarChart3,
+  ETF: BarChart3,
+  COMMODITY: Coins,
+  FX: DollarSign,
+  SPECIAL: Cpu,
+};
 
 export function Header() {
   const t = useTranslations('nav');
+  const tCat = useTranslations('categories');
   const locale = useLocale();
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -24,6 +45,8 @@ export function Header() {
     { href: `${prefix}/losers`, label: t('topLosers'), icon: TrendingDown },
   ];
 
+  const categories: (StockCategory | 'all')[] = ['all', 'US', 'KR', 'JP', 'INDEX', 'ETF', 'COMMODITY', 'FX'];
+
   const isActive = (href: string) => {
     if (href === prefix || href === `${prefix}/`) {
       return pathname === prefix || pathname === `${prefix}/` || pathname === '/';
@@ -31,10 +54,12 @@ export function Header() {
     return pathname.startsWith(href);
   };
 
+  const isCategoryActive = pathname.includes('/category/');
+
   return (
     <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/80 backdrop-blur-xl">
       <div className="container flex h-16 items-center justify-between">
-        <div className="flex items-center gap-8">
+        <div className="flex items-center gap-6">
           <Link href={prefix || '/'} className="flex items-center gap-2.5">
             <div className="p-1.5 glass-card rounded-lg">
               <Moon className="h-5 w-5 text-primary" />
@@ -62,6 +87,38 @@ export function Header() {
                 </Link>
               );
             })}
+
+            {/* Categories Dropdown */}
+            <DropdownMenu>
+              <DropdownMenuTrigger
+                className={cn(
+                  'flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
+                  isCategoryActive
+                    ? 'bg-accent text-accent-foreground'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-accent/50'
+                )}
+              >
+                <BarChart3 className="h-4 w-4" />
+                {tCat('all')}
+                <ChevronDown className="h-3 w-3" />
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="start" className="w-48">
+                {categories.map((cat, index) => {
+                  const Icon = categoryIcons[cat];
+                  return (
+                    <div key={cat}>
+                      {index === 4 && <DropdownMenuSeparator />}
+                      <Link href={cat === 'all' ? `${prefix}/` : `${prefix}/category/${cat.toLowerCase()}`}>
+                        <DropdownMenuItem className="flex items-center gap-2 cursor-pointer">
+                          <Icon className="h-4 w-4" />
+                          {tCat(cat)}
+                        </DropdownMenuItem>
+                      </Link>
+                    </div>
+                  );
+                })}
+              </DropdownMenuContent>
+            </DropdownMenu>
           </nav>
         </div>
 
@@ -107,6 +164,25 @@ export function Header() {
               </Link>
             );
           })}
+
+          {/* Mobile Categories */}
+          <div className="pt-2 border-t border-border/50 mt-2">
+            <p className="px-4 py-2 text-xs text-muted-foreground uppercase tracking-wider">{tCat('all')}</p>
+            {categories.filter(c => c !== 'all').map((cat) => {
+              const Icon = categoryIcons[cat];
+              return (
+                <Link
+                  key={cat}
+                  href={`${prefix}/category/${cat.toLowerCase()}`}
+                  className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-accent/50 transition-colors"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  <Icon className="h-5 w-5" />
+                  {tCat(cat)}
+                </Link>
+              );
+            })}
+          </div>
         </nav>
       )}
     </header>

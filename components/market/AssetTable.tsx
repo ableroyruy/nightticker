@@ -29,13 +29,23 @@ export function AssetTable({
   const marketBadgeColors: Record<MarketType, string> = {
     KR: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
     US: 'bg-purple-500/20 text-purple-400 border-purple-500/30',
+    JP: 'bg-red-500/20 text-red-400 border-red-500/30',
     INDEX: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
+    ETF: 'bg-teal-500/20 text-teal-400 border-teal-500/30',
+    COMMODITY: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
+    FX: 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30',
+    SPECIAL: 'bg-pink-500/20 text-pink-400 border-pink-500/30',
   };
 
   const marketLabels: Record<MarketType, string> = {
     KR: locale === 'ko' ? '한국' : 'KR',
     US: locale === 'ko' ? '미국' : 'US',
-    INDEX: 'Index',
+    JP: locale === 'ko' ? '일본' : 'JP',
+    INDEX: locale === 'ko' ? '지수' : 'Index',
+    ETF: 'ETF',
+    COMMODITY: locale === 'ko' ? '원자재' : 'Commodity',
+    FX: locale === 'ko' ? '통화' : 'FX',
+    SPECIAL: locale === 'ko' ? '특별' : 'Special',
   };
 
   const prefix = locale === 'ko' ? '/ko' : '';
