@@ -34,14 +34,14 @@ export function AssetCard({
   const locale = useLocale();
   const { isFavorite, toggleFavorite } = useFavorites();
 
-  // Use candle-based data for real-time price and 24h change
+  // Use candle data for chart only
   const candleSymbol = asset.hyperliquidSymbol?.replace('xyz:', '') ?? asset.symbol;
-  const { candles, currentPrice, change24h, changePercent24h, loading, error } = useCandleData(candleSymbol);
+  const { candles, loading: chartLoading, error: chartError } = useCandleData(candleSymbol);
 
-  // Use candle data if available, fallback to asset props
-  const displayPrice = currentPrice ?? asset.price;
-  const displayChange24h = change24h ?? asset.change24h;
-  const displayChangePercent24h = changePercent24h ?? asset.changePercent24h;
+  // Use allMids-based price from props (real-time), chart data is separate
+  const displayPrice = asset.price;
+  const displayChange24h = asset.change24h;
+  const displayChangePercent24h = asset.changePercent24h;
   const isPositive = (displayChangePercent24h ?? 0) >= 0;
 
   const displayName = locale === 'ko' && asset.nameKo
@@ -124,44 +124,38 @@ export function AssetCard({
           />
         </div>
 
-        {/* Mini Chart */}
-        <div className="mb-3">
-          <MiniChart
-            candles={candles}
-            loading={loading}
-            error={error}
-            width={120}
-            height={48}
-            isPositive={isPositive}
-            className="w-full"
-          />
-        </div>
-
-        {/* Price and Change */}
-        <div className="space-y-2">
-          <PriceDisplay
-            price={displayPrice}
-            change={displayChange24h}
-            changePercent={displayChangePercent24h}
-            size="md"
-            showChange={false}
-          />
-
-          <div className="flex items-center gap-2">
-            <PriceChange
-              value={displayChangePercent24h ?? null}
-              type="percent"
-              size="sm"
-              showBackground
+        {/* Price and Chart Row */}
+        <div className="flex items-center justify-between gap-3">
+          {/* Price and Change */}
+          <div className="space-y-1 min-w-0 flex-shrink-0">
+            <PriceDisplay
+              price={displayPrice}
+              change={displayChange24h}
+              changePercent={displayChangePercent24h}
+              size="md"
+              showChange={false}
             />
-            {displayChange24h != null && (
+
+            <div className="flex items-center gap-2">
               <PriceChange
-                value={displayChange24h}
-                type="amount"
+                value={displayChangePercent24h ?? null}
+                type="percent"
                 size="sm"
-                showIcon={false}
+                showBackground
               />
-            )}
+            </div>
+          </div>
+
+          {/* Mini Chart */}
+          <div className="flex-shrink-0">
+            <MiniChart
+              candles={candles}
+              loading={chartLoading}
+              error={chartError}
+              width={100}
+              height={56}
+              isPositive={isPositive}
+            />
           </div>
         </div>
       </div>

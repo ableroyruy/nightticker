@@ -1,12 +1,20 @@
 'use client';
 
+import dynamic from 'next/dynamic';
 import { useTranslations } from 'next-intl';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useHyperliquidTicker } from '@/lib/hooks/useHyperliquidTicker';
+import { useCandleData } from '@/lib/hooks/useCandleData';
 import { ConnectionStatus } from '@/components/ui/connection-status';
 import { PriceDisplay } from '@/components/market/PriceDisplay';
 import { formatLastUpdated } from '@/lib/markets/hours';
 import { Skeleton } from '@/components/ui/skeleton';
+
+// Dynamic import for chart to avoid SSR issues
+const MiniChart = dynamic(() => import('./MiniChart').then((mod) => mod.MiniChart), {
+  ssr: false,
+  loading: () => <Skeleton className="w-full h-[200px] rounded" />,
+});
 
 interface MarketPriceCardProps {
   hyperliquidSymbol: string;
@@ -21,7 +29,11 @@ export function MarketPriceCard({ hyperliquidSymbol, locale }: MarketPriceCardPr
   const tickerKey = hyperliquidSymbol.replace('xyz:', '');
   const ticker = tickers[tickerKey];
 
+  // Candle data for chart
+  const { candles, loading: chartLoading, error: chartError } = useCandleData(tickerKey);
+
   const isLoading = status === 'connecting' && !ticker;
+  const isPositive = (ticker?.changePercent24h ?? 0) >= 0;
 
   return (
     <Card>
@@ -29,7 +41,7 @@ export function MarketPriceCard({ hyperliquidSymbol, locale }: MarketPriceCardPr
         <CardTitle>{t('currentPrice')}</CardTitle>
         <ConnectionStatus status={status} lastUpdate={lastUpdate} />
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="space-y-6">
         {isLoading ? (
           <div className="space-y-2">
             <Skeleton className="h-14 w-48" />
@@ -43,6 +55,19 @@ export function MarketPriceCard({ hyperliquidSymbol, locale }: MarketPriceCardPr
             size="lg"
           />
         )}
+
+        {/* 24h Chart */}
+        <div className="w-full">
+          <MiniChart
+            candles={candles}
+            loading={chartLoading}
+            error={chartError}
+            width={600}
+            height={200}
+            isPositive={isPositive}
+            className="w-full"
+          />
+        </div>
 
         {lastUpdate && (
           <div className="text-sm text-muted-foreground">

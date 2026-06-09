@@ -16,7 +16,7 @@ type Props = {
 
 export async function generateStaticParams() {
   const slugs = getAllSlugs();
-  const locales = ['en', 'ko'];
+  const locales = ['en', 'ko', 'ja'];
 
   return locales.flatMap((locale) =>
     slugs.map((slug) => ({
@@ -38,20 +38,24 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
 
-  const name = locale === 'ko' ? stock.nameKo : stock.name;
+  const name = locale === 'ko' ? stock.nameKo : locale === 'ja' ? (stock.nameJa ?? stock.name) : stock.name;
 
   const title =
     locale === 'ko'
       ? `${name} (${stock.symbol}) 야간 시세 - 실시간 참고가격`
-      : `${name} (${stock.symbol}) Night Price - Real-time Reference Price`;
+      : locale === 'ja'
+        ? `${name} (${stock.symbol}) 夜間価格 - リアルタイム参考価格`
+        : `${name} (${stock.symbol}) Night Price - Real-time Reference Price`;
 
   const description =
     locale === 'ko'
       ? `${name} (${stock.symbol}) 야간, 주말, 휴일 참고가격을 실시간으로 확인하세요. Hyperliquid 기준 시세이며 공식 거래소 가격이 아닙니다.`
-      : `Check ${name} (${stock.symbol}) overnight, weekend, and holiday reference prices in real-time. Based on Hyperliquid market prices, not official exchange prices.`;
+      : locale === 'ja'
+        ? `${name} (${stock.symbol}) の夜間、週末、祝日の参考価格をリアルタイムで確認。Hyperliquid市場価格に基づき、公式取引所価格ではありません。`
+        : `Check ${name} (${stock.symbol}) overnight, weekend, and holiday reference prices in real-time. Based on Hyperliquid market prices, not official exchange prices.`;
 
   const canonicalUrl =
-    locale === 'ko' ? `${BASE_URL}/ko/stock/${slug}` : `${BASE_URL}/stock/${slug}`;
+    locale === 'en' ? `${BASE_URL}/stock/${slug}` : `${BASE_URL}/${locale}/stock/${slug}`;
 
   return {
     title,
@@ -83,6 +87,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       languages: {
         en: `${BASE_URL}/stock/${slug}`,
         ko: `${BASE_URL}/ko/stock/${slug}`,
+        ja: `${BASE_URL}/ja/stock/${slug}`,
       },
     },
     openGraph: {
@@ -112,7 +117,7 @@ export default async function StockPage({ params }: Props) {
 
   const faq = await getTranslations('faq');
 
-  const displayName = locale === 'ko' ? stock.nameKo : stock.name;
+  const displayName = locale === 'ko' ? stock.nameKo : locale === 'ja' ? (stock.nameJa ?? stock.name) : stock.name;
 
   return (
     <div className="container py-8 space-y-8">

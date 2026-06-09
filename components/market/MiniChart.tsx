@@ -49,6 +49,7 @@ export const MiniChart = memo(function MiniChart({
       layout: {
         background: { type: ColorType.Solid, color: 'transparent' },
         textColor: 'transparent',
+        attributionLogo: false,
       },
       grid: {
         vertLines: { visible: false },
@@ -82,6 +83,8 @@ export const MiniChart = memo(function MiniChart({
       borderDownColor: '#ef4444',
       wickUpColor: '#22c55e',
       wickDownColor: '#ef4444',
+      priceLineVisible: false,
+      lastValueVisible: false,
     });
 
     chartRef.current = chart;
