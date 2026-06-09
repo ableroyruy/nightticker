@@ -3,8 +3,14 @@
 import { useState, useEffect, useRef } from 'react';
 import { ConnectionStatus } from '@/lib/types/market';
 
-const CACHED_CANDLES_URL = '/api/market/candles';
-const POLL_INTERVAL = 60000; // 60초
+const CANDLES_API = '/api/market/candles';
+
+// 캐시 설정 - 서버와 동일하게 2분
+const CACHE_TTL = 120000;
+// 폴링 간격 - 5분 캔들이므로 5분마다 갱신
+const POLL_INTERVAL = 300000;
+// 초기 로드 시 요청 분산 (50ms 간격)
+const STAGGER_DELAY = 50;
 
 export interface CandleData {
   time: number;
@@ -24,84 +30,62 @@ interface CandleState {
   error: string | null;
 }
 
-// 전역 캐시 (심볼 → 데이터)
-const globalCache = new Map<string, { data: CandleData[]; timestamp: number }>();
-const CACHE_TTL = 300000; // 5분
+// 전역 캐시
+const cache = new Map<string, { data: CandleData[]; timestamp: number }>();
+// 진행 중인 요청 (Promise 공유로 중복 방지)
+const pending = new Map<string, Promise<CandleData[]>>();
+// 요청 분산용 카운터
+let counter = 0;
 
-// 진행 중인 요청 (중복 방지) - Promise를 공유해서 같은 심볼 동시 요청 방지
-const pendingRequests = new Map<string, Promise<CandleData[]>>();
-
-// 요청 지연을 위한 카운터 (staggered loading)
-let requestCounter = 0;
-const REQUEST_DELAY_MS = 50; // 각 요청 사이 50ms 간격
-
-function calculateChange(candles: CandleData[]) {
+function getChange(candles: CandleData[]) {
   if (candles.length < 2) return { change24h: 0, changePercent24h: 0 };
-  const first = candles[0];
-  const last = candles[candles.length - 1];
-  const change24h = last.close - first.close;
-  const changePercent24h = first.close > 0 ? (change24h / first.close) * 100 : 0;
+  const first = candles[0].close;
+  const last = candles[candles.length - 1].close;
+  const change24h = last - first;
+  const changePercent24h = first > 0 ? (change24h / first) * 100 : 0;
   return { change24h, changePercent24h };
 }
 
-// 단일 심볼 fetch (중복 요청 방지 + 재시도)
-async function fetchCandlesForSymbol(symbol: string, retries = 2): Promise<CandleData[]> {
-  // 이미 진행 중인 요청이 있으면 그 결과를 기다림
-  const pending = pendingRequests.get(symbol);
-  if (pending) {
-    return pending;
-  }
+async function fetchCandles(symbol: string): Promise<CandleData[]> {
+  // 진행 중인 요청 재사용
+  const inflight = pending.get(symbol);
+  if (inflight) return inflight;
 
-  const fetchPromise = (async () => {
-    for (let attempt = 0; attempt <= retries; attempt++) {
-      try {
-        const res = await fetch(`${CACHED_CANDLES_URL}?symbol=${symbol}`);
-        if (!res.ok) throw new Error('Failed');
+  const promise = (async () => {
+    try {
+      const res = await fetch(`${CANDLES_API}?symbol=${symbol}`);
+      if (!res.ok) return [];
 
-        const data: CandleData[] = await res.json();
-
-        if (Array.isArray(data) && data.length > 0) {
-          globalCache.set(symbol, { data, timestamp: Date.now() });
-          return data;
-        }
-        return [];
-      } catch {
-        if (attempt < retries) {
-          // 재시도 전 잠시 대기
-          await new Promise(r => setTimeout(r, 500 * (attempt + 1)));
-          continue;
-        }
-        return [];
+      const data = await res.json();
+      if (Array.isArray(data) && data.length > 0) {
+        cache.set(symbol, { data, timestamp: Date.now() });
+        return data;
       }
+      return [];
+    } catch {
+      return [];
+    } finally {
+      pending.delete(symbol);
     }
-    return [];
   })();
 
-  pendingRequests.set(symbol, fetchPromise);
-
-  // 완료 후 pendingRequests에서 제거
-  fetchPromise.finally(() => {
-    pendingRequests.delete(symbol);
-  });
-
-  return fetchPromise;
+  pending.set(symbol, promise);
+  return promise;
 }
 
 export function useCandleData(symbol: string): CandleState & { status: ConnectionStatus } {
-  const normalizedSymbol = symbol.toUpperCase();
+  const sym = symbol.toUpperCase();
 
-  // 캐시에서 초기값 가져오기
-  const cachedEntry = globalCache.get(normalizedSymbol);
-  const initialData = cachedEntry && (Date.now() - cachedEntry.timestamp < CACHE_TTL)
-    ? cachedEntry.data
-    : null;
+  // 캐시에서 초기값
+  const cached = cache.get(sym);
+  const hasCache = cached && Date.now() - cached.timestamp < CACHE_TTL;
 
   const [state, setState] = useState<CandleState>(() => {
-    if (initialData && initialData.length > 0) {
-      const { change24h, changePercent24h } = calculateChange(initialData);
+    if (hasCache && cached.data.length > 0) {
+      const { change24h, changePercent24h } = getChange(cached.data);
       return {
-        candles: initialData,
-        currentPrice: initialData[initialData.length - 1]?.close ?? null,
+        candles: cached.data,
+        currentPrice: cached.data[cached.data.length - 1]?.close ?? null,
         change24h,
         changePercent24h,
         loading: false,
@@ -118,17 +102,16 @@ export function useCandleData(symbol: string): CandleState & { status: Connectio
     };
   });
 
-  const [status, setStatus] = useState<ConnectionStatus>(initialData ? 'connected' : 'connecting');
+  const [status, setStatus] = useState<ConnectionStatus>(hasCache ? 'connected' : 'connecting');
   const mountedRef = useRef(true);
 
   useEffect(() => {
     mountedRef.current = true;
 
-    const updateState = (data: CandleData[]) => {
+    const update = (data: CandleData[]) => {
       if (!mountedRef.current) return;
-
       if (data.length > 0) {
-        const { change24h, changePercent24h } = calculateChange(data);
+        const { change24h, changePercent24h } = getChange(data);
         setState({
           candles: data,
           currentPrice: data[data.length - 1]?.close ?? null,
@@ -143,45 +126,41 @@ export function useCandleData(symbol: string): CandleState & { status: Connectio
       setStatus('connected');
     };
 
-    const fetchData = async (useDelay = false) => {
+    const load = async (stagger: boolean) => {
       // 캐시 확인
-      const cached = globalCache.get(normalizedSymbol);
-      if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
-        updateState(cached.data);
+      const c = cache.get(sym);
+      if (c && Date.now() - c.timestamp < CACHE_TTL) {
+        update(c.data);
         return;
       }
 
-      // 초기 로드 시에만 staggered delay 적용
-      if (useDelay) {
-        const delay = (requestCounter++ % 20) * REQUEST_DELAY_MS;
+      // 초기 로드 시 분산
+      if (stagger) {
+        const delay = (counter++ % 20) * STAGGER_DELAY;
         if (delay > 0) {
           await new Promise(r => setTimeout(r, delay));
-        }
-        // 딜레이 후 다시 캐시 확인 (다른 요청이 완료했을 수 있음)
-        const cachedAfterDelay = globalCache.get(normalizedSymbol);
-        if (cachedAfterDelay && Date.now() - cachedAfterDelay.timestamp < CACHE_TTL) {
-          updateState(cachedAfterDelay.data);
-          return;
+          // 딜레이 후 캐시 재확인
+          const c2 = cache.get(sym);
+          if (c2 && Date.now() - c2.timestamp < CACHE_TTL) {
+            update(c2.data);
+            return;
+          }
         }
       }
 
       if (!mountedRef.current) return;
-
-      const data = await fetchCandlesForSymbol(normalizedSymbol);
-      updateState(data);
+      const data = await fetchCandles(sym);
+      update(data);
     };
 
-    // 초기 로드는 staggered delay 적용
-    fetchData(true);
-
-    // 폴링은 딜레이 없이
-    const interval = setInterval(() => fetchData(false), POLL_INTERVAL);
+    load(true);
+    const interval = setInterval(() => load(false), POLL_INTERVAL);
 
     return () => {
       mountedRef.current = false;
       clearInterval(interval);
     };
-  }, [normalizedSymbol]);
+  }, [sym]);
 
   return { ...state, status };
 }

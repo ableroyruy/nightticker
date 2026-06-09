@@ -1,22 +1,14 @@
 'use client';
 
 import Link from 'next/link';
-import dynamic from 'next/dynamic';
 import { useLocale } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { MarketAsset, MarketType } from '@/lib/types/market';
 import { PriceDisplay, PriceChange } from '@/components/ui/price-change';
 import { FavoriteButton } from '@/components/ui/favorite-button';
 import { Badge } from '@/components/ui/badge';
-import { Skeleton } from '@/components/ui/skeleton';
 import { useFavorites } from '@/lib/context/FavoritesContext';
-import { useCandleData } from '@/lib/hooks/useCandleData';
-
-// Dynamic import to avoid SSR issues with lightweight-charts
-const MiniChart = dynamic(() => import('./MiniChart').then((mod) => mod.MiniChart), {
-  ssr: false,
-  loading: () => <Skeleton className="w-full h-12 rounded" />,
-});
+import { MemoizedChart } from './MemoizedChart';
 
 interface AssetCardProps {
   asset: MarketAsset;
@@ -34,9 +26,8 @@ export function AssetCard({
   const locale = useLocale();
   const { isFavorite, toggleFavorite } = useFavorites();
 
-  // Use candle data for chart only
+  // Chart symbol
   const candleSymbol = asset.hyperliquidSymbol?.replace('xyz:', '') ?? asset.symbol;
-  const { candles, loading: chartLoading, error: chartError } = useCandleData(candleSymbol);
 
   // Use allMids-based price from props (real-time), chart data is separate
   const displayPrice = asset.price;
@@ -160,15 +151,13 @@ export function AssetCard({
             </div>
           </div>
 
-          {/* Mini Chart */}
+          {/* Mini Chart - Memoized to prevent re-render on favorites change */}
           <div className="flex-shrink-0">
-            <MiniChart
-              candles={candles}
-              loading={chartLoading}
-              error={chartError}
+            <MemoizedChart
+              symbol={candleSymbol}
+              isPositive={isPositive}
               width={180}
               height={72}
-              isPositive={isPositive}
             />
           </div>
         </div>
