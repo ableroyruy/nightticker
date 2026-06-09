@@ -22,6 +22,7 @@ interface MiniChartProps {
   height?: number;
   className?: string;
   isPositive?: boolean;
+  autoResize?: boolean;
 }
 
 type CandlestickSeriesApi = ReturnType<IChartApi['addSeries']>;
@@ -34,6 +35,7 @@ export const MiniChart = memo(function MiniChart({
   height = 48,
   className,
   isPositive = true,
+  autoResize = false,
 }: MiniChartProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
@@ -43,9 +45,13 @@ export const MiniChart = memo(function MiniChart({
   useEffect(() => {
     if (!containerRef.current) return;
 
+    // Use container width if autoResize, otherwise use prop
+    const chartWidth = autoResize ? containerRef.current.clientWidth : width;
+    const chartHeight = height;
+
     const chart = createChart(containerRef.current, {
-      width,
-      height,
+      width: chartWidth,
+      height: chartHeight,
       layout: {
         background: { type: ColorType.Solid, color: 'transparent' },
         textColor: 'transparent',
@@ -95,7 +101,7 @@ export const MiniChart = memo(function MiniChart({
       chartRef.current = null;
       seriesRef.current = null;
     };
-  }, [width, height]);
+  }, [width, height, autoResize]);
 
   // Update chart data
   useEffect(() => {
@@ -117,18 +123,38 @@ export const MiniChart = memo(function MiniChart({
     }
   }, [candles]);
 
-  // Resize chart if dimensions change
+  // Resize chart if dimensions change or container resizes
   useEffect(() => {
-    if (chartRef.current) {
+    if (!chartRef.current || !containerRef.current) return;
+
+    if (autoResize) {
+      const resizeObserver = new ResizeObserver((entries) => {
+        const entry = entries[0];
+        if (entry && chartRef.current) {
+          const newWidth = entry.contentRect.width;
+          if (newWidth > 0) {
+            chartRef.current.resize(newWidth, height);
+            chartRef.current.timeScale().fitContent();
+          }
+        }
+      });
+
+      resizeObserver.observe(containerRef.current);
+      return () => resizeObserver.disconnect();
+    } else {
       chartRef.current.resize(width, height);
     }
-  }, [width, height]);
+  }, [width, height, autoResize]);
+
+  const containerStyle = autoResize
+    ? { height, width: '100%' }
+    : { width, height };
 
   if (loading) {
     return (
       <Skeleton
         className={cn('rounded', className)}
-        style={{ width, height }}
+        style={containerStyle}
       />
     );
   }
@@ -140,7 +166,7 @@ export const MiniChart = memo(function MiniChart({
           'flex items-center justify-center text-xs text-muted-foreground',
           className
         )}
-        style={{ width, height }}
+        style={containerStyle}
       >
         --
       </div>
@@ -154,7 +180,7 @@ export const MiniChart = memo(function MiniChart({
           'flex items-center justify-center text-xs text-muted-foreground',
           className
         )}
-        style={{ width, height }}
+        style={containerStyle}
       >
         No data
       </div>
@@ -165,7 +191,7 @@ export const MiniChart = memo(function MiniChart({
     <div
       ref={containerRef}
       className={cn('overflow-hidden', className)}
-      style={{ width, height }}
+      style={containerStyle}
     />
   );
 });

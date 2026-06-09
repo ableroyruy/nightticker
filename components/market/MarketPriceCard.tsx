@@ -62,10 +62,9 @@ export function MarketPriceCard({ hyperliquidSymbol, locale }: MarketPriceCardPr
             candles={candles}
             loading={chartLoading}
             error={chartError}
-            width={1200}
-            height={350}
+            height={300}
             isPositive={isPositive}
-            className="w-full"
+            autoResize
           />
         </div>
 
