@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { ConnectionStatus } from '@/lib/types/market';
 
 const CANDLES_API = '/api/market/candles';
@@ -32,10 +32,8 @@ interface CacheEntry {
 
 // 전역 캐시
 const cache = new Map<string, CacheEntry>();
-// 진행 중인 요청 (중복 방지)
+// 진행 중인 요청 (Promise 공유)
 const pendingRequests = new Map<string, Promise<CandleData[]>>();
-// 데이터 업데이트 콜백 (여러 컴포넌트가 같은 심볼 구독)
-const updateCallbacks = new Map<string, Set<(data: CandleData[]) => void>>();
 
 function getChange(candles: CandleData[]) {
   if (candles.length < 2) return { change24h: 0, changePercent24h: 0 };
@@ -46,77 +44,50 @@ function getChange(candles: CandleData[]) {
   return { change24h, changePercent24h };
 }
 
-function isCacheValid(symbol: string): boolean {
-  const entry = cache.get(symbol);
-  return !!(entry && Date.now() - entry.timestamp < CACHE_TTL && entry.data.length > 0);
-}
-
 function getCachedData(symbol: string): CandleData[] | null {
-  if (isCacheValid(symbol)) {
-    return cache.get(symbol)!.data;
+  const entry = cache.get(symbol);
+  if (entry && Date.now() - entry.timestamp < CACHE_TTL && entry.data.length > 0) {
+    return entry.data;
   }
   return null;
 }
 
-// 데이터 도착시 모든 구독자에게 알림
-function notifySubscribers(symbol: string, data: CandleData[]) {
-  const callbacks = updateCallbacks.get(symbol);
-  if (callbacks) {
-    callbacks.forEach(cb => cb(data));
+async function fetchFromServer(symbol: string): Promise<CandleData[]> {
+  try {
+    const res = await fetch(`${CANDLES_API}?symbol=${symbol}`);
+    if (!res.ok) return [];
+    const data = await res.json();
+    return Array.isArray(data) && data.length > 0 ? data : [];
+  } catch {
+    return [];
   }
 }
 
-// 구독 등록
-function subscribe(symbol: string, callback: (data: CandleData[]) => void) {
-  if (!updateCallbacks.has(symbol)) {
-    updateCallbacks.set(symbol, new Set());
-  }
-  updateCallbacks.get(symbol)!.add(callback);
-
-  return () => {
-    const callbacks = updateCallbacks.get(symbol);
-    if (callbacks) {
-      callbacks.delete(callback);
-      if (callbacks.size === 0) {
-        updateCallbacks.delete(symbol);
-      }
-    }
-  };
-}
-
-// API 요청 (중복 방지)
-async function fetchCandles(symbol: string): Promise<CandleData[]> {
-  // 캐시 확인
+// 데이터 가져오기 (캐시 + 요청 중복 방지)
+function fetchCandles(symbol: string): Promise<CandleData[]> {
+  // 1. 캐시 확인
   const cached = getCachedData(symbol);
-  if (cached) return cached;
+  if (cached) {
+    return Promise.resolve(cached);
+  }
 
-  // 이미 진행 중인 요청이 있으면 그 결과 대기
+  // 2. 진행 중인 요청 확인
   const pending = pendingRequests.get(symbol);
-  if (pending) return pending;
+  if (pending) {
+    return pending;
+  }
 
-  // 새 요청 시작
-  const request = (async () => {
-    try {
-      const res = await fetch(`${CANDLES_API}?symbol=${symbol}`, {
-        cache: 'no-store',
-      });
-
-      if (!res.ok) return [];
-
-      const data = await res.json();
-      if (Array.isArray(data) && data.length > 0) {
-        cache.set(symbol, { data, timestamp: Date.now() });
-        // 모든 구독자에게 알림
-        notifySubscribers(symbol, data);
-        return data;
-      }
-      return [];
-    } catch {
-      return [];
-    } finally {
-      pendingRequests.delete(symbol);
+  // 3. 새 요청
+  const request = fetchFromServer(symbol).then(data => {
+    if (data.length > 0) {
+      cache.set(symbol, { data, timestamp: Date.now() });
     }
-  })();
+    pendingRequests.delete(symbol);
+    return data;
+  }).catch(() => {
+    pendingRequests.delete(symbol);
+    return [];
+  });
 
   pendingRequests.set(symbol, request);
   return request;
@@ -124,6 +95,8 @@ async function fetchCandles(symbol: string): Promise<CandleData[]> {
 
 export function useCandleData(symbol: string): CandleState & { status: ConnectionStatus } {
   const sym = symbol.toUpperCase();
+  const mountedRef = useRef(true);
+  const symRef = useRef(sym);
 
   const [state, setState] = useState<CandleState>(() => {
     const cached = getCachedData(sym);
@@ -148,65 +121,55 @@ export function useCandleData(symbol: string): CandleState & { status: Connectio
     };
   });
 
-  const [status, setStatus] = useState<ConnectionStatus>('connecting');
+  const [status, setStatus] = useState<ConnectionStatus>(() =>
+    getCachedData(sym) ? 'connected' : 'connecting'
+  );
 
   useEffect(() => {
-    let active = true;
+    mountedRef.current = true;
+    symRef.current = sym;
 
-    // 데이터 업데이트 핸들러
-    const handleUpdate = (data: CandleData[]) => {
-      if (!active) return;
-      const { change24h, changePercent24h } = getChange(data);
-      setState({
-        candles: data,
-        currentPrice: data[data.length - 1]?.close ?? null,
-        change24h,
-        changePercent24h,
-        loading: false,
-        error: null,
-      });
-      setStatus('connected');
-    };
+    let intervalId: NodeJS.Timeout | null = null;
 
-    // 구독 등록 (다른 컴포넌트의 fetch 결과도 받음)
-    const unsubscribe = subscribe(sym, handleUpdate);
+    const loadData = async () => {
+      // 심볼이 변경됐으면 무시
+      if (symRef.current !== sym) return;
 
-    // 데이터 로드
-    async function load() {
       const data = await fetchCandles(sym);
 
-      if (active) {
-        if (data.length > 0) {
-          handleUpdate(data);
-        } else {
-          setState(prev => ({
-            ...prev,
-            loading: false,
-            error: 'No data',
-          }));
-          setStatus('connected');
-        }
-      }
-    }
+      // 언마운트됐거나 심볼이 변경됐으면 무시
+      if (!mountedRef.current || symRef.current !== sym) return;
 
-    load();
-
-    // 폴링
-    const interval = setInterval(() => {
-      if (active) {
-        // 폴링 시에는 캐시 무효화
-        const entry = cache.get(sym);
-        if (entry) {
-          entry.timestamp = 0; // 강제로 캐시 만료
-        }
-        load();
+      if (data.length > 0) {
+        const { change24h, changePercent24h } = getChange(data);
+        setState({
+          candles: data,
+          currentPrice: data[data.length - 1]?.close ?? null,
+          change24h,
+          changePercent24h,
+          loading: false,
+          error: null,
+        });
+        setStatus('connected');
+      } else {
+        setState(prev => ({ ...prev, loading: false, error: 'No data' }));
+        setStatus('connected');
       }
+    };
+
+    // 즉시 로드
+    loadData();
+
+    // 폴링 설정
+    intervalId = setInterval(() => {
+      // 캐시 무효화 후 로드
+      cache.delete(sym);
+      loadData();
     }, POLL_INTERVAL);
 
     return () => {
-      active = false;
-      unsubscribe();
-      clearInterval(interval);
+      mountedRef.current = false;
+      if (intervalId) clearInterval(intervalId);
     };
   }, [sym]);
 
