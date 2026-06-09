@@ -6,6 +6,7 @@ import { locales, Locale } from '@/lib/i18n';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
 import { JsonLd } from '@/components/seo/JsonLd';
+import { FavoritesProvider } from '@/lib/context/FavoritesContext';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -44,9 +45,11 @@ export default async function LocaleLayout({ children, params }: Props) {
       </head>
       <body className={`${geistSans.variable} ${geistMono.variable} min-h-screen flex flex-col antialiased`}>
         <NextIntlClientProvider messages={messages} locale={locale}>
-          <Header />
-          <main className="flex-1">{children}</main>
-          <Footer />
+          <FavoritesProvider>
+            <Header />
+            <main className="flex-1">{children}</main>
+            <Footer />
+          </FavoritesProvider>
         </NextIntlClientProvider>
       </body>
     </html>

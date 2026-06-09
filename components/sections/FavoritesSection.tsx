@@ -3,10 +3,11 @@
 import { useTranslations, useLocale } from 'next-intl';
 import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
 import { Star } from 'lucide-react';
-import { useFavorites } from '@/lib/hooks/useFavorites';
+import { useFavorites } from '@/lib/context/FavoritesContext';
 import { AssetCard } from '@/components/market/AssetCard';
 import { MarketAsset } from '@/lib/types/market';
 import { TickerData } from '@/lib/hooks/useHyperliquidTicker';
+import { stocks } from '@/lib/markets/stocks';
 
 interface FavoritesSectionProps {
   tickers: Record<string, TickerData>;
@@ -56,12 +57,15 @@ export function FavoritesSection({ tickers }: FavoritesSectionProps) {
   const favoriteAssets: MarketAsset[] = favorites.map((fav) => {
     // Ticker keys are stored without 'xyz:' prefix
     const ticker = tickers[fav.symbol];
+    // Look up slug from stocks if missing (for backwards compatibility)
+    const stock = stocks.find((s) => s.symbol === fav.symbol);
+    const slug = fav.slug || stock?.slug || fav.symbol.toLowerCase();
 
     return {
       symbol: fav.symbol,
       name: fav.name,
       nameKo: fav.nameKo,
-      slug: fav.slug,
+      slug,
       market: fav.market,
       price: ticker?.price ?? null,
       prevDayPx: ticker?.prevDayPx ?? null,

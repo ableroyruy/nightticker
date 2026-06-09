@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { useHyperliquidTicker } from '@/lib/hooks/useHyperliquidTicker';
-import { useFavorites } from '@/lib/hooks/useFavorites';
+import { useFavorites } from '@/lib/context/FavoritesContext';
 import { stocks } from '@/lib/markets/stocks';
 import { AssetCard } from '@/components/market/AssetCard';
 import { ConnectionStatus } from '@/components/ui/connection-status';
@@ -32,12 +32,14 @@ export function FavoritesPage() {
     // Ticker keys don't have 'xyz:' prefix
     const tickerKey = stock.hyperliquidSymbol.replace('xyz:', '');
     const ticker = tickers[tickerKey];
+    // Use slug from stock data (handles old favorites without slug)
+    const slug = fav.slug || stock.slug;
 
     return [{
       symbol: stock.symbol,
       name: stock.name,
       nameKo: stock.nameKo,
-      slug: stock.slug,
+      slug,
       market: stock.category as MarketType,
       price: ticker?.price ?? null,
       prevDayPx: ticker?.prevDayPx ?? null,

@@ -7,7 +7,7 @@ import { MarketAsset, MarketType } from '@/lib/types/market';
 import { PriceDisplay, PriceChange } from '@/components/ui/price-change';
 import { FavoriteButton } from '@/components/ui/favorite-button';
 import { Badge } from '@/components/ui/badge';
-import { useFavorites } from '@/lib/hooks/useFavorites';
+import { useFavorites } from '@/lib/context/FavoritesContext';
 
 interface AssetCardProps {
   asset: MarketAsset;
