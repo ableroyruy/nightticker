@@ -175,9 +175,5 @@ function AssetCardInner({
   );
 }
 
-// Memoize by symbol to prevent unnecessary re-renders
-export const AssetCard = memo(AssetCardInner, (prev, next) => {
-  return prev.asset.symbol === next.asset.symbol &&
-         prev.asset.market === next.asset.market &&
-         prev.rank === next.rank;
-});
+// Export directly (memo was causing issues with chart loading)
+export const AssetCard = AssetCardInner;
