@@ -67,15 +67,15 @@ export function MarketPriceCard({ hyperliquidSymbol, locale }: MarketPriceCardPr
           />
         </div>
 
-        {/* Referral Link Button */}
-        <SourceMarketLink symbol={tickerKey} />
-
         {lastUpdate && (
           <div className="text-sm text-muted-foreground">
             <span>{t('lastUpdated')}: </span>
             <span>{formatLastUpdated(lastUpdate, locale)}</span>
           </div>
         )}
+
+        {/* Referral Link Button */}
+        <SourceMarketLink symbol={tickerKey} />
       </CardContent>
     </Card>
   );
