@@ -88,10 +88,12 @@ export function AssetCard({
   const prefix = locale === 'en' ? '' : `/${locale}`;
 
   return (
-    <Link href={`${prefix}${href}`} className="block">
+    <Link href={`${prefix}${href}`} className="block group">
       <div
         className={cn(
-          'glass-card glass-card-hover rounded-2xl p-4 h-full',
+          'glass-card glass-card-hover rounded-2xl p-4 h-full cursor-pointer',
+          'transition-all duration-200 active:scale-[0.98]',
+          'group-hover:border-primary/30',
           className
         )}
       >
