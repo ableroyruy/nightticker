@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 const API_URL = 'https://api.hyperliquid.xyz/info';
 const CANDLE_INTERVAL = '5m';
-const CACHE_REVALIDATE = 30; // 30 seconds
+const CACHE_REVALIDATE = 60; // 60 seconds (5분봉이라 길어도 됨)
 
 interface RawCandle {
   t: number;
@@ -78,7 +78,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(candles, {
       headers: {
-        'Cache-Control': 'public, s-maxage=30, stale-while-revalidate=60',
+        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=120',
       },
     });
   } catch (error) {

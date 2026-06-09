@@ -4,13 +4,17 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { ConnectionStatus } from '@/lib/types/market';
 
 const WS_URL = 'wss://api.hyperliquid.xyz/ws';
-const CACHED_CANDLES_URL = '/api/market/candles'; // Our cached API
+const CACHED_CANDLES_URL = '/api/market/candles';
 const CANDLE_INTERVAL = '5m';
 const CANDLES_6H = 72;
 const RECONNECT_DELAY = 3000;
 
+// Request queue settings
+const MAX_CONCURRENT_REQUESTS = 3;
+const REQUEST_DELAY = 100; // ms between requests
+
 export interface CandleData {
-  time: number; // seconds
+  time: number;
   open: number;
   high: number;
   low: number;
@@ -19,7 +23,7 @@ export interface CandleData {
 }
 
 interface RawCandle {
-  t: number; // timestamp ms
+  t: number;
   o: string;
   h: string;
   l: string;
@@ -38,6 +42,46 @@ interface CandleState {
 
 type CandleListener = (state: CandleState) => void;
 
+// Simple request queue to prevent overwhelming the server
+class RequestQueue {
+  private queue: Array<() => Promise<void>> = [];
+  private activeCount = 0;
+  private maxConcurrent: number;
+  private delay: number;
+
+  constructor(maxConcurrent: number, delay: number) {
+    this.maxConcurrent = maxConcurrent;
+    this.delay = delay;
+  }
+
+  async add<T>(fn: () => Promise<T>): Promise<T> {
+    return new Promise((resolve, reject) => {
+      const execute = async () => {
+        this.activeCount++;
+        try {
+          const result = await fn();
+          resolve(result);
+        } catch (e) {
+          reject(e);
+        } finally {
+          this.activeCount--;
+          setTimeout(() => this.processNext(), this.delay);
+        }
+      };
+
+      this.queue.push(execute);
+      this.processNext();
+    });
+  }
+
+  private processNext() {
+    if (this.activeCount < this.maxConcurrent && this.queue.length > 0) {
+      const next = this.queue.shift();
+      if (next) next();
+    }
+  }
+}
+
 // Singleton WebSocket manager for candle subscriptions
 class CandleWebSocketManager {
   private static instance: CandleWebSocketManager | null = null;
@@ -48,8 +92,11 @@ class CandleWebSocketManager {
   private candleStates: Map<string, CandleState> = new Map();
   private reconnectTimeout: NodeJS.Timeout | null = null;
   private pendingSubscriptions: Set<string> = new Set();
+  private requestQueue: RequestQueue;
 
-  private constructor() {}
+  private constructor() {
+    this.requestQueue = new RequestQueue(MAX_CONCURRENT_REQUESTS, REQUEST_DELAY);
+  }
 
   static getInstance(): CandleWebSocketManager {
     if (!CandleWebSocketManager.instance) {
@@ -77,16 +124,18 @@ class CandleWebSocketManager {
     }
   }
 
-  // Fetch from our cached API (fast)
   private async fetchCachedCandles(symbol: string): Promise<CandleData[]> {
-    const response = await fetch(`${CACHED_CANDLES_URL}?symbol=${symbol}`);
+    // Use queue to limit concurrent requests
+    return this.requestQueue.add(async () => {
+      const response = await fetch(`${CACHED_CANDLES_URL}?symbol=${symbol}`);
 
-    if (!response.ok) {
-      throw new Error(`HTTP error: ${response.status}`);
-    }
+      if (!response.ok) {
+        throw new Error(`HTTP error: ${response.status}`);
+      }
 
-    const data: CandleData[] = await response.json();
-    return Array.isArray(data) ? data : [];
+      const data: CandleData[] = await response.json();
+      return Array.isArray(data) ? data : [];
+    });
   }
 
   private calculateChange(candles: CandleData[]): { change24h: number; changePercent24h: number } {
@@ -112,13 +161,11 @@ class CandleWebSocketManager {
 
       this.ws.onopen = () => {
         this.status = 'connected';
-        // Subscribe to all pending symbols
         this.pendingSubscriptions.forEach((symbol) => {
           this.sendSubscription(symbol);
         });
         this.pendingSubscriptions.clear();
 
-        // Re-subscribe existing symbols
         this.subscribedSymbols.forEach((symbol) => {
           this.sendSubscription(symbol);
         });
@@ -141,7 +188,6 @@ class CandleWebSocketManager {
         this.status = 'disconnected';
         this.ws = null;
 
-        // Attempt reconnect if there are still subscribers
         if (this.subscribedSymbols.size > 0) {
           this.reconnectTimeout = setTimeout(() => {
             this.connect();
@@ -190,7 +236,6 @@ class CandleWebSocketManager {
 
   private handleMessage(message: { channel?: string; data?: RawCandle }) {
     if (message.channel?.startsWith('candle') && message.data) {
-      // Extract symbol from channel: "candle:xyz:AAPL:5m" -> "AAPL"
       const parts = message.channel.split(':');
       if (parts.length >= 3) {
         const symbol = parts[2];
@@ -212,12 +257,9 @@ class CandleWebSocketManager {
         const lastCandle = updatedCandles[updatedCandles.length - 1];
 
         if (lastCandle && lastCandle.time === newCandle.time) {
-          // Update existing candle
           updatedCandles[updatedCandles.length - 1] = newCandle;
         } else {
-          // Add new candle
           updatedCandles.push(newCandle);
-          // Keep only last 72 candles (6 hours)
           if (updatedCandles.length > CANDLES_6H) {
             updatedCandles = updatedCandles.slice(-CANDLES_6H);
           }
@@ -239,51 +281,47 @@ class CandleWebSocketManager {
   }
 
   async subscribe(symbol: string, listener: CandleListener): Promise<() => void> {
-    // Add listener
     if (!this.listeners.has(symbol)) {
       this.listeners.set(symbol, new Set());
     }
     this.listeners.get(symbol)!.add(listener);
 
-    // Initialize state if needed
     if (!this.candleStates.has(symbol)) {
       this.candleStates.set(symbol, this.getDefaultState());
     }
 
-    // Notify with current state
     listener(this.candleStates.get(symbol)!);
 
-    // Fetch initial data if this is a new subscription
     if (!this.subscribedSymbols.has(symbol)) {
       this.subscribedSymbols.add(symbol);
 
-      // Fetch from our cached API (fast)
-      try {
-        const candles = await this.fetchCachedCandles(symbol);
-        const { change24h, changePercent24h } = this.calculateChange(candles);
-        const lastCandle = candles[candles.length - 1];
+      // Fetch with queue (prevents too many concurrent requests)
+      this.fetchCachedCandles(symbol)
+        .then((candles) => {
+          const { change24h, changePercent24h } = this.calculateChange(candles);
+          const lastCandle = candles[candles.length - 1];
 
-        this.candleStates.set(symbol, {
-          candles,
-          currentPrice: lastCandle?.close ?? null,
-          change24h,
-          changePercent24h,
-          loading: false,
-          error: null,
+          this.candleStates.set(symbol, {
+            candles,
+            currentPrice: lastCandle?.close ?? null,
+            change24h,
+            changePercent24h,
+            loading: false,
+            error: null,
+          });
+
+          this.notifyListeners(symbol);
+        })
+        .catch((e) => {
+          console.error(`Failed to fetch candles for ${symbol}:`, e);
+          this.candleStates.set(symbol, {
+            ...this.getDefaultState(),
+            loading: false,
+            error: 'Failed to load candle data',
+          });
+          this.notifyListeners(symbol);
         });
 
-        this.notifyListeners(symbol);
-      } catch (e) {
-        console.error(`Failed to fetch candles for ${symbol}:`, e);
-        this.candleStates.set(symbol, {
-          ...this.getDefaultState(),
-          loading: false,
-          error: 'Failed to load candle data',
-        });
-        this.notifyListeners(symbol);
-      }
-
-      // Subscribe via WebSocket for real-time updates
       if (this.ws?.readyState === WebSocket.OPEN) {
         this.sendSubscription(symbol);
       } else {
@@ -292,13 +330,11 @@ class CandleWebSocketManager {
       }
     }
 
-    // Return unsubscribe function
     return () => {
       const symbolListeners = this.listeners.get(symbol);
       if (symbolListeners) {
         symbolListeners.delete(listener);
 
-        // If no more listeners for this symbol, unsubscribe
         if (symbolListeners.size === 0) {
           this.listeners.delete(symbol);
           this.subscribedSymbols.delete(symbol);
@@ -306,7 +342,6 @@ class CandleWebSocketManager {
           this.candleStates.delete(symbol);
           this.sendUnsubscription(symbol);
 
-          // Close WebSocket if no more subscriptions
           if (this.subscribedSymbols.size === 0) {
             if (this.reconnectTimeout) {
               clearTimeout(this.reconnectTimeout);
@@ -344,12 +379,10 @@ export function useCandleData(symbol: string): CandleState & { status: Connectio
   useEffect(() => {
     const manager = CandleWebSocketManager.getInstance();
 
-    // Subscribe and store unsubscribe function
     manager.subscribe(symbol, handleUpdate).then((unsub) => {
       unsubscribeRef.current = unsub;
     });
 
-    // Poll status
     const statusInterval = setInterval(() => {
       setStatus(manager.getStatus());
     }, 1000);

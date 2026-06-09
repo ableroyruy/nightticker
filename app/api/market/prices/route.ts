@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server';
 
 const API_URL = 'https://api.hyperliquid.xyz/info';
-const CACHE_REVALIDATE = 5; // 5 seconds
+const CACHE_REVALIDATE = 1; // 1 second
 
 async function fetchPrices(): Promise<Record<string, string>> {
   // Use Next.js fetch cache with revalidation
@@ -25,7 +25,7 @@ export async function GET() {
 
     return NextResponse.json(prices, {
       headers: {
-        'Cache-Control': 'public, s-maxage=5, stale-while-revalidate=10',
+        'Cache-Control': 'public, s-maxage=1, stale-while-revalidate=5',
       },
     });
   } catch (error) {
