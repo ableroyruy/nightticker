@@ -18,33 +18,29 @@ export function GainersPage() {
   const t = useTranslations('pages.gainers');
   const filterT = useTranslations('favorites.filter');
   const locale = useLocale();
-  const { prices, previousPrices, status, lastUpdate } = useHyperliquidTicker();
+  const { tickers, status, lastUpdate } = useHyperliquidTicker();
   const [filter, setFilter] = useState<FilterType>('all');
 
-  // Convert stocks to MarketAsset format with live prices
+  // Convert stocks to MarketAsset format with ticker data
   const allAssets: MarketAsset[] = stocks.map((stock) => {
-    const price = prices[stock.hyperliquidSymbol] ?? null;
-    const prevPrice = previousPrices[stock.hyperliquidSymbol] ?? null;
-
-    let changePercent24h: number | null = null;
-    if (price !== null && prevPrice !== null && prevPrice !== 0) {
-      changePercent24h = ((price - prevPrice) / prevPrice) * 100;
-    }
+    // Ticker keys don't have 'xyz:' prefix
+    const tickerKey = stock.hyperliquidSymbol.replace('xyz:', '');
+    const ticker = tickers[tickerKey];
 
     return {
       symbol: stock.symbol,
       name: stock.name,
       nameKo: stock.nameKo,
       market: stock.category as MarketType,
-      price,
-      previousPrice: prevPrice,
-      changePercent24h,
-      volume24h: null,
+      price: ticker?.price ?? null,
+      prevDayPx: ticker?.prevDayPx ?? null,
+      change24h: ticker?.change24h ?? null,
+      changePercent24h: ticker?.changePercent24h ?? null,
       hyperliquidSymbol: stock.hyperliquidSymbol,
     };
   });
 
-  // Filter to gainers only
+  // Filter to gainers only (24h positive change)
   const gainers = allAssets
     .filter((a) => a.changePercent24h != null && a.changePercent24h > 0)
     .sort((a, b) => (b.changePercent24h ?? 0) - (a.changePercent24h ?? 0));
@@ -113,9 +109,7 @@ export function GainersPage() {
             </p>
           </div>
         ) : (
-          <div className="glass-card rounded-xl overflow-hidden">
-            <AssetTable assets={filteredGainers} />
-          </div>
+          <AssetTable assets={filteredGainers} />
         )}
 
         {/* Compliance Notice */}

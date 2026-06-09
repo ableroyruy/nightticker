@@ -29,14 +29,16 @@ export function AssetTable({
   const marketBadgeColors: Record<MarketType, string> = {
     KR: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
     US: 'bg-purple-500/20 text-purple-400 border-purple-500/30',
-    CRYPTO: 'bg-orange-500/20 text-orange-400 border-orange-500/30',
+    INDEX: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
   };
 
   const marketLabels: Record<MarketType, string> = {
     KR: locale === 'ko' ? '한국' : 'KR',
     US: locale === 'ko' ? '미국' : 'US',
-    CRYPTO: 'Crypto',
+    INDEX: 'Index',
   };
+
+  const prefix = locale === 'ko' ? '/ko' : '';
 
   if (assets.length === 0) {
     return (
@@ -64,7 +66,7 @@ export function AssetTable({
               <th className="text-right py-3 px-4">{t('price')}</th>
               <th className="text-right py-3 px-4">{t('change24h')}</th>
               <th className="text-right py-3 px-4 hidden md:table-cell">
-                {t('volume')}
+                {locale === 'ko' ? '변동액' : 'Change'}
               </th>
               <th className="w-12 py-3 px-4"></th>
             </tr>
@@ -74,7 +76,7 @@ export function AssetTable({
               const displayName =
                 locale === 'ko' && asset.nameKo ? asset.nameKo : asset.name;
               const isFav = isFavorite(asset.symbol, asset.market);
-              const href = `/markets/${asset.symbol.toLowerCase()}`;
+              const href = `${prefix}/markets/${asset.symbol.toLowerCase()}`;
 
               return (
                 <tr key={`${asset.market}-${asset.symbol}`}>
@@ -124,10 +126,13 @@ export function AssetTable({
                       size="sm"
                     />
                   </td>
-                  <td className="text-right tabular-nums text-muted-foreground hidden md:table-cell">
-                    {asset.volume24h !== null && asset.volume24h !== undefined
-                      ? formatVolume(asset.volume24h)
-                      : '—'}
+                  <td className="text-right hidden md:table-cell">
+                    <PriceChange
+                      value={asset.change24h ?? null}
+                      type="amount"
+                      size="sm"
+                      showIcon={false}
+                    />
                   </td>
                   <td>
                     <FavoriteButton
@@ -151,17 +156,4 @@ export function AssetTable({
       </div>
     </div>
   );
-}
-
-function formatVolume(volume: number): string {
-  if (volume >= 1_000_000_000) {
-    return `$${(volume / 1_000_000_000).toFixed(1)}B`;
-  }
-  if (volume >= 1_000_000) {
-    return `$${(volume / 1_000_000).toFixed(1)}M`;
-  }
-  if (volume >= 1_000) {
-    return `$${(volume / 1_000).toFixed(1)}K`;
-  }
-  return `$${volume.toFixed(0)}`;
 }

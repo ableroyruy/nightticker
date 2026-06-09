@@ -13,38 +13,33 @@ import { MarketAsset, MarketType } from '@/lib/types/market';
 
 export function HomePage() {
   const locale = useLocale();
-  const { prices, previousPrices, status, lastUpdate } = useHyperliquidTicker();
+  const { tickers, status, lastUpdate } = useHyperliquidTicker();
   const marketOrder = getMarketOrder(locale);
 
-  // Convert stock data to MarketAsset format with live prices
+  // Convert stock data to MarketAsset format with live prices and 24h data
   const allAssets: MarketAsset[] = stocks.map((stock) => {
-    const price = prices[stock.hyperliquidSymbol] ?? null;
-    const prevPrice = previousPrices[stock.hyperliquidSymbol] ?? null;
-
-    // Calculate change percent (simplified - would need historical data for 24h)
-    let changePercent24h: number | null = null;
-    if (price !== null && prevPrice !== null && prevPrice !== 0) {
-      changePercent24h = ((price - prevPrice) / prevPrice) * 100;
-    }
+    // Ticker keys don't have 'xyz:' prefix - just the symbol
+    const tickerKey = stock.hyperliquidSymbol.replace('xyz:', '');
+    const ticker = tickers[tickerKey];
 
     return {
       symbol: stock.symbol,
       name: stock.name,
       nameKo: stock.nameKo,
       market: stock.category as MarketType,
-      price,
-      previousPrice: prevPrice,
-      changePercent24h,
-      volume24h: null,
+      price: ticker?.price ?? null,
+      prevDayPx: ticker?.prevDayPx ?? null,
+      change24h: ticker?.change24h ?? null,
+      changePercent24h: ticker?.changePercent24h ?? null,
       hyperliquidSymbol: stock.hyperliquidSymbol,
     };
   });
 
-  // Filter by market
+  // Filter by market (exclude INDEX for gainers/losers sections)
   const krAssets = allAssets.filter((a) => a.market === 'KR');
   const usAssets = allAssets.filter((a) => a.market === 'US');
 
-  // Sort by change percent for gainers/losers
+  // Sort by 24h change percent for gainers/losers
   const getGainers = (assets: MarketAsset[]) =>
     assets
       .filter((a) => a.changePercent24h != null && a.changePercent24h > 0)
@@ -60,7 +55,7 @@ export function HomePage() {
   const usGainers = getGainers(usAssets);
   const usLosers = getLosers(usAssets);
 
-  // Determine order based on user preference
+  // Determine order based on user's language preference
   const isKrFirst = marketOrder === 'KR_FIRST';
 
   return (
@@ -70,9 +65,9 @@ export function HomePage() {
 
       <div className="container py-8 space-y-12">
         {/* Favorites Section */}
-        <FavoritesSection prices={prices} />
+        <FavoritesSection tickers={tickers} />
 
-        <Separator className="opacity-50" />
+        <Separator className="opacity-30" />
 
         {/* Market Sections - Order based on user preference */}
         {isKrFirst ? (
@@ -82,17 +77,17 @@ export function HomePage() {
               market="KR"
               gainers={krGainers}
               losers={krLosers}
-              limit={5}
+              limit={10}
             />
 
-            <Separator className="opacity-50" />
+            <Separator className="opacity-30" />
 
             {/* US Market */}
             <GainersLosersSection
               market="US"
               gainers={usGainers}
               losers={usLosers}
-              limit={5}
+              limit={10}
             />
           </>
         ) : (
@@ -102,22 +97,22 @@ export function HomePage() {
               market="US"
               gainers={usGainers}
               losers={usLosers}
-              limit={5}
+              limit={10}
             />
 
-            <Separator className="opacity-50" />
+            <Separator className="opacity-30" />
 
             {/* Korea Market */}
             <GainersLosersSection
               market="KR"
               gainers={krGainers}
               losers={krLosers}
-              limit={5}
+              limit={10}
             />
           </>
         )}
 
-        <Separator className="opacity-50" />
+        <Separator className="opacity-30" />
 
         {/* Compliance Notice */}
         <ComplianceNotice />

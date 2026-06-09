@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { useTranslations, useLocale } from 'next-intl';
 import { TrendingUp, TrendingDown, ArrowRight } from 'lucide-react';
 import { MarketAsset, MarketType } from '@/lib/types/market';
-import { AssetCard } from '@/components/market/AssetCard';
+import { AnimatedAssetGrid } from '@/components/market/AnimatedAssetGrid';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
@@ -27,7 +27,7 @@ export function GainersLosersSection({
   const marketLabels: Record<MarketType, { en: string; ko: string }> = {
     KR: { en: 'Korea Market', ko: '한국시장' },
     US: { en: 'US Market', ko: '미국시장' },
-    CRYPTO: { en: 'Crypto', ko: '암호화폐' },
+    INDEX: { en: 'Index', ko: '지수' },
   };
 
   const marketLabel =
@@ -45,7 +45,7 @@ export function GainersLosersSection({
             'h-8 w-1 rounded-full',
             market === 'KR' && 'bg-blue-500',
             market === 'US' && 'bg-purple-500',
-            market === 'CRYPTO' && 'bg-orange-500'
+            market === 'INDEX' && 'bg-emerald-500'
           )}
         />
         <h2 className="text-2xl font-bold">{marketLabel}</h2>
@@ -67,16 +67,12 @@ export function GainersLosersSection({
         </div>
 
         {displayGainers.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-            {displayGainers.map((asset, index) => (
-              <AssetCard
-                key={`${asset.market}-${asset.symbol}`}
-                asset={asset}
-                rank={index + 1}
-                showMarketBadge={false}
-              />
-            ))}
-          </div>
+          <AnimatedAssetGrid
+            assets={displayGainers}
+            showRank
+            showMarketBadge={false}
+            gridId={`${market}-gainers`}
+          />
         ) : (
           <div className="glass-card rounded-2xl p-6 text-center">
             <p className="text-muted-foreground">{t('noGainers')}</p>
@@ -100,16 +96,12 @@ export function GainersLosersSection({
         </div>
 
         {displayLosers.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-            {displayLosers.map((asset, index) => (
-              <AssetCard
-                key={`${asset.market}-${asset.symbol}`}
-                asset={asset}
-                rank={index + 1}
-                showMarketBadge={false}
-              />
-            ))}
-          </div>
+          <AnimatedAssetGrid
+            assets={displayLosers}
+            showRank
+            showMarketBadge={false}
+            gridId={`${market}-losers`}
+          />
         ) : (
           <div className="glass-card rounded-2xl p-6 text-center">
             <p className="text-muted-foreground">{t('noLosers')}</p>

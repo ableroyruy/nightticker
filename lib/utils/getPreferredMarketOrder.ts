@@ -2,57 +2,46 @@
 
 import { MarketType } from '@/lib/types/market';
 
-const MARKET_PREFERENCE_KEY = 'nightticker_market_preference';
+const LANGUAGE_KEY = 'nightticker_language';
 
 export type MarketOrder = 'KR_FIRST' | 'US_FIRST';
+export type SupportedLanguage = 'en' | 'ko';
 
-export function detectUserMarketPreference(): MarketOrder {
-  // Check localStorage first
-  if (typeof window !== 'undefined') {
-    const stored = localStorage.getItem(MARKET_PREFERENCE_KEY);
-    if (stored === 'KR_FIRST' || stored === 'US_FIRST') {
-      return stored;
-    }
-  }
-
-  // Check browser language
-  if (typeof navigator !== 'undefined') {
-    const lang = navigator.language?.toLowerCase() || '';
-    if (lang === 'ko' || lang === 'ko-kr' || lang.startsWith('ko-')) {
-      return 'KR_FIRST';
-    }
-  }
-
-  // Check timezone
-  if (typeof Intl !== 'undefined') {
-    try {
-      const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-      if (timezone === 'Asia/Seoul') {
-        return 'KR_FIRST';
-      }
-    } catch {
-      // Ignore timezone detection errors
-    }
-  }
-
-  // Default to US first
-  return 'US_FIRST';
+export function getSavedLanguage(): SupportedLanguage | null {
+  if (typeof window === 'undefined') return null;
+  const saved = localStorage.getItem(LANGUAGE_KEY);
+  if (saved === 'en' || saved === 'ko') return saved;
+  return null;
 }
 
-export function saveMarketPreference(preference: MarketOrder): void {
+export function saveLanguage(lang: SupportedLanguage): void {
   if (typeof window !== 'undefined') {
-    localStorage.setItem(MARKET_PREFERENCE_KEY, preference);
+    localStorage.setItem(LANGUAGE_KEY, lang);
   }
+}
+
+export function detectBrowserLanguage(): SupportedLanguage {
+  if (typeof navigator === 'undefined') return 'en';
+
+  const lang = navigator.language?.toLowerCase() || '';
+  if (lang === 'ko' || lang === 'ko-kr' || lang.startsWith('ko-')) {
+    return 'ko';
+  }
+  return 'en';
+}
+
+export function getPreferredLanguage(): SupportedLanguage {
+  // 1. User saved preference
+  const saved = getSavedLanguage();
+  if (saved) return saved;
+
+  // 2. Browser language
+  return detectBrowserLanguage();
 }
 
 export function getMarketOrder(locale: string): MarketOrder {
-  // If locale is explicitly set to Korean, prefer Korean market
-  if (locale === 'ko') {
-    return 'KR_FIRST';
-  }
-
-  // Otherwise, detect from browser settings
-  return detectUserMarketPreference();
+  // Korean = Korea first, English = US first
+  return locale === 'ko' ? 'KR_FIRST' : 'US_FIRST';
 }
 
 export function sortMarketsByPreference<T extends { market: MarketType }>(
@@ -61,8 +50,8 @@ export function sortMarketsByPreference<T extends { market: MarketType }>(
 ): T[] {
   const orderMap: Record<MarketType, number> =
     order === 'KR_FIRST'
-      ? { KR: 0, US: 1, CRYPTO: 2 }
-      : { US: 0, KR: 1, CRYPTO: 2 };
+      ? { KR: 0, US: 1, INDEX: 2 }
+      : { US: 0, KR: 1, INDEX: 2 };
 
   return [...items].sort((a, b) => {
     return (orderMap[a.market] ?? 3) - (orderMap[b.market] ?? 3);

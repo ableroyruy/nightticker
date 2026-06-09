@@ -19,33 +19,29 @@ type SortType = 'added' | 'gainers' | 'losers' | 'name';
 export function FavoritesPage() {
   const t = useTranslations('favorites');
   const locale = useLocale();
-  const { prices, previousPrices, status, lastUpdate } = useHyperliquidTicker();
+  const { tickers, status, lastUpdate } = useHyperliquidTicker();
   const { favorites, isLoaded } = useFavorites();
   const [filter, setFilter] = useState<FilterType>('all');
   const [sort, setSort] = useState<SortType>('added');
 
-  // Convert favorites to MarketAsset format with live prices
+  // Convert favorites to MarketAsset format with ticker data
   const favoriteAssets = favorites.flatMap((fav): MarketAsset[] => {
     const stock = stocks.find((s) => s.symbol === fav.symbol);
     if (!stock) return [];
 
-    const price = prices[stock.hyperliquidSymbol] ?? null;
-    const prevPrice = previousPrices[stock.hyperliquidSymbol] ?? null;
-
-    let changePercent24h: number | null = null;
-    if (price !== null && prevPrice !== null && prevPrice !== 0) {
-      changePercent24h = ((price - prevPrice) / prevPrice) * 100;
-    }
+    // Ticker keys don't have 'xyz:' prefix
+    const tickerKey = stock.hyperliquidSymbol.replace('xyz:', '');
+    const ticker = tickers[tickerKey];
 
     return [{
       symbol: stock.symbol,
       name: stock.name,
       nameKo: stock.nameKo,
       market: stock.category as MarketType,
-      price,
-      previousPrice: prevPrice,
-      changePercent24h,
-      volume24h: null,
+      price: ticker?.price ?? null,
+      prevDayPx: ticker?.prevDayPx ?? null,
+      change24h: ticker?.change24h ?? null,
+      changePercent24h: ticker?.changePercent24h ?? null,
       hyperliquidSymbol: stock.hyperliquidSymbol,
     }];
   });
@@ -71,7 +67,6 @@ export function FavoritesPage() {
         );
       case 'added':
       default:
-        // Maintain original favorites order (most recent first)
         return 0;
     }
   });
@@ -147,7 +142,9 @@ export function FavoritesPage() {
 
             {/* Sort dropdown */}
             <div className="flex items-center gap-2">
-              <span className="text-sm text-muted-foreground">Sort:</span>
+              <span className="text-sm text-muted-foreground">
+                {locale === 'ko' ? '정렬:' : 'Sort:'}
+              </span>
               <div className="flex gap-1">
                 {sorts.map((s) => (
                   <Button

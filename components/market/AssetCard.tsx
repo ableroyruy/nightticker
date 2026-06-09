@@ -31,22 +31,20 @@ export function AssetCard({
   const marketBadgeColors: Record<MarketType, string> = {
     KR: 'bg-blue-500/20 text-blue-400 border-blue-500/30',
     US: 'bg-purple-500/20 text-purple-400 border-purple-500/30',
-    CRYPTO: 'bg-orange-500/20 text-orange-400 border-orange-500/30',
+    INDEX: 'bg-emerald-500/20 text-emerald-400 border-emerald-500/30',
   };
 
   const marketLabels: Record<MarketType, string> = {
     KR: locale === 'ko' ? '한국' : 'KR',
     US: locale === 'ko' ? '미국' : 'US',
-    CRYPTO: 'Crypto',
+    INDEX: 'Index',
   };
 
-  const href =
-    asset.market === 'CRYPTO'
-      ? `/markets/${asset.symbol.toLowerCase()}`
-      : `/markets/${asset.symbol.toLowerCase()}`;
+  const href = `/markets/${asset.symbol.toLowerCase()}`;
+  const prefix = locale === 'ko' ? '/ko' : '';
 
   return (
-    <Link href={href} className="block">
+    <Link href={`${prefix}${href}`} className="block">
       <div
         className={cn(
           'glass-card glass-card-hover rounded-2xl p-4 h-full',
@@ -97,39 +95,30 @@ export function AssetCard({
         <div className="space-y-2">
           <PriceDisplay
             price={asset.price}
-            previousPrice={asset.previousPrice}
+            change={asset.change24h}
+            changePercent={asset.changePercent24h}
             size="md"
             showChange={false}
           />
 
-          <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
             <PriceChange
               value={asset.changePercent24h ?? null}
               type="percent"
               size="sm"
               showBackground
             />
-            {asset.volume24h !== null && asset.volume24h !== undefined && (
-              <span className="text-xs text-muted-foreground tabular-nums">
-                Vol: {formatVolume(asset.volume24h)}
-              </span>
+            {asset.change24h != null && (
+              <PriceChange
+                value={asset.change24h}
+                type="amount"
+                size="sm"
+                showIcon={false}
+              />
             )}
           </div>
         </div>
       </div>
     </Link>
   );
-}
-
-function formatVolume(volume: number): string {
-  if (volume >= 1_000_000_000) {
-    return `${(volume / 1_000_000_000).toFixed(1)}B`;
-  }
-  if (volume >= 1_000_000) {
-    return `${(volume / 1_000_000).toFixed(1)}M`;
-  }
-  if (volume >= 1_000) {
-    return `${(volume / 1_000).toFixed(1)}K`;
-  }
-  return volume.toFixed(0);
 }

@@ -1,6 +1,9 @@
 export interface MarketPrice {
   symbol: string;
   price: number | null;
+  prevDayPx: number | null;
+  change24h: number | null;
+  changePercent24h: number | null;
   lastUpdated: Date;
 }
 

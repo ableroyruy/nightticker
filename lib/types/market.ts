@@ -1,4 +1,4 @@
-export type MarketType = 'KR' | 'US' | 'CRYPTO';
+export type MarketType = 'KR' | 'US' | 'INDEX';
 
 export interface MarketAsset {
   symbol: string;
@@ -6,11 +6,9 @@ export interface MarketAsset {
   nameKo?: string;
   market: MarketType;
   price: number | null;
-  previousPrice?: number | null;
-  change24h?: number | null;
-  changePercent24h?: number | null;
-  volume24h?: number | null;
-  lastUpdated?: Date;
+  prevDayPx: number | null;
+  change24h: number | null;
+  changePercent24h: number | null;
   hyperliquidSymbol?: string;
 }
 
@@ -20,12 +18,6 @@ export interface FavoriteAsset {
   name: string;
   nameKo?: string;
   addedAt: number;
-}
-
-export interface PriceUpdate {
-  symbol: string;
-  price: number;
-  previousPrice?: number;
 }
 
 export type ConnectionStatus = 'connected' | 'connecting' | 'disconnected';

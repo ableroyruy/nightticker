@@ -1,16 +1,14 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { PriceDisplay } from '@/components/market/PriceDisplay';
+import { MarketPriceCard } from '@/components/market/MarketPriceCard';
 import { WatchlistButton } from '@/components/market/WatchlistButton';
 import { HyperliquidBadge } from '@/components/common/HyperliquidBadge';
 import { ComplianceNotice } from '@/components/common/ComplianceNotice';
 import { SourceMarketLink } from '@/components/common/SourceMarketLink';
-import { getMarketData } from '@/lib/providers/market-data-provider';
 import { getStockBySymbol, getAllSymbols } from '@/lib/markets/stocks';
-import { formatLastUpdated } from '@/lib/markets/hours';
 
 type Props = {
   params: Promise<{ locale: string; symbol: string }>;
@@ -77,10 +75,7 @@ export default async function MarketPage({ params }: Props) {
     notFound();
   }
 
-  const t = await getTranslations('market');
   const faq = await getTranslations('faq');
-
-  const marketData = await getMarketData(symbol);
 
   const displayName = locale === 'ko' ? stock.nameKo : stock.name;
 
@@ -100,30 +95,8 @@ export default async function MarketPage({ params }: Props) {
 
       <Separator />
 
-      {/* Price Card */}
-      <Card>
-        <CardHeader>
-          <CardTitle>{t('currentPrice')}</CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <PriceDisplay
-            price={marketData?.price?.price ?? null}
-            size="lg"
-          />
-
-          {marketData?.price?.lastUpdated && (
-            <div className="text-sm text-muted-foreground">
-              <span>{t('lastUpdated')}: </span>
-              <span>
-                {formatLastUpdated(
-                  new Date(marketData.price.lastUpdated),
-                  locale
-                )}
-              </span>
-            </div>
-          )}
-        </CardContent>
-      </Card>
+      {/* Real-time Price Card */}
+      <MarketPriceCard hyperliquidSymbol={stock.hyperliquidSymbol} locale={locale} />
 
       {/* Source Market Link */}
       <Card>
