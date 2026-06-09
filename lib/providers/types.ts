@@ -17,6 +17,7 @@ export interface Stock {
   symbol: string;
   name: string;
   nameKo: string;
+  slug: string;
   category: 'US' | 'KR' | 'INDEX';
   hyperliquidSymbol: string;
 }

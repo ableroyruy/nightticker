@@ -63,7 +63,7 @@ export function JsonLd({ type, locale, baseUrl = 'https://nightticker.com', stoc
         '@type': 'SearchAction',
         target: {
           '@type': 'EntryPoint',
-          urlTemplate: `${baseUrl}/markets/{search_term_string}`,
+          urlTemplate: `${baseUrl}/stock/{search_term_string}`,
         },
         'query-input': 'required name=search_term_string',
       },

@@ -43,8 +43,8 @@ export function StockSearch({ className, onSelect }: StockSearchProps) {
     setSelectedIndex(0);
   }, [filteredStocks]);
 
-  const handleSelect = (symbol: string) => {
-    router.push(`${prefix}/markets/${symbol.toLowerCase()}`);
+  const handleSelect = (slug: string) => {
+    router.push(`${prefix}/stock/${slug}`);
     setQuery('');
     setIsOpen(false);
     onSelect?.();
@@ -69,7 +69,7 @@ export function StockSearch({ className, onSelect }: StockSearchProps) {
       case 'Enter':
         e.preventDefault();
         if (filteredStocks[selectedIndex]) {
-          handleSelect(filteredStocks[selectedIndex].symbol);
+          handleSelect(filteredStocks[selectedIndex].slug);
         }
         break;
       case 'Escape':
@@ -132,7 +132,7 @@ export function StockSearch({ className, onSelect }: StockSearchProps) {
                       ? 'bg-accent'
                       : 'hover:bg-accent/50'
                   )}
-                  onClick={() => handleSelect(stock.symbol)}
+                  onClick={() => handleSelect(stock.slug)}
                   onMouseEnter={() => setSelectedIndex(index)}
                 >
                   <div className="p-1.5 rounded-lg bg-primary/10">
@@ -140,13 +140,13 @@ export function StockSearch({ className, onSelect }: StockSearchProps) {
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="font-semibold">{stock.symbol}</span>
+                      <span className="font-semibold">{locale === 'ko' ? stock.nameKo : stock.name}</span>
                       <span className="text-xs px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
                         {stock.category}
                       </span>
                     </div>
                     <span className="text-sm text-muted-foreground truncate block">
-                      {locale === 'ko' ? stock.nameKo : stock.name}
+                      {stock.symbol}
                     </span>
                   </div>
                 </button>

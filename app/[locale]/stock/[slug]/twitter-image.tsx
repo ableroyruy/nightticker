@@ -1,5 +1,5 @@
 import { ImageResponse } from 'next/og';
-import { getStockBySymbol } from '@/lib/markets/stocks';
+import { getStockBySlug } from '@/lib/markets/stocks';
 
 export const runtime = 'edge';
 
@@ -13,10 +13,10 @@ export const contentType = 'image/png';
 export default async function Image({
   params,
 }: {
-  params: Promise<{ locale: string; symbol: string }>;
+  params: Promise<{ locale: string; slug: string }>;
 }) {
-  const { locale, symbol } = await params;
-  const stock = getStockBySymbol(symbol);
+  const { locale, slug } = await params;
+  const stock = getStockBySlug(slug);
 
   if (!stock) {
     return new ImageResponse(
@@ -84,18 +84,18 @@ export default async function Image({
           <span style={{ fontSize: '32px', fontWeight: 600, color: 'white' }}>NightTicker</span>
         </div>
 
-        {/* Stock Info */}
+        {/* Stock Info - Name first, then Symbol */}
         <div style={{ display: 'flex', flexDirection: 'column', flex: 1, justifyContent: 'center' }}>
           <div
             style={{
-              fontSize: '96px',
+              fontSize: '72px',
               fontWeight: 700,
               color: 'white',
               marginBottom: '16px',
               letterSpacing: '-2px',
             }}
           >
-            {stock.symbol}
+            {name}
           </div>
           <div
             style={{
@@ -104,7 +104,7 @@ export default async function Image({
               marginBottom: '32px',
             }}
           >
-            {name}
+            {stock.symbol}
           </div>
           <div
             style={{

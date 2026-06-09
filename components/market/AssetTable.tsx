@@ -76,7 +76,7 @@ export function AssetTable({
               const displayName =
                 locale === 'ko' && asset.nameKo ? asset.nameKo : asset.name;
               const isFav = isFavorite(asset.symbol, asset.market);
-              const href = `${prefix}/markets/${asset.symbol.toLowerCase()}`;
+              const href = `${prefix}/stock/${asset.slug}`;
 
               return (
                 <tr key={`${asset.market}-${asset.symbol}`}>
@@ -91,10 +91,8 @@ export function AssetTable({
                       className="flex items-center gap-2 hover:text-primary transition-colors"
                     >
                       <div>
-                        <span className="font-medium">{asset.symbol}</span>
-                        <p className="text-xs text-muted-foreground truncate max-w-[120px] sm:max-w-[200px]">
-                          {displayName}
-                        </p>
+                        <span className="font-medium">{displayName}</span>
+                        <p className="text-xs text-muted-foreground truncate max-w-[120px] sm:max-w-[200px]">{asset.symbol}</p>
                       </div>
                     </Link>
                   </td>
@@ -143,6 +141,7 @@ export function AssetTable({
                           market: asset.market,
                           name: asset.name,
                           nameKo: asset.nameKo,
+                          slug: asset.slug,
                         })
                       }
                       size="sm"

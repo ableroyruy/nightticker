@@ -61,6 +61,7 @@ export function FavoritesSection({ tickers }: FavoritesSectionProps) {
       symbol: fav.symbol,
       name: fav.name,
       nameKo: fav.nameKo,
+      slug: fav.slug,
       market: fav.market,
       price: ticker?.price ?? null,
       prevDayPx: ticker?.prevDayPx ?? null,

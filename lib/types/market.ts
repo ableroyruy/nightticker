@@ -4,6 +4,7 @@ export interface MarketAsset {
   symbol: string;
   name: string;
   nameKo?: string;
+  slug: string;
   market: MarketType;
   price: number | null;
   prevDayPx: number | null;
@@ -17,6 +18,7 @@ export interface FavoriteAsset {
   symbol: string;
   name: string;
   nameKo?: string;
+  slug: string;
   addedAt: number;
 }
 

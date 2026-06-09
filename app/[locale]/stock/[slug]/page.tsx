@@ -8,20 +8,20 @@ import { WatchlistButton } from '@/components/market/WatchlistButton';
 import { HyperliquidBadge } from '@/components/common/HyperliquidBadge';
 import { ComplianceNotice } from '@/components/common/ComplianceNotice';
 import { SourceMarketLink } from '@/components/common/SourceMarketLink';
-import { getStockBySymbol, getAllSymbols } from '@/lib/markets/stocks';
+import { getStockBySlug, getAllSlugs } from '@/lib/markets/stocks';
 
 type Props = {
-  params: Promise<{ locale: string; symbol: string }>;
+  params: Promise<{ locale: string; slug: string }>;
 };
 
 export async function generateStaticParams() {
-  const symbols = getAllSymbols();
+  const slugs = getAllSlugs();
   const locales = ['en', 'ko'];
 
   return locales.flatMap((locale) =>
-    symbols.map((symbol) => ({
+    slugs.map((slug) => ({
       locale,
-      symbol,
+      slug,
     }))
   );
 }
@@ -29,8 +29,8 @@ export async function generateStaticParams() {
 const BASE_URL = 'https://nightticker.com';
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const { locale, symbol } = await params;
-  const stock = getStockBySymbol(symbol);
+  const { locale, slug } = await params;
+  const stock = getStockBySlug(slug);
 
   if (!stock) {
     return {
@@ -39,18 +39,19 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   }
 
   const name = locale === 'ko' ? stock.nameKo : stock.name;
+
   const title =
     locale === 'ko'
-      ? `${name} 야간 가격 | Hyperliquid Market Price`
-      : `${name} Night Price | Hyperliquid Market Price`;
+      ? `${name} (${stock.symbol}) 야간 시세 - 실시간 참고가격`
+      : `${name} (${stock.symbol}) Night Price - Real-time Reference Price`;
 
   const description =
     locale === 'ko'
-      ? `Hyperliquid Market Prices 기준 ${name} 야간 참고가격을 확인하세요. 공식 거래소 가격이 아니며 참고용 정보입니다.`
-      : `Check the current ${name} Night Price using Hyperliquid Market Prices. For reference purposes only. Not an official stock exchange price.`;
+      ? `${name} (${stock.symbol}) 야간, 주말, 휴일 참고가격을 실시간으로 확인하세요. Hyperliquid 기준 시세이며 공식 거래소 가격이 아닙니다.`
+      : `Check ${name} (${stock.symbol}) overnight, weekend, and holiday reference prices in real-time. Based on Hyperliquid market prices, not official exchange prices.`;
 
   const canonicalUrl =
-    locale === 'ko' ? `${BASE_URL}/ko/markets/${symbol}` : `${BASE_URL}/markets/${symbol}`;
+    locale === 'ko' ? `${BASE_URL}/ko/stock/${slug}` : `${BASE_URL}/stock/${slug}`;
 
   return {
     title,
@@ -58,24 +59,30 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     keywords:
       locale === 'ko'
         ? [
-            `${name} 야간 가격`,
+            `${name} 야간 시세`,
             `${name} 주말 가격`,
+            `${name} 휴일 시세`,
+            `${stock.symbol} 야간 가격`,
             `${stock.symbol} 시세`,
-            `${stock.name.toLowerCase()} night price`,
+            '야간 주식 시세',
+            'overnight stock price',
             'hyperliquid',
           ]
         : [
-            `${stock.name.toLowerCase()} night price`,
-            `${stock.name.toLowerCase()} overnight price`,
-            `${stock.name.toLowerCase()} weekend price`,
+            `${name} night price`,
+            `${name} overnight price`,
+            `${name} weekend price`,
             `${stock.symbol} price`,
+            `${stock.symbol} after hours`,
+            'overnight stock price',
+            'weekend stock price',
             'hyperliquid',
           ],
     alternates: {
       canonical: canonicalUrl,
       languages: {
-        en: `${BASE_URL}/markets/${symbol}`,
-        ko: `${BASE_URL}/ko/markets/${symbol}`,
+        en: `${BASE_URL}/stock/${slug}`,
+        ko: `${BASE_URL}/ko/stock/${slug}`,
       },
     },
     openGraph: {
@@ -94,11 +101,11 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function MarketPage({ params }: Props) {
-  const { locale, symbol } = await params;
+export default async function StockPage({ params }: Props) {
+  const { locale, slug } = await params;
   setRequestLocale(locale);
 
-  const stock = getStockBySymbol(symbol);
+  const stock = getStockBySlug(slug);
   if (!stock) {
     notFound();
   }
@@ -109,14 +116,14 @@ export default async function MarketPage({ params }: Props) {
 
   return (
     <div className="container py-8 space-y-8">
-      {/* Stock Header */}
+      {/* Stock Header - Name first, then Symbol */}
       <div className="flex items-start justify-between">
         <div>
-          <div className="flex items-center gap-3 mb-2">
-            <h1 className="text-3xl md:text-4xl font-bold">{stock.symbol}</h1>
+          <div className="flex items-center gap-3 mb-1">
+            <h1 className="text-3xl md:text-4xl font-bold">{displayName}</h1>
             <WatchlistButton symbol={stock.symbol} />
           </div>
-          <p className="text-xl text-muted-foreground">{displayName}</p>
+          <p className="text-lg text-muted-foreground">{stock.symbol}</p>
         </div>
         <HyperliquidBadge />
       </div>

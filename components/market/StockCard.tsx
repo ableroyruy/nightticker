@@ -22,12 +22,12 @@ export function StockCard({ stock, price }: StockCardProps) {
       <CardContent className="p-4">
         <div className="flex items-start justify-between mb-2">
           <Link
-            href={`${prefix}/markets/${stock.symbol.toLowerCase()}`}
+            href={`${prefix}/stock/${stock.slug}`}
             className="hover:underline"
           >
-            <h3 className="font-bold text-lg">{stock.symbol}</h3>
+            <h3 className="font-bold text-lg">{locale === 'ko' ? stock.nameKo : stock.name}</h3>
             <p className="text-sm text-muted-foreground">
-              {locale === 'ko' ? stock.nameKo : stock.name}
+              {stock.symbol}
             </p>
           </Link>
           <WatchlistButton symbol={stock.symbol} />

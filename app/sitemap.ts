@@ -1,10 +1,10 @@
 import { MetadataRoute } from 'next';
-import { getAllSymbols } from '@/lib/markets/stocks';
+import { getAllSlugs } from '@/lib/markets/stocks';
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://nightticker.com';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const symbols = getAllSymbols();
+  const slugs = getAllSlugs();
   const locales = ['en', 'ko'];
 
   // Static pages
@@ -47,19 +47,19 @@ export default function sitemap(): MetadataRoute.Sitemap {
     }
   }
 
-  // Add market pages for each locale
+  // Add stock pages for each locale
   for (const locale of locales) {
-    for (const symbol of symbols) {
+    for (const slug of slugs) {
       const prefix = locale === 'en' ? '' : `/${locale}`;
       routes.push({
-        url: `${baseUrl}${prefix}/markets/${symbol}`,
+        url: `${baseUrl}${prefix}/stock/${slug}`,
         lastModified: new Date(),
         changeFrequency: 'hourly',
         priority: 0.9,
         alternates: {
           languages: {
-            en: `${baseUrl}/markets/${symbol}`,
-            ko: `${baseUrl}/ko/markets/${symbol}`,
+            en: `${baseUrl}/stock/${slug}`,
+            ko: `${baseUrl}/ko/stock/${slug}`,
           },
         },
       });

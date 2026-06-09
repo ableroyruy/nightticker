@@ -40,7 +40,7 @@ export function AssetCard({
     INDEX: 'Index',
   };
 
-  const href = `/markets/${asset.symbol.toLowerCase()}`;
+  const href = `/stock/${asset.slug}`;
   const prefix = locale === 'ko' ? '/ko' : '';
 
   return (
@@ -60,7 +60,7 @@ export function AssetCard({
             )}
             <div className="min-w-0">
               <div className="flex items-center gap-2">
-                <span className="font-semibold truncate">{asset.symbol}</span>
+                <span className="font-semibold truncate">{displayName}</span>
                 {showMarketBadge && (
                   <Badge
                     variant="outline"
@@ -73,9 +73,7 @@ export function AssetCard({
                   </Badge>
                 )}
               </div>
-              <p className="text-xs text-muted-foreground truncate">
-                {displayName}
-              </p>
+              <p className="text-xs text-muted-foreground truncate">{asset.symbol}</p>
             </div>
           </div>
           <FavoriteButton
@@ -86,6 +84,7 @@ export function AssetCard({
                 market: asset.market,
                 name: asset.name,
                 nameKo: asset.nameKo,
+                slug: asset.slug,
               })
             }
             size="sm"

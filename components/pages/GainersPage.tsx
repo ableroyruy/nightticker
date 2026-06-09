@@ -31,6 +31,7 @@ export function GainersPage() {
       symbol: stock.symbol,
       name: stock.name,
       nameKo: stock.nameKo,
+      slug: stock.slug,
       market: stock.category as MarketType,
       price: ticker?.price ?? null,
       prevDayPx: ticker?.prevDayPx ?? null,

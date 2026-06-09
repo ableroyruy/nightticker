@@ -6,6 +6,7 @@ export const stocks: Stock[] = [
     symbol: 'AAPL',
     name: 'Apple',
     nameKo: '애플',
+    slug: 'apple',
     category: 'US',
     hyperliquidSymbol: 'xyz:AAPL',
   },
@@ -13,6 +14,7 @@ export const stocks: Stock[] = [
     symbol: 'TSLA',
     name: 'Tesla',
     nameKo: '테슬라',
+    slug: 'tesla',
     category: 'US',
     hyperliquidSymbol: 'xyz:TSLA',
   },
@@ -20,6 +22,7 @@ export const stocks: Stock[] = [
     symbol: 'NVDA',
     name: 'Nvidia',
     nameKo: '엔비디아',
+    slug: 'nvidia',
     category: 'US',
     hyperliquidSymbol: 'xyz:NVDA',
   },
@@ -27,6 +30,7 @@ export const stocks: Stock[] = [
     symbol: 'MSFT',
     name: 'Microsoft',
     nameKo: '마이크로소프트',
+    slug: 'microsoft',
     category: 'US',
     hyperliquidSymbol: 'xyz:MSFT',
   },
@@ -34,6 +38,7 @@ export const stocks: Stock[] = [
     symbol: 'GOOGL',
     name: 'Alphabet (Google)',
     nameKo: '알파벳 (구글)',
+    slug: 'google',
     category: 'US',
     hyperliquidSymbol: 'xyz:GOOGL',
   },
@@ -41,6 +46,7 @@ export const stocks: Stock[] = [
     symbol: 'AMZN',
     name: 'Amazon',
     nameKo: '아마존',
+    slug: 'amazon',
     category: 'US',
     hyperliquidSymbol: 'xyz:AMZN',
   },
@@ -48,6 +54,7 @@ export const stocks: Stock[] = [
     symbol: 'META',
     name: 'Meta',
     nameKo: '메타',
+    slug: 'meta',
     category: 'US',
     hyperliquidSymbol: 'xyz:META',
   },
@@ -55,6 +62,7 @@ export const stocks: Stock[] = [
     symbol: 'AMD',
     name: 'AMD',
     nameKo: 'AMD',
+    slug: 'amd',
     category: 'US',
     hyperliquidSymbol: 'xyz:AMD',
   },
@@ -62,6 +70,7 @@ export const stocks: Stock[] = [
     symbol: 'PLTR',
     name: 'Palantir',
     nameKo: '팔란티어',
+    slug: 'palantir',
     category: 'US',
     hyperliquidSymbol: 'xyz:PLTR',
   },
@@ -69,6 +78,7 @@ export const stocks: Stock[] = [
     symbol: 'MSTR',
     name: 'MicroStrategy',
     nameKo: '마이크로스트래티지',
+    slug: 'microstrategy',
     category: 'US',
     hyperliquidSymbol: 'xyz:MSTR',
   },
@@ -77,6 +87,7 @@ export const stocks: Stock[] = [
     symbol: 'SMSN',
     name: 'Samsung Electronics',
     nameKo: '삼성전자',
+    slug: 'samsung',
     category: 'KR',
     hyperliquidSymbol: 'xyz:SMSN',
   },
@@ -84,6 +95,7 @@ export const stocks: Stock[] = [
     symbol: 'SKHX',
     name: 'SK Hynix',
     nameKo: 'SK하이닉스',
+    slug: 'sk-hynix',
     category: 'KR',
     hyperliquidSymbol: 'xyz:SKHX',
   },
@@ -91,6 +103,7 @@ export const stocks: Stock[] = [
     symbol: 'HYUNDAI',
     name: 'Hyundai Motor',
     nameKo: '현대자동차',
+    slug: 'hyundai',
     category: 'KR',
     hyperliquidSymbol: 'xyz:HYUNDAI',
   },
@@ -99,6 +112,7 @@ export const stocks: Stock[] = [
     symbol: 'SP500',
     name: 'S&P 500',
     nameKo: 'S&P 500',
+    slug: 'sp500',
     category: 'INDEX',
     hyperliquidSymbol: 'xyz:SP500',
   },
@@ -106,6 +120,7 @@ export const stocks: Stock[] = [
     symbol: 'XYZ100',
     name: 'Nasdaq 100',
     nameKo: '나스닥 100',
+    slug: 'nasdaq-100',
     category: 'INDEX',
     hyperliquidSymbol: 'xyz:XYZ100',
   },
@@ -117,6 +132,10 @@ export function getStockBySymbol(symbol: string): Stock | undefined {
   );
 }
 
+export function getStockBySlug(slug: string): Stock | undefined {
+  return stocks.find((s) => s.slug === slug.toLowerCase());
+}
+
 export function getStocksByCategory(category: 'US' | 'KR' | 'INDEX'): Stock[] {
   return stocks.filter((s) => s.category === category);
 }
@@ -125,7 +144,10 @@ export function getAllSymbols(): string[] {
   return stocks.map((s) => s.symbol.toLowerCase());
 }
 
+export function getAllSlugs(): string[] {
+  return stocks.map((s) => s.slug);
+}
+
 export function getPopularStocks(): Stock[] {
-  // Return first 6 stocks as popular
   return stocks.slice(0, 6);
 }
