@@ -1,5 +1,5 @@
 import { Metadata } from 'next';
-import { getTranslations, setRequestLocale } from 'next-intl/server';
+import { setRequestLocale } from 'next-intl/server';
 import { HomePage } from '@/components/pages/HomePage';
 
 type Props = {
@@ -10,51 +10,81 @@ const BASE_URL = 'https://nightticker.com';
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: 'site' });
 
-  const title = `${t('name')} - ${t('tagline')}`;
-  const description = t('description');
+  const isKo = locale === 'ko';
+  const isJa = locale === 'ja';
+
+  const meta = {
+    ko: {
+      title: '야간 주가 - 주말/휴일 주식 시세 | 나이트티커',
+      description: '미국주식, 한국주식 야간 주가를 확인하세요. 주말, 휴일, 장마감 후 테슬라, 엔비디아, 삼성전자 등 주요 종목의 주식 시세를 제공합니다. 하이퍼리퀴드 기반.',
+      keywords: [
+        '야간 주가',
+        '테슬라 야간 주가',
+        '엔비디아 야간 주가',
+        '삼성전자 야간 주가',
+        '미국주식 야간 주가',
+        '주말 주가',
+        '휴일 주가',
+        '장마감 후 주가',
+        '나이트티커',
+      ],
+    },
+    en: {
+      title: 'Night Stock Prices - Weekend & Holiday Quotes | NightTicker',
+      description: 'Check US and Korean night stock prices. Get weekend, holiday, and after-hours quotes for Tesla, Nvidia, Apple, Samsung and more. Powered by Hyperliquid.',
+      keywords: [
+        'night stock price',
+        'Tesla night price',
+        'Nvidia after hours',
+        'Apple weekend price',
+        'after hours stock price',
+        'weekend stock price',
+        'holiday stock price',
+        'NightTicker',
+      ],
+    },
+    ja: {
+      title: '夜間株価 - 週末・休日の株式相場 | ナイトティッカー',
+      description: '米国株・韓国株の夜間株価をチェック。週末、休日、市場終了後のテスラ、エヌビディア、サムスンなどの株式相場を提供。ハイパーリキッド基盤。',
+      keywords: [
+        '夜間株価',
+        'テスラ 夜間株価',
+        'エヌビディア 夜間株価',
+        '米国株 夜間',
+        '週末 株価',
+        '休日 株価',
+        'ナイトティッカー',
+      ],
+    },
+  };
+
+  const current = isJa ? meta.ja : isKo ? meta.ko : meta.en;
 
   return {
-    title,
-    description,
-    keywords:
-      locale === 'ko'
-        ? [
-            '야간 주식 가격',
-            '주말 주식 시세',
-            '휴일 주식 가격',
-            'overnight stock price',
-            'weekend stock price',
-            'hyperliquid',
-          ]
-        : [
-            'overnight stock price',
-            'night stock price',
-            'weekend stock price',
-            'holiday stock price',
-            'after hours price',
-            'hyperliquid',
-          ],
+    title: current.title,
+    description: current.description,
+    keywords: current.keywords,
     alternates: {
-      canonical: locale === 'ko' ? `${BASE_URL}/ko` : BASE_URL,
+      canonical: locale === 'en' ? BASE_URL : `${BASE_URL}/${locale}`,
       languages: {
         en: BASE_URL,
         ko: `${BASE_URL}/ko`,
+        ja: `${BASE_URL}/ja`,
       },
     },
     openGraph: {
-      title,
-      description,
-      url: locale === 'ko' ? `${BASE_URL}/ko` : BASE_URL,
-      siteName: 'NightTicker',
-      locale: locale === 'ko' ? 'ko_KR' : 'en_US',
+      title: current.title,
+      description: current.description,
+      url: locale === 'en' ? BASE_URL : `${BASE_URL}/${locale}`,
+      siteName: isJa ? 'ナイトティッカー' : isKo ? '나이트티커' : 'NightTicker',
+      locale: isJa ? 'ja_JP' : isKo ? 'ko_KR' : 'en_US',
       type: 'website',
     },
     twitter: {
       card: 'summary_large_image',
-      title,
-      description,
+      title: current.title,
+      description: current.description,
     },
   };
 }

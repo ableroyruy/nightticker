@@ -9,19 +9,53 @@ type Props = {
   params: Promise<{ locale: string }>;
 };
 
+const BASE_URL = 'https://nightticker.com';
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: 'pages.howDataWorks' });
+  const isKo = locale === 'ko';
+  const isJa = locale === 'ja';
+
+  const meta = {
+    ko: {
+      title: '데이터 작동 방식 - 나이트티커 야간 주가 출처 | 나이트티커',
+      description: '나이트티커가 야간 주가를 제공하는 방식을 알아보세요. 하이퍼리퀴드 시장 가격 데이터 소스와 참고가격에 대해 설명합니다.',
+      keywords: ['야간 주가 출처', '데이터 소스', '하이퍼리퀴드', '나이트티커'],
+    },
+    en: {
+      title: 'How Data Works - NightTicker Price Source | NightTicker',
+      description: 'Learn how NightTicker provides night stock prices. Understand our Hyperliquid market price data source and reference price information.',
+      keywords: ['night price source', 'data source', 'Hyperliquid', 'NightTicker'],
+    },
+    ja: {
+      title: 'データの仕組み - ナイトティッカーの価格ソース | ナイトティッカー',
+      description: 'ナイトティッカーが夜間株価を提供する仕組みを説明。ハイパーリキッド市場価格データソースについて解説。',
+      keywords: ['夜間株価 ソース', 'データソース', 'ハイパーリキッド', 'ナイトティッカー'],
+    },
+  };
+
+  const current = isJa ? meta.ja : isKo ? meta.ko : meta.en;
+  const canonicalUrl = locale === 'en' ? `${BASE_URL}/how-data-works` : `${BASE_URL}/${locale}/how-data-works`;
 
   return {
-    title: t('title'),
-    description: t('description'),
+    title: current.title,
+    description: current.description,
+    keywords: current.keywords,
     alternates: {
-      canonical: '/how-data-works',
+      canonical: canonicalUrl,
       languages: {
-        en: '/how-data-works',
-        ko: '/ko/how-data-works',
+        en: `${BASE_URL}/how-data-works`,
+        ko: `${BASE_URL}/ko/how-data-works`,
+        ja: `${BASE_URL}/ja/how-data-works`,
       },
+    },
+    openGraph: {
+      title: current.title,
+      description: current.description,
+      url: canonicalUrl,
+      siteName: isJa ? 'ナイトティッカー' : isKo ? '나이트티커' : 'NightTicker',
+      locale: isJa ? 'ja_JP' : isKo ? 'ko_KR' : 'en_US',
+      type: 'website',
     },
   };
 }

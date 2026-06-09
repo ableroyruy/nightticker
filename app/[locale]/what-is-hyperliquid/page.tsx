@@ -9,19 +9,53 @@ type Props = {
   params: Promise<{ locale: string }>;
 };
 
+const BASE_URL = 'https://nightticker.com';
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: 'pages.whatIsHyperliquid' });
+  const isKo = locale === 'ko';
+  const isJa = locale === 'ja';
+
+  const meta = {
+    ko: {
+      title: '하이퍼리퀴드란 - 나이트티커 야간 주가 출처 | 나이트티커',
+      description: '나이트티커의 야간 주가 출처인 하이퍼리퀴드에 대해 알아보세요. 하이퍼리퀴드 시장과 참고가격의 특징을 설명합니다.',
+      keywords: ['하이퍼리퀴드', 'Hyperliquid', '야간 주가 출처', '나이트티커'],
+    },
+    en: {
+      title: 'What is Hyperliquid - NightTicker Price Source | NightTicker',
+      description: 'Learn about Hyperliquid, the source of night stock prices on NightTicker. Understand how Hyperliquid market prices work.',
+      keywords: ['Hyperliquid', 'night price source', 'market prices', 'NightTicker'],
+    },
+    ja: {
+      title: 'ハイパーリキッドとは - ナイトティッカーの価格ソース | ナイトティッカー',
+      description: 'ナイトティッカーの夜間株価ソースであるハイパーリキッドについて解説。ハイパーリキッド市場価格の特徴を説明。',
+      keywords: ['ハイパーリキッド', 'Hyperliquid', '夜間株価ソース', 'ナイトティッカー'],
+    },
+  };
+
+  const current = isJa ? meta.ja : isKo ? meta.ko : meta.en;
+  const canonicalUrl = locale === 'en' ? `${BASE_URL}/what-is-hyperliquid` : `${BASE_URL}/${locale}/what-is-hyperliquid`;
 
   return {
-    title: t('title'),
-    description: t('description'),
+    title: current.title,
+    description: current.description,
+    keywords: current.keywords,
     alternates: {
-      canonical: '/what-is-hyperliquid',
+      canonical: canonicalUrl,
       languages: {
-        en: '/what-is-hyperliquid',
-        ko: '/ko/what-is-hyperliquid',
+        en: `${BASE_URL}/what-is-hyperliquid`,
+        ko: `${BASE_URL}/ko/what-is-hyperliquid`,
+        ja: `${BASE_URL}/ja/what-is-hyperliquid`,
       },
+    },
+    openGraph: {
+      title: current.title,
+      description: current.description,
+      url: canonicalUrl,
+      siteName: isJa ? 'ナイトティッカー' : isKo ? '나이트티커' : 'NightTicker',
+      locale: isJa ? 'ja_JP' : isKo ? 'ko_KR' : 'en_US',
+      type: 'website',
     },
   };
 }

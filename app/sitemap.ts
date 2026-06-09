@@ -3,6 +3,9 @@ import { getAllSlugs } from '@/lib/markets/stocks';
 
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://nightticker.com';
 
+// Category slugs that have stocks
+const categories = ['us', 'kr', 'jp', 'index', 'etf', 'commodity', 'fx', 'special'];
+
 export default function sitemap(): MetadataRoute.Sitemap {
   const slugs = getAllSlugs();
   const locales = ['en', 'ko'];
@@ -41,6 +44,25 @@ export default function sitemap(): MetadataRoute.Sitemap {
           languages: {
             en: `${baseUrl}${page}`,
             ko: `${baseUrl}/ko${page}`,
+          },
+        },
+      });
+    }
+  }
+
+  // Add category pages for each locale
+  for (const locale of locales) {
+    for (const category of categories) {
+      const prefix = locale === 'en' ? '' : `/${locale}`;
+      routes.push({
+        url: `${baseUrl}${prefix}/category/${category}`,
+        lastModified: new Date(),
+        changeFrequency: 'daily',
+        priority: 0.85,
+        alternates: {
+          languages: {
+            en: `${baseUrl}/category/${category}`,
+            ko: `${baseUrl}/ko/category/${category}`,
           },
         },
       });

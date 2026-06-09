@@ -6,6 +6,7 @@ import { getMarketOrder } from '@/lib/utils/getPreferredMarketOrder';
 import { HeroSection } from '@/components/sections/HeroSection';
 import { FavoritesSection } from '@/components/sections/FavoritesSection';
 import { GainersLosersSection } from '@/components/sections/GainersLosersSection';
+import { CategorySection } from '@/components/sections/CategorySection';
 import { ComplianceNotice } from '@/components/common/ComplianceNotice';
 import { Separator } from '@/components/ui/separator';
 import { stocks } from '@/lib/markets/stocks';
@@ -37,12 +38,15 @@ export function HomePage() {
     };
   });
 
-  // Filter by market (exclude INDEX for gainers/losers sections)
+  // Filter by market
   const krAssets = allAssets.filter((a) => a.market === 'KR');
   const usAssets = allAssets.filter((a) => a.market === 'US');
-  const jpAssets = allAssets.filter((a) => a.market === 'JP');
+  const indexAssets = allAssets.filter((a) => a.market === 'INDEX');
+  const etfAssets = allAssets.filter((a) => a.market === 'ETF');
+  const commodityAssets = allAssets.filter((a) => a.market === 'COMMODITY');
+  const fxAssets = allAssets.filter((a) => a.market === 'FX');
 
-  // Sort by 24h change percent for gainers/losers
+  // Sort by 24h change percent for gainers/losers (US/KR stocks only)
   const getGainers = (assets: MarketAsset[]) =>
     assets
       .filter((a) => a.changePercent24h != null && a.changePercent24h > 0)
@@ -57,32 +61,31 @@ export function HomePage() {
   const krLosers = getLosers(krAssets);
   const usGainers = getGainers(usAssets);
   const usLosers = getLosers(usAssets);
-  const jpGainers = getGainers(jpAssets);
-  const jpLosers = getLosers(jpAssets);
 
   // Determine order based on user's language preference
   const isKrFirst = marketOrder === 'KR_FIRST';
-  const isJpFirst = locale === 'ja';
 
-  // Build market sections in order
-  const marketSections = [
+  // Stock sections (US/KR) with gainers/losers - limit 3
+  const stockSections = [
     { market: 'US' as MarketType, gainers: usGainers, losers: usLosers },
     { market: 'KR' as MarketType, gainers: krGainers, losers: krLosers },
-    { market: 'JP' as MarketType, gainers: jpGainers, losers: jpLosers },
   ];
 
-  // Reorder based on locale
-  if (isJpFirst) {
-    const jpSection = marketSections.find(s => s.market === 'JP')!;
-    const others = marketSections.filter(s => s.market !== 'JP');
-    marketSections.length = 0;
-    marketSections.push(jpSection, ...others);
-  } else if (isKrFirst) {
-    const krSection = marketSections.find(s => s.market === 'KR')!;
-    const others = marketSections.filter(s => s.market !== 'KR');
-    marketSections.length = 0;
-    marketSections.push(krSection, ...others);
+  // Reorder stock sections based on locale
+  if (isKrFirst) {
+    const krSection = stockSections.find((s) => s.market === 'KR')!;
+    const others = stockSections.filter((s) => s.market !== 'KR');
+    stockSections.length = 0;
+    stockSections.push(krSection, ...others);
   }
+
+  // Category sections (INDEX, ETF, COMMODITY, FX) - show all sorted by change%
+  const categorySections: { market: MarketType; assets: MarketAsset[] }[] = [
+    { market: 'INDEX', assets: indexAssets },
+    { market: 'ETF', assets: etfAssets },
+    { market: 'COMMODITY', assets: commodityAssets },
+    { market: 'FX', assets: fxAssets },
+  ];
 
   return (
     <div className="min-h-screen">
@@ -95,16 +98,28 @@ export function HomePage() {
 
         <Separator className="opacity-30" />
 
-        {/* Market Sections - Order based on user preference */}
-        {marketSections.map((section, index) => (
+        {/* Stock Sections (US/KR) - Gainers/Losers with limit 3 */}
+        {stockSections.map((section, index) => (
           <div key={section.market}>
             <GainersLosersSection
               market={section.market}
               gainers={section.gainers}
               losers={section.losers}
-              limit={10}
+              limit={3}
             />
-            {index < marketSections.length - 1 && (
+            {index < stockSections.length - 1 && (
+              <Separator className="opacity-30 mt-12" />
+            )}
+          </div>
+        ))}
+
+        <Separator className="opacity-30" />
+
+        {/* Category Sections (INDEX, ETF, COMMODITY, FX) - All items sorted by change% */}
+        {categorySections.map((section, index) => (
+          <div key={section.market}>
+            <CategorySection market={section.market} assets={section.assets} />
+            {index < categorySections.length - 1 && (
               <Separator className="opacity-30 mt-12" />
             )}
           </div>

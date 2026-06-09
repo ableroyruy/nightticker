@@ -38,50 +38,66 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     };
   }
 
-  const name = locale === 'ko' ? stock.nameKo : locale === 'ja' ? (stock.nameJa ?? stock.name) : stock.name;
+  const isKo = locale === 'ko';
+  const isJa = locale === 'ja';
+  const name = isKo ? stock.nameKo : isJa ? (stock.nameJa ?? stock.name) : stock.name;
+  const isStock = ['US', 'KR', 'JP'].includes(stock.category);
 
-  const title =
-    locale === 'ko'
-      ? `${name} (${stock.symbol}) 야간 시세 - 실시간 참고가격`
-      : locale === 'ja'
-        ? `${name} (${stock.symbol}) 夜間価格 - リアルタイム参考価格`
-        : `${name} (${stock.symbol}) Night Price - Real-time Reference Price`;
+  // 주식은 "주가", 나머지는 카테고리별 용어
+  const priceTerms = {
+    ko: isStock ? '주가' : stock.category === 'INDEX' ? '지수' : stock.category === 'FX' ? '환율' : '시세',
+    en: 'price',
+    ja: isStock ? '株価' : stock.category === 'INDEX' ? '指数' : stock.category === 'FX' ? '為替' : '相場',
+  };
 
-  const description =
-    locale === 'ko'
-      ? `${name} (${stock.symbol}) 야간, 주말, 휴일 참고가격을 실시간으로 확인하세요. Hyperliquid 기준 시세이며 공식 거래소 가격이 아닙니다.`
-      : locale === 'ja'
-        ? `${name} (${stock.symbol}) の夜間、週末、祝日の参考価格をリアルタイムで確認。Hyperliquid市場価格に基づき、公式取引所価格ではありません。`
-        : `Check ${name} (${stock.symbol}) overnight, weekend, and holiday reference prices in real-time. Based on Hyperliquid market prices, not official exchange prices.`;
+  const priceTerm = isJa ? priceTerms.ja : isKo ? priceTerms.ko : priceTerms.en;
 
-  const canonicalUrl =
-    locale === 'en' ? `${BASE_URL}/stock/${slug}` : `${BASE_URL}/${locale}/stock/${slug}`;
+  const meta = {
+    ko: {
+      title: `${name} 야간 ${priceTerm} - 주말/휴일 주식 시세 | 나이트티커`,
+      description: `${name} 야간 ${priceTerm}를 확인하세요. 장마감 후, 주말, 휴일에도 ${name} ${isStock ? '주식 시세' : '시세'}를 모니터링할 수 있습니다. 하이퍼리퀴드 기반.`,
+      keywords: [
+        `${name} 야간 ${priceTerm}`,
+        `${name} 주말 ${priceTerm}`,
+        `${name} 휴일 ${priceTerm}`,
+        `${name} 장마감 후`,
+        isStock ? '야간 주가' : `야간 ${priceTerm}`,
+        isStock ? '주말 주가' : `주말 ${priceTerm}`,
+        '나이트티커',
+      ],
+    },
+    en: {
+      title: `${name} Night ${priceTerm.charAt(0).toUpperCase() + priceTerm.slice(1)} - Weekend & Holiday | NightTicker`,
+      description: `Check ${name} night ${priceTerm}. Monitor ${name} ${isStock ? 'stock price' : priceTerm} after hours, on weekends, and holidays. Powered by Hyperliquid.`,
+      keywords: [
+        `${name} night ${priceTerm}`,
+        `${name} after hours`,
+        `${name} weekend ${priceTerm}`,
+        `${name} holiday ${priceTerm}`,
+        isStock ? 'night stock price' : `night ${priceTerm}`,
+        'NightTicker',
+      ],
+    },
+    ja: {
+      title: `${name} 夜間${priceTerm} - 週末・休日相場 | ナイトティッカー`,
+      description: `${name}の夜間${priceTerm}をチェック。市場終了後、週末、休日も${name}の${isStock ? '株価' : '相場'}を確認できます。ハイパーリキッド基盤。`,
+      keywords: [
+        `${name} 夜間${priceTerm}`,
+        `${name} 週末${priceTerm}`,
+        `${name} 休日${priceTerm}`,
+        isStock ? '夜間株価' : `夜間${priceTerm}`,
+        'ナイトティッカー',
+      ],
+    },
+  };
+
+  const current = isJa ? meta.ja : isKo ? meta.ko : meta.en;
+  const canonicalUrl = locale === 'en' ? `${BASE_URL}/stock/${slug}` : `${BASE_URL}/${locale}/stock/${slug}`;
 
   return {
-    title,
-    description,
-    keywords:
-      locale === 'ko'
-        ? [
-            `${name} 야간 시세`,
-            `${name} 주말 가격`,
-            `${name} 휴일 시세`,
-            `${stock.symbol} 야간 가격`,
-            `${stock.symbol} 시세`,
-            '야간 주식 시세',
-            'overnight stock price',
-            'hyperliquid',
-          ]
-        : [
-            `${name} night price`,
-            `${name} overnight price`,
-            `${name} weekend price`,
-            `${stock.symbol} price`,
-            `${stock.symbol} after hours`,
-            'overnight stock price',
-            'weekend stock price',
-            'hyperliquid',
-          ],
+    title: current.title,
+    description: current.description,
+    keywords: current.keywords,
     alternates: {
       canonical: canonicalUrl,
       languages: {
@@ -91,17 +107,17 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       },
     },
     openGraph: {
-      title,
-      description,
+      title: current.title,
+      description: current.description,
       url: canonicalUrl,
-      siteName: 'NightTicker',
-      locale: locale === 'ko' ? 'ko_KR' : 'en_US',
+      siteName: isJa ? 'ナイトティッカー' : isKo ? '나이트티커' : 'NightTicker',
+      locale: isJa ? 'ja_JP' : isKo ? 'ko_KR' : 'en_US',
       type: 'website',
     },
     twitter: {
       card: 'summary_large_image',
-      title,
-      description,
+      title: current.title,
+      description: current.description,
     },
   };
 }

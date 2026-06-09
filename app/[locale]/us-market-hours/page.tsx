@@ -8,19 +8,53 @@ type Props = {
   params: Promise<{ locale: string }>;
 };
 
+const BASE_URL = 'https://nightticker.com';
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: 'pages.usMarketHours' });
+  const isKo = locale === 'ko';
+  const isJa = locale === 'ja';
+
+  const meta = {
+    ko: {
+      title: '미국 주식시장 거래시간 - NYSE/나스닥 개장시간 | 나이트티커',
+      description: '미국 주식시장 거래시간을 확인하세요. NYSE, 나스닥 개장시간, 프리마켓, 애프터마켓 시간 정보를 제공합니다. 장마감 후 야간 주가는 하이퍼리퀴드 기반.',
+      keywords: ['미국 주식시장 시간', '뉴욕증시 개장시간', '나스닥 거래시간', 'NYSE 시간', '프리마켓', '나이트티커'],
+    },
+    en: {
+      title: 'US Stock Market Hours - NYSE & NASDAQ Trading Hours | NightTicker',
+      description: 'Check US stock market trading hours. Get NYSE, NASDAQ opening hours, pre-market, and after-hours trading schedule. Powered by Hyperliquid.',
+      keywords: ['US stock market hours', 'NYSE trading hours', 'NASDAQ hours', 'pre-market hours', 'after hours trading', 'NightTicker'],
+    },
+    ja: {
+      title: '米国株式市場 取引時間 - NYSE/NASDAQ営業時間 | ナイトティッカー',
+      description: '米国株式市場の取引時間を確認。NYSE、NASDAQ開場時間、プレマーケット、アフターマーケット情報。ハイパーリキッド基盤。',
+      keywords: ['米国株式市場 時間', 'NYSE 取引時間', 'NASDAQ 時間', 'プレマーケット', 'ナイトティッカー'],
+    },
+  };
+
+  const current = isJa ? meta.ja : isKo ? meta.ko : meta.en;
+  const canonicalUrl = locale === 'en' ? `${BASE_URL}/us-market-hours` : `${BASE_URL}/${locale}/us-market-hours`;
 
   return {
-    title: t('title'),
-    description: t('description'),
+    title: current.title,
+    description: current.description,
+    keywords: current.keywords,
     alternates: {
-      canonical: '/us-market-hours',
+      canonical: canonicalUrl,
       languages: {
-        en: '/us-market-hours',
-        ko: '/ko/us-market-hours',
+        en: `${BASE_URL}/us-market-hours`,
+        ko: `${BASE_URL}/ko/us-market-hours`,
+        ja: `${BASE_URL}/ja/us-market-hours`,
       },
+    },
+    openGraph: {
+      title: current.title,
+      description: current.description,
+      url: canonicalUrl,
+      siteName: isJa ? 'ナイトティッカー' : isKo ? '나이트티커' : 'NightTicker',
+      locale: isJa ? 'ja_JP' : isKo ? 'ko_KR' : 'en_US',
+      type: 'website',
     },
   };
 }

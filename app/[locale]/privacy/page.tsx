@@ -6,19 +6,53 @@ type Props = {
   params: Promise<{ locale: string }>;
 };
 
+const BASE_URL = 'https://nightticker.com';
+
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;
-  const t = await getTranslations({ locale, namespace: 'pages.privacy' });
+  const isKo = locale === 'ko';
+  const isJa = locale === 'ja';
+
+  const meta = {
+    ko: {
+      title: '개인정보처리방침 | 나이트티커',
+      description: '나이트티커 개인정보처리방침입니다. 나이트티커가 수집하는 정보와 처리 방식을 안내합니다.',
+      keywords: ['개인정보처리방침', '개인정보', '나이트티커'],
+    },
+    en: {
+      title: 'Privacy Policy | NightTicker',
+      description: 'NightTicker privacy policy. Learn about what information we collect and how we handle your data.',
+      keywords: ['privacy policy', 'privacy', 'NightTicker'],
+    },
+    ja: {
+      title: 'プライバシーポリシー | ナイトティッカー',
+      description: 'ナイトティッカーのプライバシーポリシー。収集する情報とその取り扱い方法について説明します。',
+      keywords: ['プライバシーポリシー', '個人情報', 'ナイトティッカー'],
+    },
+  };
+
+  const current = isJa ? meta.ja : isKo ? meta.ko : meta.en;
+  const canonicalUrl = locale === 'en' ? `${BASE_URL}/privacy` : `${BASE_URL}/${locale}/privacy`;
 
   return {
-    title: t('title'),
-    description: t('description'),
+    title: current.title,
+    description: current.description,
+    keywords: current.keywords,
     alternates: {
-      canonical: '/privacy',
+      canonical: canonicalUrl,
       languages: {
-        en: '/privacy',
-        ko: '/ko/privacy',
+        en: `${BASE_URL}/privacy`,
+        ko: `${BASE_URL}/ko/privacy`,
+        ja: `${BASE_URL}/ja/privacy`,
       },
+    },
+    openGraph: {
+      title: current.title,
+      description: current.description,
+      url: canonicalUrl,
+      siteName: isJa ? 'ナイトティッカー' : isKo ? '나이트티커' : 'NightTicker',
+      locale: isJa ? 'ja_JP' : isKo ? 'ko_KR' : 'en_US',
+      type: 'website',
     },
   };
 }
