@@ -27,6 +27,7 @@ const categoryIcons: Record<StockCategory | 'all', React.ElementType> = {
   COMMODITY: Coins,
   FX: DollarSign,
   SPECIAL: Cpu,
+  SEMICONDUCTOR: Cpu,
 };
 
 export function Header() {
@@ -45,7 +46,7 @@ export function Header() {
     { href: `${prefix}/losers`, label: t('topLosers'), icon: TrendingDown },
   ];
 
-  const categories: (StockCategory | 'all')[] = ['all', 'US', 'KR', 'JP', 'INDEX', 'ETF', 'COMMODITY', 'FX'];
+  const categories: (StockCategory | 'all')[] = ['all', 'US', 'KR', 'JP', 'INDEX', 'ETF', 'COMMODITY', 'FX', 'SEMICONDUCTOR'];
 
   const isActive = (href: string) => {
     if (href === prefix || href === `${prefix}/`) {

@@ -48,3 +48,4 @@ export function formatLastUpdated(date: Date, locale: string = 'en'): string {
     hour12: false,
   }).format(date);
 }
+

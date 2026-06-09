@@ -68,7 +68,8 @@
     "ETF": "ETF",
     "COMMODITY": "コモディティ",
     "FX": "通貨",
-    "SPECIAL": "特別"
+    "SPECIAL": "特別",
+    "SEMICONDUCTOR": "半導体"
   },
   "market": {
     "nightPrice": "夜間価格",

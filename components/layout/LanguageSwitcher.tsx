@@ -11,6 +11,7 @@ const languages = [
   { code: 'en', label: 'English', flag: 'EN' },
   { code: 'ko', label: '한국어', flag: 'KO' },
   { code: 'ja', label: '日本語', flag: 'JA' },
+  { code: 'zh', label: '简体中文', flag: 'ZH' },
 ] as const;
 
 export function LanguageSwitcher() {
@@ -48,6 +49,8 @@ export function LanguageSwitcher() {
       newPath = pathname.slice(3) || '/';
     } else if (pathname.startsWith('/ja')) {
       newPath = pathname.slice(3) || '/';
+    } else if (pathname.startsWith('/zh')) {
+      newPath = pathname.slice(3) || '/';
     }
 
     // Add new locale prefix (en is default, no prefix needed)
@@ -55,6 +58,8 @@ export function LanguageSwitcher() {
       newPath = `/ko${newPath}`;
     } else if (newLocale === 'ja') {
       newPath = `/ja${newPath}`;
+    } else if (newLocale === 'zh') {
+      newPath = `/zh${newPath}`;
     }
 
     setIsOpen(false);

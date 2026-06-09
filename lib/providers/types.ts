@@ -13,14 +13,32 @@ export interface MarketDataProvider {
   isAvailable(): Promise<boolean>;
 }
 
-export type StockCategory = 'US' | 'KR' | 'JP' | 'INDEX' | 'ETF' | 'COMMODITY' | 'FX' | 'SPECIAL';
+export type StockCategory = 'US' | 'KR' | 'JP' | 'INDEX' | 'ETF' | 'COMMODITY' | 'FX' | 'SPECIAL' | 'SEMICONDUCTOR';
+
+export type StockSector =
+  | 'BigTech'
+  | 'Semiconductors'
+  | 'EV'
+  | 'Fintech'
+  | 'AI'
+  | 'Retail'
+  | 'Healthcare'
+  | 'Space'
+  | 'Entertainment'
+  | 'Energy'
+  | 'Metals'
+  | 'Agriculture'
+  | 'Currency'
+  | 'Other';
 
 export interface Stock {
   symbol: string;
   name: string;
   nameKo: string;
   nameJa?: string;
+  nameZh?: string;
   slug: string;
   category: StockCategory;
+  sector?: StockSector;
   hyperliquidSymbol: string;
 }

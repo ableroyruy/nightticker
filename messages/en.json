@@ -68,7 +68,8 @@
     "ETF": "ETFs",
     "COMMODITY": "Commodities",
     "FX": "Currencies",
-    "SPECIAL": "Special"
+    "SPECIAL": "Special",
+    "SEMICONDUCTOR": "Semiconductors"
   },
   "market": {
     "nightPrice": "Night Price",

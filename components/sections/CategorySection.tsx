@@ -19,25 +19,30 @@ const marketIcons: Record<string, React.ElementType> = {
   COMMODITY: Coins,
   FX: DollarSign,
   SPECIAL: Cpu,
+  SEMICONDUCTOR: Cpu,
 };
 
 export function CategorySection({ market, assets }: CategorySectionProps) {
   const t = useTranslations('categories');
   const locale = useLocale();
 
-  const marketLabels: Record<MarketType, { en: string; ko: string }> = {
-    KR: { en: 'Korea Market', ko: '한국시장' },
-    US: { en: 'US Market', ko: '미국시장' },
-    JP: { en: 'Japan Market', ko: '일본시장' },
-    INDEX: { en: 'Indices', ko: '지수' },
-    ETF: { en: 'ETFs', ko: 'ETF' },
-    COMMODITY: { en: 'Commodities', ko: '원자재' },
-    FX: { en: 'Currencies', ko: '통화' },
-    SPECIAL: { en: 'Special', ko: '특별' },
+  const marketLabels: Record<MarketType, { en: string; ko: string; ja: string; zh: string }> = {
+    KR: { en: 'Korea Market', ko: '한국시장', ja: '韓国市場', zh: '韩国市场' },
+    US: { en: 'US Market', ko: '미국시장', ja: '米国市場', zh: '美国市场' },
+    JP: { en: 'Japan Market', ko: '일본시장', ja: '日本市場', zh: '日本市场' },
+    INDEX: { en: 'Indices', ko: '지수', ja: '指数', zh: '指数' },
+    ETF: { en: 'ETFs', ko: 'ETF', ja: 'ETF', zh: 'ETF' },
+    COMMODITY: { en: 'Commodities', ko: '원자재', ja: 'コモディティ', zh: '大宗商品' },
+    FX: { en: 'Currencies', ko: '통화', ja: '通貨', zh: '外汇' },
+    SPECIAL: { en: 'Special', ko: '특별', ja: '特別', zh: '特殊' },
+    SEMICONDUCTOR: { en: 'Semiconductors', ko: '반도체', ja: '半導体', zh: '半导体' },
   };
 
   const marketLabel =
-    locale === 'ko' ? marketLabels[market].ko : marketLabels[market].en;
+    locale === 'ko' ? marketLabels[market].ko :
+    locale === 'ja' ? marketLabels[market].ja :
+    locale === 'zh' ? marketLabels[market].zh :
+    marketLabels[market].en;
 
   // Sort by change percent (descending - gainers first)
   const sortedAssets = [...assets].sort((a, b) => {
@@ -65,7 +70,8 @@ export function CategorySection({ market, assets }: CategorySectionProps) {
               market === 'ETF' && 'bg-teal-500',
               market === 'COMMODITY' && 'bg-amber-500',
               market === 'FX' && 'bg-cyan-500',
-              market === 'SPECIAL' && 'bg-pink-500'
+              market === 'SPECIAL' && 'bg-pink-500',
+              market === 'SEMICONDUCTOR' && 'bg-violet-500'
             )}
           />
           <div className="flex items-center gap-2">

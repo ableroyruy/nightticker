@@ -9,7 +9,7 @@ import { GainersLosersSection } from '@/components/sections/GainersLosersSection
 import { CategorySection } from '@/components/sections/CategorySection';
 import { ComplianceNotice } from '@/components/common/ComplianceNotice';
 import { Separator } from '@/components/ui/separator';
-import { stocks } from '@/lib/markets/stocks';
+import { stocks, getStocksBySectorForCategory } from '@/lib/markets/stocks';
 import { MarketAsset, MarketType } from '@/lib/types/market';
 
 export function HomePage() {
@@ -46,6 +46,26 @@ export function HomePage() {
   const commodityAssets = allAssets.filter((a) => a.market === 'COMMODITY');
   const fxAssets = allAssets.filter((a) => a.market === 'FX');
 
+  // Semiconductor stocks (cross-market sector)
+  const semiconductorStocks = getStocksBySectorForCategory('Semiconductors');
+  const semiconductorAssets: MarketAsset[] = semiconductorStocks.map((stock) => {
+    const tickerKey = stock.hyperliquidSymbol.replace('xyz:', '');
+    const ticker = tickers[tickerKey];
+    return {
+      symbol: stock.symbol,
+      name: stock.name,
+      nameKo: stock.nameKo,
+      nameJa: stock.nameJa,
+      slug: stock.slug,
+      market: 'SEMICONDUCTOR' as MarketType,
+      price: ticker?.price ?? null,
+      prevDayPx: ticker?.prevDayPx ?? null,
+      change24h: ticker?.change24h ?? null,
+      changePercent24h: ticker?.changePercent24h ?? null,
+      hyperliquidSymbol: stock.hyperliquidSymbol,
+    };
+  });
+
   // Sort by 24h change percent for gainers/losers (US/KR stocks only)
   const getGainers = (assets: MarketAsset[]) =>
     assets
@@ -79,8 +99,9 @@ export function HomePage() {
     stockSections.push(krSection, ...others);
   }
 
-  // Category sections (INDEX, ETF, COMMODITY, FX) - show all sorted by change%
+  // Category sections (INDEX, ETF, COMMODITY, FX, SEMICONDUCTOR) - show all sorted by change%
   const categorySections: { market: MarketType; assets: MarketAsset[] }[] = [
+    { market: 'SEMICONDUCTOR', assets: semiconductorAssets },
     { market: 'INDEX', assets: indexAssets },
     { market: 'ETF', assets: etfAssets },
     { market: 'COMMODITY', assets: commodityAssets },
@@ -105,7 +126,7 @@ export function HomePage() {
               market={section.market}
               gainers={section.gainers}
               losers={section.losers}
-              limit={3}
+              limit={5}
             />
             {index < stockSections.length - 1 && (
               <Separator className="opacity-30 mt-12" />

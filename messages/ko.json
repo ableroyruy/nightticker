@@ -68,7 +68,8 @@
     "ETF": "ETF",
     "COMMODITY": "원자재",
     "FX": "통화",
-    "SPECIAL": "특별"
+    "SPECIAL": "특별",
+    "SEMICONDUCTOR": "반도체"
   },
   "market": {
     "nightPrice": "야간 가격",

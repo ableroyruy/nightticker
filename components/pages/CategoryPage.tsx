@@ -2,7 +2,7 @@
 
 import { useTranslations, useLocale } from 'next-intl';
 import { useHyperliquidTicker } from '@/lib/hooks/useHyperliquidTicker';
-import { getStocksByCategory } from '@/lib/markets/stocks';
+import { getStocksByCategory, getStocksBySectorForCategory } from '@/lib/markets/stocks';
 import { ComplianceNotice } from '@/components/common/ComplianceNotice';
 import { ConnectionStatus } from '@/components/ui/connection-status';
 import { AssetTable } from '@/components/market/AssetTable';
@@ -19,6 +19,7 @@ const categoryIcons: Record<StockCategory, React.ElementType> = {
   COMMODITY: Coins,
   FX: DollarSign,
   SPECIAL: Cpu,
+  SEMICONDUCTOR: Cpu,
 };
 
 interface CategoryPageProps {
@@ -30,7 +31,10 @@ export function CategoryPage({ category }: CategoryPageProps) {
   const locale = useLocale();
   const { tickers, status, lastUpdate } = useHyperliquidTicker();
 
-  const stocks = getStocksByCategory(category);
+  // SEMICONDUCTOR is a special case - it shows stocks by sector, not category
+  const stocks = category === 'SEMICONDUCTOR'
+    ? getStocksBySectorForCategory('Semiconductors')
+    : getStocksByCategory(category);
   const Icon = categoryIcons[category];
 
   // Convert stock data to MarketAsset format with live prices

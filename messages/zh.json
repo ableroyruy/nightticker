@@ -1,0 +1,220 @@
+{
+  "site": {
+    "name": "NightTicker",
+    "tagline": "市场永不眠",
+    "description": "追踪传统交易所休市时的股票参考价格。"
+  },
+  "hero": {
+    "title": "NightTicker",
+    "subtitle": "市场永不眠",
+    "description": "当传统股票交易所休市时，实时监控市场动态。追踪夜间、周末和节假日的参考价格。",
+    "timing": "夜间。周末。节假日。",
+    "source": "Hyperliquid市场价格。",
+    "disclaimer": "仅供参考。"
+  },
+  "nav": {
+    "home": "首页",
+    "favorites": "收藏",
+    "topGainers": "涨幅榜",
+    "topLosers": "跌幅榜",
+    "overnightPrices": "夜间价格",
+    "weekendPrices": "周末价格",
+    "holidayPrices": "节假日价格",
+    "usMarketHours": "美股交易时间",
+    "koreaMarketHours": "韩股交易时间",
+    "howDataWorks": "数据原理",
+    "whatIsHyperliquid": "什么是Hyperliquid",
+    "about": "关于",
+    "disclaimer": "免责声明",
+    "privacy": "隐私政策",
+    "terms": "服务条款"
+  },
+  "favorites": {
+    "title": "收藏",
+    "empty": "暂无收藏",
+    "emptyHint": "点击任意资产上的星标图标将其添加到收藏",
+    "filter": {
+      "all": "全部",
+      "kr": "韩国",
+      "us": "美国",
+      "jp": "日本",
+      "crypto": "加密货币"
+    },
+    "sort": {
+      "added": "最近添加",
+      "gainers": "涨幅最大",
+      "losers": "跌幅最大",
+      "name": "名称"
+    }
+  },
+  "sections": {
+    "topGainers": "涨幅榜",
+    "topLosers": "跌幅榜",
+    "viewAll": "查看全部",
+    "noGainers": "暂无上涨标的",
+    "noLosers": "暂无下跌标的",
+    "popularStocks": "热门股票",
+    "usStocks": "美国股票",
+    "koreanStocks": "韩国股票",
+    "indexMarkets": "指数",
+    "yourWatchlist": "自选股"
+  },
+  "categories": {
+    "all": "全部市场",
+    "US": "美股",
+    "KR": "韩股",
+    "JP": "日股",
+    "INDEX": "指数",
+    "ETF": "ETF",
+    "COMMODITY": "大宗商品",
+    "FX": "外汇",
+    "SPECIAL": "特殊资产",
+    "SEMICONDUCTOR": "半导体"
+  },
+  "market": {
+    "nightPrice": "夜间价格",
+    "overnightPrice": "夜间价格",
+    "weekendPrice": "周末价格",
+    "marketClosedPrice": "休市价格",
+    "currentPrice": "当前Hyperliquid市场价格",
+    "lastUpdated": "最后更新",
+    "open": "开市",
+    "closed": "休市",
+    "viewSourceMarket": "查看数据来源",
+    "viewOnHyperliquid": "在Hyperliquid查看",
+    "exploreDetails": "查看详情",
+    "priceUnavailable": "价格不可用",
+    "loading": "加载中..."
+  },
+  "table": {
+    "name": "名称",
+    "market": "市场",
+    "price": "价格",
+    "change24h": "24小时涨跌",
+    "volume": "成交量",
+    "noData": "暂无数据"
+  },
+  "connection": {
+    "connected": "实时",
+    "connecting": "连接中",
+    "disconnected": "离线"
+  },
+  "watchlist": {
+    "title": "自选股",
+    "add": "添加到自选",
+    "remove": "从自选移除",
+    "empty": "自选股为空"
+  },
+  "compliance": {
+    "badge": "Hyperliquid市场价格",
+    "referralDisclosure": "Hyperliquid链接可能包含推荐归属。",
+    "forReference": "仅供参考。",
+    "notOfficial": "非官方交易所价格。",
+    "mayDiffer": "可能与传统交易所价格存在显著差异。",
+    "noReliance": "请勿依据此信息进行投资或交易决策。",
+    "fullNotice": "本页面显示的Hyperliquid市场价格仅供参考。Hyperliquid市场价格并非官方交易所价格。价格可能与传统股票交易所的价格存在显著差异。显示的信息可能存在延迟、不准确、遗漏或错误。NightTicker不验证市场数据的准确性。请勿依据显示的信息进行投资或交易决策。"
+  },
+  "footer": {
+    "disclaimer": "NightTicker是一个独立的信息网站。NightTicker不是经纪商、交易所、证券公司、交易平台、财务顾问或投资服务。所有信息仅供参考。NightTicker显示Hyperliquid市场价格，而非官方交易所价格。请勿依据显示的信息进行投资或交易决策。",
+    "copyright": "NightTicker"
+  },
+  "faq": {
+    "title": "常见问题",
+    "q1": "什么是Hyperliquid市场价格？",
+    "a1": "Hyperliquid市场价格是来自Hyperliquid市场的参考价格。它们不是官方交易所价格，可能与传统交易所价格存在显著差异。",
+    "q2": "NightTicker显示的是官方交易所价格吗？",
+    "a2": "不是。NightTicker仅显示Hyperliquid市场价格作为参考。这些不是官方交易所价格。",
+    "q3": "为什么Hyperliquid价格可能与交易所价格不同？",
+    "a3": "Hyperliquid独立于传统股票交易所运营。价格反映的是Hyperliquid平台上的市场活动，可能因流动性、时间和市场条件等各种因素而有所不同。",
+    "q4": "我应该使用NightTicker的价格进行投资决策吗？",
+    "a4": "不应该。NightTicker仅提供参考信息。请勿依据此信息进行投资或交易决策。请始终咨询官方来源和财务顾问。",
+    "q5": "夜间价格是什么意思？",
+    "a5": "夜间价格是指传统股票交易所休市时（如夜间、周末或节假日）的当前Hyperliquid市场价格。这只是参考价格。",
+    "q6": "在哪里可以查看详细图表？",
+    "a6": "如需查看详细图表、历史数据和高级市场信息，请直接访问Hyperliquid。"
+  },
+  "pages": {
+    "gainers": {
+      "title": "涨幅榜",
+      "description": "过去24小时涨幅最大的资产"
+    },
+    "losers": {
+      "title": "跌幅榜",
+      "description": "过去24小时跌幅最大的资产"
+    },
+    "favorites": {
+      "title": "收藏",
+      "description": "您收藏的资产"
+    },
+    "overnight": {
+      "title": "夜间价格",
+      "description": "查看传统股票市场休市时的夜间参考价格。",
+      "content": "当传统股票交易所夜间休市时，Hyperliquid市场价格可能继续反映市场活动。NightTicker仅出于信息目的显示这些夜间参考价格。"
+    },
+    "weekend": {
+      "title": "周末价格",
+      "description": "查看传统股票市场休市时的周末参考价格。",
+      "content": "传统股票交易所通常在周末休市。然而，Hyperliquid市场价格可能继续变动。NightTicker仅出于信息目的显示这些周末参考价格。"
+    },
+    "holiday": {
+      "title": "节假日价格",
+      "description": "查看传统股票市场休市时的节假日参考价格。",
+      "content": "在市场节假日期间，传统股票交易所可能休市。在此期间，Hyperliquid市场价格可能仍然可用。NightTicker仅出于信息目的显示这些节假日参考价格。"
+    },
+    "usMarketHours": {
+      "title": "美股交易时间",
+      "description": "美国股票市场交易时间和时间表信息。"
+    },
+    "koreaMarketHours": {
+      "title": "韩股交易时间",
+      "description": "韩国股票市场交易时间和时间表信息。"
+    },
+    "howDataWorks": {
+      "title": "数据原理",
+      "description": "了解NightTicker如何显示Hyperliquid市场价格。"
+    },
+    "whatIsHyperliquid": {
+      "title": "什么是Hyperliquid",
+      "description": "了解Hyperliquid，NightTicker上显示的市场价格的来源。"
+    },
+    "about": {
+      "title": "关于NightTicker",
+      "description": "了解NightTicker和我们的使命。"
+    },
+    "disclaimer": {
+      "title": "免责声明",
+      "description": "重要免责声明和法律信息。"
+    },
+    "privacy": {
+      "title": "隐私政策",
+      "description": "NightTicker如何处理您的隐私。"
+    },
+    "terms": {
+      "title": "服务条款",
+      "description": "使用NightTicker的条款和条件。"
+    }
+  },
+  "search": {
+    "placeholder": "搜索股票...",
+    "noResults": "未找到结果"
+  },
+  "common": {
+    "language": "语言",
+    "english": "English",
+    "korean": "한국어",
+    "japanese": "日本語",
+    "chinese": "简体中文",
+    "loading": "加载中...",
+    "error": "发生错误",
+    "retry": "重试"
+  },
+  "marketClock": {
+    "localTime": "当地时间",
+    "usMarket": "美国市场",
+    "koreaMarket": "韩国市场",
+    "open": "开市",
+    "closed": "休市",
+    "opens": "开市时间",
+    "closes": "休市时间"
+  }
+}
