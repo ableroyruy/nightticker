@@ -1,10 +1,9 @@
 'use client';
 
-import { useEffect, useRef, memo } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   createChart,
   IChartApi,
-  ISeriesApi,
   CandlestickData,
   Time,
   ColorType,
@@ -21,31 +20,33 @@ interface MiniChartProps {
   width?: number;
   height?: number;
   className?: string;
-  isPositive?: boolean;
   autoResize?: boolean;
 }
 
 type CandlestickSeriesApi = ReturnType<IChartApi['addSeries']>;
 
-export const MiniChart = memo(function MiniChart({
+export function MiniChart({
   candles,
   loading = false,
   error = null,
   width = 120,
   height = 48,
   className,
-  isPositive = true,
   autoResize = false,
 }: MiniChartProps) {
   const containerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const seriesRef = useRef<CandlestickSeriesApi | null>(null);
+  // 차트 준비 상태를 state로 추적
+  const [chartReady, setChartReady] = useState(false);
 
-  // Initialize chart
+  // Initialize chart - 한 번만 실행
   useEffect(() => {
     if (!containerRef.current) return;
 
-    // Use container width if autoResize, otherwise use prop
+    // 이미 차트가 있으면 스킵
+    if (chartRef.current) return;
+
     const chartWidth = autoResize ? containerRef.current.clientWidth : width;
     const chartHeight = height;
 
@@ -74,7 +75,7 @@ export const MiniChart = memo(function MiniChart({
         borderVisible: false,
       },
       crosshair: {
-        mode: 0, // Hidden
+        mode: 0,
         vertLine: { visible: false },
         horzLine: { visible: false },
       },
@@ -95,17 +96,19 @@ export const MiniChart = memo(function MiniChart({
 
     chartRef.current = chart;
     seriesRef.current = series;
+    setChartReady(true);
 
     return () => {
       chart.remove();
       chartRef.current = null;
       seriesRef.current = null;
+      setChartReady(false);
     };
   }, [width, height, autoResize]);
 
-  // Update chart data
+  // Update chart data - chartReady 상태에 의존
   useEffect(() => {
-    if (!seriesRef.current || !candles.length) return;
+    if (!chartReady || !seriesRef.current || !candles.length) return;
 
     const chartData: CandlestickData<Time>[] = candles.map((c) => ({
       time: c.time as Time,
@@ -117,13 +120,12 @@ export const MiniChart = memo(function MiniChart({
 
     seriesRef.current.setData(chartData);
 
-    // Fit content to visible area
     if (chartRef.current) {
       chartRef.current.timeScale().fitContent();
     }
-  }, [candles]);
+  }, [candles, chartReady]);
 
-  // Resize chart if dimensions change or container resizes
+  // Resize chart
   useEffect(() => {
     if (!chartRef.current || !containerRef.current) return;
 
@@ -194,4 +196,4 @@ export const MiniChart = memo(function MiniChart({
       style={containerStyle}
     />
   );
-});
+}

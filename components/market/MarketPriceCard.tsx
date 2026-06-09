@@ -33,7 +33,6 @@ export function MarketPriceCard({ hyperliquidSymbol, locale }: MarketPriceCardPr
   const { candles, loading: chartLoading, error: chartError } = useCandleData(tickerKey);
 
   const isLoading = status === 'connecting' && !ticker;
-  const isPositive = (ticker?.changePercent24h ?? 0) >= 0;
 
   return (
     <Card>
@@ -63,7 +62,6 @@ export function MarketPriceCard({ hyperliquidSymbol, locale }: MarketPriceCardPr
             loading={chartLoading}
             error={chartError}
             height={300}
-            isPositive={isPositive}
             autoResize
           />
         </div>

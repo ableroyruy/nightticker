@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { ConnectionStatus } from '@/lib/types/market';
 
 const CANDLES_API = '/api/market/candles';
@@ -32,7 +32,7 @@ interface CacheEntry {
 
 // 전역 캐시
 const cache = new Map<string, CacheEntry>();
-// 진행 중인 요청 (Promise 공유)
+// 진행 중인 요청
 const pendingRequests = new Map<string, Promise<CandleData[]>>();
 
 function getChange(candles: CandleData[]) {
@@ -64,20 +64,20 @@ async function fetchFromServer(symbol: string): Promise<CandleData[]> {
 }
 
 // 데이터 가져오기 (캐시 + 요청 중복 방지)
-function fetchCandles(symbol: string): Promise<CandleData[]> {
-  // 1. 캐시 확인
+async function fetchCandles(symbol: string): Promise<CandleData[]> {
+  // 캐시 확인
   const cached = getCachedData(symbol);
   if (cached) {
-    return Promise.resolve(cached);
+    return cached;
   }
 
-  // 2. 진행 중인 요청 확인
+  // 진행 중인 요청 확인
   const pending = pendingRequests.get(symbol);
   if (pending) {
     return pending;
   }
 
-  // 3. 새 요청
+  // 새 요청
   const request = fetchFromServer(symbol).then(data => {
     if (data.length > 0) {
       cache.set(symbol, { data, timestamp: Date.now() });
@@ -86,7 +86,7 @@ function fetchCandles(symbol: string): Promise<CandleData[]> {
     return data;
   }).catch(() => {
     pendingRequests.delete(symbol);
-    return [];
+    return [] as CandleData[];
   });
 
   pendingRequests.set(symbol, request);
@@ -96,7 +96,6 @@ function fetchCandles(symbol: string): Promise<CandleData[]> {
 export function useCandleData(symbol: string): CandleState & { status: ConnectionStatus } {
   const sym = symbol.toUpperCase();
   const mountedRef = useRef(true);
-  const symRef = useRef(sym);
 
   const [state, setState] = useState<CandleState>(() => {
     const cached = getCachedData(sym);
@@ -125,53 +124,47 @@ export function useCandleData(symbol: string): CandleState & { status: Connectio
     getCachedData(sym) ? 'connected' : 'connecting'
   );
 
+  const loadData = useCallback(async () => {
+    if (!mountedRef.current) return;
+
+    const data = await fetchCandles(sym);
+
+    if (!mountedRef.current) return;
+
+    if (data.length > 0) {
+      const { change24h, changePercent24h } = getChange(data);
+      setState({
+        candles: data,
+        currentPrice: data[data.length - 1]?.close ?? null,
+        change24h,
+        changePercent24h,
+        loading: false,
+        error: null,
+      });
+      setStatus('connected');
+    } else {
+      setState(prev => ({ ...prev, loading: false, error: 'No data' }));
+      setStatus('connected');
+    }
+  }, [sym]);
+
   useEffect(() => {
     mountedRef.current = true;
-    symRef.current = sym;
-
-    let intervalId: NodeJS.Timeout | null = null;
-
-    const loadData = async () => {
-      // 심볼이 변경됐으면 무시
-      if (symRef.current !== sym) return;
-
-      const data = await fetchCandles(sym);
-
-      // 언마운트됐거나 심볼이 변경됐으면 무시
-      if (!mountedRef.current || symRef.current !== sym) return;
-
-      if (data.length > 0) {
-        const { change24h, changePercent24h } = getChange(data);
-        setState({
-          candles: data,
-          currentPrice: data[data.length - 1]?.close ?? null,
-          change24h,
-          changePercent24h,
-          loading: false,
-          error: null,
-        });
-        setStatus('connected');
-      } else {
-        setState(prev => ({ ...prev, loading: false, error: 'No data' }));
-        setStatus('connected');
-      }
-    };
 
     // 즉시 로드
     loadData();
 
     // 폴링 설정
-    intervalId = setInterval(() => {
-      // 캐시 무효화 후 로드
+    const intervalId = setInterval(() => {
       cache.delete(sym);
       loadData();
     }, POLL_INTERVAL);
 
     return () => {
       mountedRef.current = false;
-      if (intervalId) clearInterval(intervalId);
+      clearInterval(intervalId);
     };
-  }, [sym]);
+  }, [sym, loadData]);
 
   return { ...state, status };
 }
