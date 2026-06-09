@@ -16,11 +16,6 @@ export function HomePage() {
   const { tickers, status, lastUpdate } = useHyperliquidTicker();
   const marketOrder = getMarketOrder(locale);
 
-  // 디버깅: tickers 상태 확인
-  const tickerCount = Object.keys(tickers).length;
-  const hasChangeData = Object.values(tickers).some(t => t.changePercent24h !== 0);
-  console.log(`[HomePage] tickers 개수: ${tickerCount}, changePercent24h 데이터 있음: ${hasChangeData}`);
-
   // Convert stock data to MarketAsset format with live prices and 24h data
   const allAssets: MarketAsset[] = stocks.map((stock) => {
     // Ticker keys don't have 'xyz:' prefix - just the symbol
@@ -64,9 +59,6 @@ export function HomePage() {
   const usLosers = getLosers(usAssets);
   const jpGainers = getGainers(jpAssets);
   const jpLosers = getLosers(jpAssets);
-
-  // 디버깅: gainers/losers 카운트
-  console.log(`[HomePage] US: ${usGainers.length} gainers, ${usLosers.length} losers`);
 
   // Determine order based on user's language preference
   const isKrFirst = marketOrder === 'KR_FIRST';
