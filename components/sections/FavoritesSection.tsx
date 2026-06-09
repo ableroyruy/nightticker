@@ -1,7 +1,6 @@
 'use client';
 
 import { useTranslations, useLocale } from 'next-intl';
-import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
 import { Star } from 'lucide-react';
 import { useFavorites } from '@/lib/context/FavoritesContext';
 import { AssetCard } from '@/components/market/AssetCard';
@@ -85,27 +84,16 @@ export function FavoritesSection({ tickers }: FavoritesSectionProps) {
           {favorites.length} {locale === 'ko' ? '개' : 'items'}
         </span>
       </div>
-      <LayoutGroup id="favorites">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          <AnimatePresence mode="popLayout">
-            {favoriteAssets.map((asset) => (
-              <motion.div
-                key={`fav-${asset.symbol}`}
-                layout
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.9 }}
-                transition={{
-                  layout: { type: 'spring', stiffness: 350, damping: 30 },
-                  opacity: { duration: 0.2 },
-                }}
-              >
-                <AssetCard asset={asset} showMarketBadge />
-              </motion.div>
-            ))}
-          </AnimatePresence>
-        </div>
-      </LayoutGroup>
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        {favoriteAssets.map((asset) => (
+          <div
+            key={`fav-${asset.symbol}`}
+            className="transition-opacity duration-200"
+          >
+            <AssetCard asset={asset} showMarketBadge />
+          </div>
+        ))}
+      </div>
     </section>
   );
 }
