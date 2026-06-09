@@ -128,3 +128,67 @@
     @apply font-sans;
   }
 }
+
+/* Time-of-day theme accents - subtle and professional */
+
+/* Morning: warm amber accents */
+.time-morning {
+  --time-accent: oklch(0.75 0.12 75);
+  --time-accent-subtle: oklch(0.95 0.03 75);
+}
+
+.dark.time-morning,
+.time-morning.dark {
+  --time-accent: oklch(0.8 0.1 75);
+  --time-accent-subtle: oklch(0.25 0.04 75);
+}
+
+/* Day: clean blue accents */
+.time-day {
+  --time-accent: oklch(0.6 0.15 240);
+  --time-accent-subtle: oklch(0.95 0.02 240);
+}
+
+.dark.time-day,
+.time-day.dark {
+  --time-accent: oklch(0.7 0.12 240);
+  --time-accent-subtle: oklch(0.25 0.04 240);
+}
+
+/* Evening: indigo accents */
+.time-evening {
+  --time-accent: oklch(0.55 0.18 280);
+  --time-accent-subtle: oklch(0.95 0.02 280);
+}
+
+.dark.time-evening,
+.time-evening.dark {
+  --time-accent: oklch(0.65 0.15 280);
+  --time-accent-subtle: oklch(0.22 0.05 280);
+}
+
+/* Night: deep navy accents (strongest brand identity) */
+.time-night {
+  --time-accent: oklch(0.45 0.15 260);
+  --time-accent-subtle: oklch(0.92 0.02 260);
+}
+
+.dark.time-night,
+.time-night.dark {
+  --time-accent: oklch(0.55 0.12 260);
+  --time-accent-subtle: oklch(0.18 0.06 260);
+}
+
+/* Apply time-based accent to primary for subtle theming */
+:root:is(.time-morning, .time-day, .time-evening, .time-night) {
+  --primary: var(--time-accent);
+}
+
+.dark:is(.time-morning, .time-day, .time-evening, .time-night) {
+  --primary: var(--time-accent);
+}
+
+/* Subtle transition for theme changes */
+html {
+  transition: --primary 0.5s ease-in-out;
+}

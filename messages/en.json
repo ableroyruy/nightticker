@@ -145,5 +145,14 @@
     "language": "Language",
     "english": "English",
     "korean": "Korean"
+  },
+  "marketClock": {
+    "localTime": "Your Local Time",
+    "usMarket": "US Market",
+    "koreaMarket": "Korea Market",
+    "open": "Open",
+    "closed": "Closed",
+    "opens": "Opens",
+    "closes": "Closes"
   }
 }

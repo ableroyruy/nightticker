@@ -3,10 +3,11 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Moon } from 'lucide-react';
 import { StockSearch } from '@/components/market/StockSearch';
 import { StockGrid } from '@/components/market/StockGrid';
+import { MarketClock } from '@/components/market/MarketClock';
 import { HyperliquidBadge } from '@/components/common/HyperliquidBadge';
 import { ComplianceNotice } from '@/components/common/ComplianceNotice';
 import { Separator } from '@/components/ui/separator';
-import { getAllMarketData, getMarketDataByCategory } from '@/lib/providers/market-data-provider';
+import { getMarketDataByCategory } from '@/lib/providers/market-data-provider';
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -78,6 +79,11 @@ export default async function HomePage({ params }: Props) {
           {/* Search */}
           <div className="flex justify-center pt-4">
             <StockSearch />
+          </div>
+
+          {/* Market Clock */}
+          <div className="pt-8 max-w-4xl mx-auto w-full">
+            <MarketClock />
           </div>
         </div>
       </section>

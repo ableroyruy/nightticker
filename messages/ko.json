@@ -145,5 +145,14 @@
     "language": "언어",
     "english": "English",
     "korean": "한국어"
+  },
+  "marketClock": {
+    "localTime": "현재 시간",
+    "usMarket": "미국 시장",
+    "koreaMarket": "한국 시장",
+    "open": "개장",
+    "closed": "휴장",
+    "opens": "개장",
+    "closes": "마감"
   }
 }
