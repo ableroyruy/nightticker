@@ -126,7 +126,13 @@ export default async function StockPage({ params }: Props) {
         <div>
           <div className="flex items-center gap-3 mb-1">
             <h1 className="text-3xl md:text-4xl font-bold">{displayName}</h1>
-            <WatchlistButton symbol={stock.symbol} />
+            <WatchlistButton
+                symbol={stock.symbol}
+                market={stock.category}
+                name={stock.name}
+                nameKo={stock.nameKo}
+                slug={stock.slug}
+              />
           </div>
           <p className="text-lg text-muted-foreground">{stock.symbol}</p>
         </div>

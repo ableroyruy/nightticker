@@ -25,8 +25,23 @@ export const KR_MARKET: MarketHours = {
   tradingDays: [1, 2, 3, 4, 5], // Monday to Friday
 };
 
+export const JP_MARKET: MarketHours = {
+  name: 'Japanese Stock Market',
+  nameKo: '일본 주식 시장',
+  timezone: 'Asia/Tokyo',
+  openTime: '09:00',
+  closeTime: '15:00',
+  tradingDays: [1, 2, 3, 4, 5], // Monday to Friday
+};
+
+const localeMap: Record<string, string> = {
+  en: 'en-US',
+  ko: 'ko-KR',
+  ja: 'ja-JP',
+};
+
 export function formatLastUpdated(date: Date, locale: string = 'en'): string {
-  return new Intl.DateTimeFormat(locale === 'ko' ? 'ko-KR' : 'en-US', {
+  return new Intl.DateTimeFormat(localeMap[locale] || 'en-US', {
     hour: '2-digit',
     minute: '2-digit',
     second: '2-digit',

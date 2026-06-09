@@ -2,18 +2,30 @@
 
 import { Star } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { useWatchlist } from '@/lib/hooks/useWatchlist';
+import { useFavorites } from '@/lib/context/FavoritesContext';
 import { useTranslations } from 'next-intl';
+import { MarketType } from '@/lib/types/market';
 
 interface WatchlistButtonProps {
   symbol: string;
+  market: MarketType;
+  name: string;
+  nameKo?: string;
+  slug: string;
   size?: 'sm' | 'default';
 }
 
-export function WatchlistButton({ symbol, size = 'sm' }: WatchlistButtonProps) {
-  const { isWatched, toggle, isLoaded } = useWatchlist();
+export function WatchlistButton({
+  symbol,
+  market,
+  name,
+  nameKo,
+  slug,
+  size = 'sm',
+}: WatchlistButtonProps) {
+  const { isFavorite, toggleFavorite, isLoaded } = useFavorites();
   const t = useTranslations('watchlist');
-  const watched = isWatched(symbol);
+  const watched = isFavorite(symbol, market);
 
   if (!isLoaded) {
     return (
@@ -27,7 +39,7 @@ export function WatchlistButton({ symbol, size = 'sm' }: WatchlistButtonProps) {
     <Button
       variant="ghost"
       size="icon"
-      onClick={() => toggle(symbol)}
+      onClick={() => toggleFavorite({ symbol, market, name, nameKo, slug })}
       title={watched ? t('remove') : t('add')}
       className={`h-8 w-8 ${watched ? 'text-yellow-500' : 'text-muted-foreground'}`}
     >

@@ -49,6 +49,8 @@ class CandleWebSocketManager {
   private candleStates: Map<string, CandleState> = new Map();
   private reconnectTimeout: NodeJS.Timeout | null = null;
   private pendingSubscriptions: Set<string> = new Set();
+  private fetchQueue: Array<{ symbol: string; resolve: (data: CandleData[]) => void; reject: (err: Error) => void }> = [];
+  private isFetching = false;
 
   private constructor() {}
 
@@ -77,9 +79,6 @@ class CandleWebSocketManager {
       symbolListeners.forEach((listener) => listener(state));
     }
   }
-
-  private fetchQueue: Array<{ symbol: string; resolve: (data: CandleData[]) => void; reject: (err: Error) => void }> = [];
-  private isFetching = false;
 
   private async processFetchQueue() {
     if (this.isFetching || this.fetchQueue.length === 0) return;

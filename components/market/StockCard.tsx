@@ -30,7 +30,13 @@ export function StockCard({ stock, price }: StockCardProps) {
               {stock.symbol}
             </p>
           </Link>
-          <WatchlistButton symbol={stock.symbol} />
+          <WatchlistButton
+            symbol={stock.symbol}
+            market={stock.category}
+            name={stock.name}
+            nameKo={stock.nameKo}
+            slug={stock.slug}
+          />
         </div>
 
         <div className="mt-4">

@@ -1,9 +1,10 @@
 'use client';
 
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { Wifi, WifiOff, Loader2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { ConnectionStatus as ConnectionStatusType } from '@/lib/types/market';
+import { formatLastUpdated } from '@/lib/markets/hours';
 
 interface ConnectionStatusProps {
   status: ConnectionStatusType;
@@ -17,6 +18,7 @@ export function ConnectionStatus({
   className,
 }: ConnectionStatusProps) {
   const t = useTranslations('connection');
+  const locale = useLocale();
 
   const statusConfig = {
     connected: {
@@ -74,7 +76,7 @@ export function ConnectionStatus({
       <span className="font-medium">{config.text}</span>
       {lastUpdate && status === 'connected' && (
         <span className="text-muted-foreground">
-          {lastUpdate.toLocaleTimeString()}
+          {formatLastUpdated(lastUpdate, locale)}
         </span>
       )}
     </div>
