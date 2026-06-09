@@ -152,8 +152,8 @@ export function AssetCard({
               candles={candles}
               loading={chartLoading}
               error={chartError}
-              width={100}
-              height={56}
+              width={140}
+              height={64}
               isPositive={isPositive}
             />
           </div>

@@ -56,14 +56,14 @@ export function MarketPriceCard({ hyperliquidSymbol, locale }: MarketPriceCardPr
           />
         )}
 
-        {/* 24h Chart */}
-        <div className="w-full">
+        {/* 6h Chart */}
+        <div className="w-full overflow-hidden rounded-lg">
           <MiniChart
             candles={candles}
             loading={chartLoading}
             error={chartError}
-            width={600}
-            height={200}
+            width={800}
+            height={300}
             isPositive={isPositive}
             className="w-full"
           />

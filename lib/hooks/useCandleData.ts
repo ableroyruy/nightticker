@@ -7,7 +7,8 @@ const WS_URL = 'wss://api.hyperliquid.xyz/ws';
 const API_URL = 'https://api.hyperliquid.xyz/info';
 const RECONNECT_DELAY = 3000;
 const CANDLE_INTERVAL = '5m';
-const CANDLES_24H = 288; // 24 hours / 5 minutes = 288 candles
+const CANDLES_6H = 72; // 6 hours / 5 minutes = 72 candles
+const FETCH_DELAY = 100; // Delay between API calls to avoid rate limiting
 
 export interface CandleData {
   time: number; // seconds
@@ -77,9 +78,34 @@ class CandleWebSocketManager {
     }
   }
 
-  private async fetchInitialCandles(symbol: string): Promise<CandleData[]> {
+  private fetchQueue: Array<{ symbol: string; resolve: (data: CandleData[]) => void; reject: (err: Error) => void }> = [];
+  private isFetching = false;
+
+  private async processFetchQueue() {
+    if (this.isFetching || this.fetchQueue.length === 0) return;
+
+    this.isFetching = true;
+
+    while (this.fetchQueue.length > 0) {
+      const item = this.fetchQueue.shift()!;
+      try {
+        const data = await this.doFetchCandles(item.symbol);
+        item.resolve(data);
+      } catch (e) {
+        item.reject(e as Error);
+      }
+      // Small delay between requests to avoid rate limiting
+      if (this.fetchQueue.length > 0) {
+        await new Promise((r) => setTimeout(r, FETCH_DELAY));
+      }
+    }
+
+    this.isFetching = false;
+  }
+
+  private async doFetchCandles(symbol: string): Promise<CandleData[]> {
     const now = Date.now();
-    const startTime = now - 24 * 60 * 60 * 1000;
+    const startTime = now - 6 * 60 * 60 * 1000; // 6 hours
 
     const response = await fetch(API_URL, {
       method: 'POST',
@@ -101,6 +127,10 @@ class CandleWebSocketManager {
 
     const data: RawCandle[] = await response.json();
 
+    if (!Array.isArray(data)) {
+      return [];
+    }
+
     return data.map((c) => ({
       time: Math.floor(c.t / 1000),
       open: parseFloat(c.o),
@@ -109,6 +139,13 @@ class CandleWebSocketManager {
       close: parseFloat(c.c),
       volume: parseFloat(c.v),
     }));
+  }
+
+  private fetchInitialCandles(symbol: string): Promise<CandleData[]> {
+    return new Promise((resolve, reject) => {
+      this.fetchQueue.push({ symbol, resolve, reject });
+      this.processFetchQueue();
+    });
   }
 
   private calculateChange(candles: CandleData[]): { change24h: number; changePercent24h: number } {
@@ -239,9 +276,9 @@ class CandleWebSocketManager {
         } else {
           // Add new candle
           updatedCandles.push(newCandle);
-          // Keep only last 288 candles (24 hours)
-          if (updatedCandles.length > CANDLES_24H) {
-            updatedCandles = updatedCandles.slice(-CANDLES_24H);
+          // Keep only last 72 candles (6 hours)
+          if (updatedCandles.length > CANDLES_6H) {
+            updatedCandles = updatedCandles.slice(-CANDLES_6H);
           }
         }
 
