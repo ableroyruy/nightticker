@@ -40,6 +40,7 @@ export function HomePage() {
   // Filter by market (exclude INDEX for gainers/losers sections)
   const krAssets = allAssets.filter((a) => a.market === 'KR');
   const usAssets = allAssets.filter((a) => a.market === 'US');
+  const jpAssets = allAssets.filter((a) => a.market === 'JP');
 
   // Sort by 24h change percent for gainers/losers
   const getGainers = (assets: MarketAsset[]) =>
@@ -56,9 +57,32 @@ export function HomePage() {
   const krLosers = getLosers(krAssets);
   const usGainers = getGainers(usAssets);
   const usLosers = getLosers(usAssets);
+  const jpGainers = getGainers(jpAssets);
+  const jpLosers = getLosers(jpAssets);
 
   // Determine order based on user's language preference
   const isKrFirst = marketOrder === 'KR_FIRST';
+  const isJpFirst = locale === 'ja';
+
+  // Build market sections in order
+  const marketSections = [
+    { market: 'US' as MarketType, gainers: usGainers, losers: usLosers },
+    { market: 'KR' as MarketType, gainers: krGainers, losers: krLosers },
+    { market: 'JP' as MarketType, gainers: jpGainers, losers: jpLosers },
+  ];
+
+  // Reorder based on locale
+  if (isJpFirst) {
+    const jpSection = marketSections.find(s => s.market === 'JP')!;
+    const others = marketSections.filter(s => s.market !== 'JP');
+    marketSections.length = 0;
+    marketSections.push(jpSection, ...others);
+  } else if (isKrFirst) {
+    const krSection = marketSections.find(s => s.market === 'KR')!;
+    const others = marketSections.filter(s => s.market !== 'KR');
+    marketSections.length = 0;
+    marketSections.push(krSection, ...others);
+  }
 
   return (
     <div className="min-h-screen">
@@ -72,47 +96,19 @@ export function HomePage() {
         <Separator className="opacity-30" />
 
         {/* Market Sections - Order based on user preference */}
-        {isKrFirst ? (
-          <>
-            {/* Korea Market */}
+        {marketSections.map((section, index) => (
+          <div key={section.market}>
             <GainersLosersSection
-              market="KR"
-              gainers={krGainers}
-              losers={krLosers}
+              market={section.market}
+              gainers={section.gainers}
+              losers={section.losers}
               limit={10}
             />
-
-            <Separator className="opacity-30" />
-
-            {/* US Market */}
-            <GainersLosersSection
-              market="US"
-              gainers={usGainers}
-              losers={usLosers}
-              limit={10}
-            />
-          </>
-        ) : (
-          <>
-            {/* US Market */}
-            <GainersLosersSection
-              market="US"
-              gainers={usGainers}
-              losers={usLosers}
-              limit={10}
-            />
-
-            <Separator className="opacity-30" />
-
-            {/* Korea Market */}
-            <GainersLosersSection
-              market="KR"
-              gainers={krGainers}
-              losers={krLosers}
-              limit={10}
-            />
-          </>
-        )}
+            {index < marketSections.length - 1 && (
+              <Separator className="opacity-30 mt-12" />
+            )}
+          </div>
+        ))}
 
         <Separator className="opacity-30" />
 

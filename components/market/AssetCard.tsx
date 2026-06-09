@@ -62,6 +62,17 @@ export function AssetCard({
     SPECIAL: 'bg-pink-500/20 text-pink-400 border-pink-500/30',
   };
 
+  const marketFlags: Record<MarketType, string> = {
+    KR: '🇰🇷',
+    US: '🇺🇸',
+    JP: '🇯🇵',
+    INDEX: '📊',
+    ETF: '📈',
+    COMMODITY: '🛢️',
+    FX: '💱',
+    SPECIAL: '⚡',
+  };
+
   const marketLabels: Record<MarketType, string> = {
     KR: locale === 'ko' ? '한국' : locale === 'ja' ? '韓国' : 'KR',
     US: locale === 'ko' ? '미국' : locale === 'ja' ? '米国' : 'US',
@@ -102,6 +113,7 @@ export function AssetCard({
                       marketBadgeColors[asset.market]
                     )}
                   >
+                    <span className="mr-0.5">{marketFlags[asset.market]}</span>
                     {marketLabels[asset.market]}
                   </Badge>
                 )}
@@ -152,8 +164,8 @@ export function AssetCard({
               candles={candles}
               loading={chartLoading}
               error={chartError}
-              width={140}
-              height={64}
+              width={180}
+              height={72}
               isPositive={isPositive}
             />
           </div>

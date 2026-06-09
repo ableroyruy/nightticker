@@ -37,18 +37,29 @@ export function AssetTable({
     SPECIAL: 'bg-pink-500/20 text-pink-400 border-pink-500/30',
   };
 
-  const marketLabels: Record<MarketType, string> = {
-    KR: locale === 'ko' ? '한국' : 'KR',
-    US: locale === 'ko' ? '미국' : 'US',
-    JP: locale === 'ko' ? '일본' : 'JP',
-    INDEX: locale === 'ko' ? '지수' : 'Index',
-    ETF: 'ETF',
-    COMMODITY: locale === 'ko' ? '원자재' : 'Commodity',
-    FX: locale === 'ko' ? '통화' : 'FX',
-    SPECIAL: locale === 'ko' ? '특별' : 'Special',
+  const marketFlags: Record<MarketType, string> = {
+    KR: '🇰🇷',
+    US: '🇺🇸',
+    JP: '🇯🇵',
+    INDEX: '📊',
+    ETF: '📈',
+    COMMODITY: '🛢️',
+    FX: '💱',
+    SPECIAL: '⚡',
   };
 
-  const prefix = locale === 'ko' ? '/ko' : '';
+  const marketLabels: Record<MarketType, string> = {
+    KR: locale === 'ko' ? '한국' : locale === 'ja' ? '韓国' : 'KR',
+    US: locale === 'ko' ? '미국' : locale === 'ja' ? '米国' : 'US',
+    JP: locale === 'ko' ? '일본' : locale === 'ja' ? '日本' : 'JP',
+    INDEX: locale === 'ko' ? '지수' : locale === 'ja' ? '指数' : 'Index',
+    ETF: 'ETF',
+    COMMODITY: locale === 'ko' ? '원자재' : locale === 'ja' ? '商品' : 'Commodity',
+    FX: locale === 'ko' ? '통화' : locale === 'ja' ? '通貨' : 'FX',
+    SPECIAL: locale === 'ko' ? '특별' : locale === 'ja' ? '特別' : 'Special',
+  };
+
+  const prefix = locale === 'en' ? '' : `/${locale}`;
 
   if (assets.length === 0) {
     return (
@@ -115,6 +126,7 @@ export function AssetTable({
                           marketBadgeColors[asset.market]
                         )}
                       >
+                        <span className="mr-0.5">{marketFlags[asset.market]}</span>
                         {marketLabels[asset.market]}
                       </Badge>
                     </td>

@@ -12,7 +12,7 @@ import { TrendingDown, Filter } from 'lucide-react';
 import { MarketAsset, MarketType } from '@/lib/types/market';
 import { cn } from '@/lib/utils';
 
-type FilterType = 'all' | 'kr' | 'us';
+type FilterType = 'all' | 'kr' | 'us' | 'jp';
 
 export function LosersPage() {
   const t = useTranslations('pages.losers');
@@ -31,6 +31,7 @@ export function LosersPage() {
       symbol: stock.symbol,
       name: stock.name,
       nameKo: stock.nameKo,
+      nameJa: stock.nameJa,
       slug: stock.slug,
       market: stock.category as MarketType,
       price: ticker?.price ?? null,
@@ -51,6 +52,7 @@ export function LosersPage() {
     if (filter === 'all') return true;
     if (filter === 'kr') return asset.market === 'KR';
     if (filter === 'us') return asset.market === 'US';
+    if (filter === 'jp') return asset.market === 'JP';
     return true;
   });
 
@@ -58,6 +60,7 @@ export function LosersPage() {
     { key: 'all', label: filterT('all') },
     { key: 'kr', label: filterT('kr') },
     { key: 'us', label: filterT('us') },
+    { key: 'jp', label: filterT('jp') },
   ];
 
   return (

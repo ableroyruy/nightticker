@@ -8,7 +8,7 @@ const API_URL = 'https://api.hyperliquid.xyz/info';
 const RECONNECT_DELAY = 3000;
 const CANDLE_INTERVAL = '5m';
 const CANDLES_6H = 72; // 6 hours / 5 minutes = 72 candles
-const FETCH_DELAY = 100; // Delay between API calls to avoid rate limiting
+const FETCH_DELAY = 300; // Delay between API calls to avoid rate limiting
 
 export interface CandleData {
   time: number; // seconds

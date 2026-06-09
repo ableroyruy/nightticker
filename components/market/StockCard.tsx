@@ -15,7 +15,7 @@ interface StockCardProps {
 
 export function StockCard({ stock, price }: StockCardProps) {
   const locale = useLocale();
-  const prefix = locale === 'ko' ? '/ko' : '';
+  const prefix = locale === 'en' ? '' : `/${locale}`;
 
   return (
     <Card className="hover:shadow-md transition-shadow">
