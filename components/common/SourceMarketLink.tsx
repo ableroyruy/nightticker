@@ -20,12 +20,8 @@ export function SourceMarketLink({
   const t = useTranslations('market');
   const referralUrl = process.env.NEXT_PUBLIC_HYPERLIQUID_REFERRAL_URL;
 
-  // Construct the market URL - adjust path as needed for Hyperliquid
-  const marketUrl = referralUrl
-    ? symbol
-      ? `${referralUrl}/trade/${symbol}`
-      : referralUrl
-    : '#';
+  // Use referral URL directly (join URL handles referral tracking)
+  const marketUrl = referralUrl || '#';
 
   return (
     <div className="space-y-2">

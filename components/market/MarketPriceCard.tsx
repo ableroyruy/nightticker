@@ -2,6 +2,7 @@
 
 import dynamic from 'next/dynamic';
 import { useTranslations } from 'next-intl';
+import { ExternalLink } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { useHyperliquidTicker } from '@/lib/hooks/useHyperliquidTicker';
 import { useCandleData } from '@/lib/hooks/useCandleData';
@@ -34,6 +35,9 @@ export function MarketPriceCard({ hyperliquidSymbol, locale }: MarketPriceCardPr
 
   const isLoading = status === 'connecting' && !ticker;
 
+  // Referral link - use join URL for referral tracking
+  const referralUrl = process.env.NEXT_PUBLIC_HYPERLIQUID_REFERRAL_URL;
+
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -47,16 +51,31 @@ export function MarketPriceCard({ hyperliquidSymbol, locale }: MarketPriceCardPr
             <Skeleton className="h-6 w-32" />
           </div>
         ) : (
-          <PriceDisplay
-            price={ticker?.price ?? null}
-            change24h={ticker?.change24h ?? null}
-            changePercent24h={ticker?.changePercent24h ?? null}
-            size="lg"
-          />
+          <a
+            href={referralUrl || '#'}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="block hover:opacity-80 transition-opacity cursor-pointer group"
+          >
+            <div className="flex items-center gap-2">
+              <PriceDisplay
+                price={ticker?.price ?? null}
+                change24h={ticker?.change24h ?? null}
+                changePercent24h={ticker?.changePercent24h ?? null}
+                size="lg"
+              />
+              <ExternalLink className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+            </div>
+          </a>
         )}
 
         {/* 6h Chart */}
-        <div className="w-full overflow-hidden rounded-lg">
+        <a
+          href={referralUrl || '#'}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block w-full overflow-hidden rounded-lg hover:opacity-90 transition-opacity cursor-pointer"
+        >
           <MiniChart
             candles={candles}
             loading={chartLoading}
@@ -64,7 +83,7 @@ export function MarketPriceCard({ hyperliquidSymbol, locale }: MarketPriceCardPr
             height={300}
             autoResize
           />
-        </div>
+        </a>
 
         {lastUpdate && (
           <div className="text-sm text-muted-foreground">

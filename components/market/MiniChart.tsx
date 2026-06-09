@@ -180,7 +180,7 @@ export function MiniChart({
   return (
     <div
       ref={containerRef}
-      className={cn('overflow-hidden pointer-events-none', className)}
+      className={cn('overflow-hidden', className)}
       style={containerStyle}
     />
   );
