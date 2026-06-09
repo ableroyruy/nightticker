@@ -32,6 +32,10 @@ interface CacheEntry {
 
 // 전역 캐시
 const cache = new Map<string, CacheEntry>();
+// 진행 중인 요청 (중복 방지)
+const pendingRequests = new Map<string, Promise<CandleData[]>>();
+// 데이터 업데이트 콜백 (여러 컴포넌트가 같은 심볼 구독)
+const updateCallbacks = new Map<string, Set<(data: CandleData[]) => void>>();
 
 function getChange(candles: CandleData[]) {
   if (candles.length < 2) return { change24h: 0, changePercent24h: 0 };
@@ -54,29 +58,73 @@ function getCachedData(symbol: string): CandleData[] | null {
   return null;
 }
 
-async function fetchFromAPI(symbol: string): Promise<CandleData[]> {
-  try {
-    const res = await fetch(`${CANDLES_API}?symbol=${symbol}`, {
-      cache: 'no-store',
-    });
-
-    if (!res.ok) return [];
-
-    const data = await res.json();
-    if (Array.isArray(data) && data.length > 0) {
-      cache.set(symbol, { data, timestamp: Date.now() });
-      return data;
-    }
-    return [];
-  } catch {
-    return [];
+// 데이터 도착시 모든 구독자에게 알림
+function notifySubscribers(symbol: string, data: CandleData[]) {
+  const callbacks = updateCallbacks.get(symbol);
+  if (callbacks) {
+    callbacks.forEach(cb => cb(data));
   }
+}
+
+// 구독 등록
+function subscribe(symbol: string, callback: (data: CandleData[]) => void) {
+  if (!updateCallbacks.has(symbol)) {
+    updateCallbacks.set(symbol, new Set());
+  }
+  updateCallbacks.get(symbol)!.add(callback);
+
+  return () => {
+    const callbacks = updateCallbacks.get(symbol);
+    if (callbacks) {
+      callbacks.delete(callback);
+      if (callbacks.size === 0) {
+        updateCallbacks.delete(symbol);
+      }
+    }
+  };
+}
+
+// API 요청 (중복 방지)
+async function fetchCandles(symbol: string): Promise<CandleData[]> {
+  // 캐시 확인
+  const cached = getCachedData(symbol);
+  if (cached) return cached;
+
+  // 이미 진행 중인 요청이 있으면 그 결과 대기
+  const pending = pendingRequests.get(symbol);
+  if (pending) return pending;
+
+  // 새 요청 시작
+  const request = (async () => {
+    try {
+      const res = await fetch(`${CANDLES_API}?symbol=${symbol}`, {
+        cache: 'no-store',
+      });
+
+      if (!res.ok) return [];
+
+      const data = await res.json();
+      if (Array.isArray(data) && data.length > 0) {
+        cache.set(symbol, { data, timestamp: Date.now() });
+        // 모든 구독자에게 알림
+        notifySubscribers(symbol, data);
+        return data;
+      }
+      return [];
+    } catch {
+      return [];
+    } finally {
+      pendingRequests.delete(symbol);
+    }
+  })();
+
+  pendingRequests.set(symbol, request);
+  return request;
 }
 
 export function useCandleData(symbol: string): CandleState & { status: ConnectionStatus } {
   const sym = symbol.toUpperCase();
 
-  // 초기 상태: 캐시 확인
   const [state, setState] = useState<CandleState>(() => {
     const cached = getCachedData(sym);
     if (cached) {
@@ -105,47 +153,39 @@ export function useCandleData(symbol: string): CandleState & { status: Connectio
   useEffect(() => {
     let active = true;
 
-    async function load() {
-      // 캐시 확인
-      const cached = getCachedData(sym);
-      if (cached) {
-        if (active) {
-          const { change24h, changePercent24h } = getChange(cached);
-          setState({
-            candles: cached,
-            currentPrice: cached[cached.length - 1]?.close ?? null,
-            change24h,
-            changePercent24h,
-            loading: false,
-            error: null,
-          });
-          setStatus('connected');
-        }
-        return;
-      }
+    // 데이터 업데이트 핸들러
+    const handleUpdate = (data: CandleData[]) => {
+      if (!active) return;
+      const { change24h, changePercent24h } = getChange(data);
+      setState({
+        candles: data,
+        currentPrice: data[data.length - 1]?.close ?? null,
+        change24h,
+        changePercent24h,
+        loading: false,
+        error: null,
+      });
+      setStatus('connected');
+    };
 
-      // API 호출
-      const data = await fetchFromAPI(sym);
+    // 구독 등록 (다른 컴포넌트의 fetch 결과도 받음)
+    const unsubscribe = subscribe(sym, handleUpdate);
+
+    // 데이터 로드
+    async function load() {
+      const data = await fetchCandles(sym);
 
       if (active) {
         if (data.length > 0) {
-          const { change24h, changePercent24h } = getChange(data);
-          setState({
-            candles: data,
-            currentPrice: data[data.length - 1]?.close ?? null,
-            change24h,
-            changePercent24h,
-            loading: false,
-            error: null,
-          });
+          handleUpdate(data);
         } else {
           setState(prev => ({
             ...prev,
             loading: false,
             error: 'No data',
           }));
+          setStatus('connected');
         }
-        setStatus('connected');
       }
     }
 
@@ -153,11 +193,19 @@ export function useCandleData(symbol: string): CandleState & { status: Connectio
 
     // 폴링
     const interval = setInterval(() => {
-      if (active) load();
+      if (active) {
+        // 폴링 시에는 캐시 무효화
+        const entry = cache.get(sym);
+        if (entry) {
+          entry.timestamp = 0; // 강제로 캐시 만료
+        }
+        load();
+      }
     }, POLL_INTERVAL);
 
     return () => {
       active = false;
+      unsubscribe();
       clearInterval(interval);
     };
   }, [sym]);
