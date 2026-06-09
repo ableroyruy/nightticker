@@ -1,14 +1,22 @@
 'use client';
 
+import { memo } from 'react';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { useLocale } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { MarketAsset, MarketType } from '@/lib/types/market';
 import { PriceDisplay, PriceChange } from '@/components/ui/price-change';
 import { FavoriteButton } from '@/components/ui/favorite-button';
 import { Badge } from '@/components/ui/badge';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useFavorites } from '@/lib/context/FavoritesContext';
-import { MemoizedChart } from './MemoizedChart';
+import { useCandleData } from '@/lib/hooks/useCandleData';
+
+const MiniChart = dynamic(() => import('./MiniChart').then((mod) => mod.MiniChart), {
+  ssr: false,
+  loading: () => <Skeleton className="w-[180px] h-[72px] rounded" />,
+});
 
 interface AssetCardProps {
   asset: MarketAsset;
@@ -17,7 +25,7 @@ interface AssetCardProps {
   className?: string;
 }
 
-export function AssetCard({
+function AssetCardInner({
   asset,
   rank,
   showMarketBadge = true,
@@ -26,14 +34,14 @@ export function AssetCard({
   const locale = useLocale();
   const { isFavorite, toggleFavorite } = useFavorites();
 
-  // Chart symbol
+  // Chart data
   const candleSymbol = asset.hyperliquidSymbol?.replace('xyz:', '') ?? asset.symbol;
+  const { candles, loading: chartLoading, error: chartError } = useCandleData(candleSymbol);
 
-  // Use allMids-based price from props (real-time), chart data is separate
+  // Use allMids-based price from props (real-time)
   const displayPrice = asset.price;
   const displayChange24h = asset.change24h;
   const displayChangePercent24h = asset.changePercent24h;
-  const isPositive = (displayChangePercent24h ?? 0) >= 0;
 
   const displayName = locale === 'ko' && asset.nameKo
     ? asset.nameKo
@@ -151,11 +159,12 @@ export function AssetCard({
             </div>
           </div>
 
-          {/* Mini Chart - Memoized to prevent re-render on favorites change */}
+          {/* Mini Chart */}
           <div className="flex-shrink-0">
-            <MemoizedChart
-              symbol={candleSymbol}
-              isPositive={isPositive}
+            <MiniChart
+              candles={candles}
+              loading={chartLoading}
+              error={chartError}
               width={180}
               height={72}
             />
@@ -165,3 +174,10 @@ export function AssetCard({
     </Link>
   );
 }
+
+// Memoize by symbol to prevent unnecessary re-renders
+export const AssetCard = memo(AssetCardInner, (prev, next) => {
+  return prev.asset.symbol === next.asset.symbol &&
+         prev.asset.market === next.asset.market &&
+         prev.rank === next.rank;
+});

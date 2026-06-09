@@ -10,6 +10,13 @@ export const metadata: Metadata = {
   description: 'Monitor stock-related market activity when traditional exchanges are closed. Overnight, weekend, and holiday reference prices powered by Hyperliquid Market Prices.',
   keywords: ['night stock price', 'overnight stock price', 'weekend stock price', 'market closed price', 'hyperliquid'],
   authors: [{ name: 'NightTicker' }],
+  icons: {
+    icon: [
+      { url: '/icon.svg', type: 'image/svg+xml' },
+      { url: '/favicon.ico', sizes: 'any' },
+    ],
+    apple: '/apple-icon.png',
+  },
   openGraph: {
     type: 'website',
     siteName: 'NightTicker',

@@ -54,9 +54,7 @@ export function FavoritesSection({ tickers }: FavoritesSectionProps) {
 
   // Convert favorites to MarketAsset format with ticker data
   const favoriteAssets: MarketAsset[] = favorites.map((fav) => {
-    // Ticker keys are stored without 'xyz:' prefix
     const ticker = tickers[fav.symbol];
-    // Look up slug from stocks if missing (for backwards compatibility)
     const stock = stocks.find((s) => s.symbol === fav.symbol);
     const slug = fav.slug || stock?.slug || fav.symbol.toLowerCase();
 
@@ -70,6 +68,7 @@ export function FavoritesSection({ tickers }: FavoritesSectionProps) {
       prevDayPx: ticker?.prevDayPx ?? null,
       change24h: ticker?.change24h ?? null,
       changePercent24h: ticker?.changePercent24h ?? null,
+      hyperliquidSymbol: stock?.hyperliquidSymbol,
     };
   });
 
