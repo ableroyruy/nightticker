@@ -5,6 +5,7 @@ import { Geist, Geist_Mono } from 'next/font/google';
 import { locales, Locale } from '@/lib/i18n';
 import { Header } from '@/components/layout/Header';
 import { Footer } from '@/components/layout/Footer';
+import { InstallButton } from '@/components/layout/InstallButton';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { FavoritesProvider } from '@/lib/context/FavoritesContext';
 import { SearchRankingProvider } from '@/lib/context/SearchRankingContext';
@@ -60,6 +61,7 @@ export default async function LocaleLayout({ children, params }: Props) {
         <NextIntlClientProvider messages={messages} locale={locale}>
           <FavoritesProvider>
             <SearchRankingProvider>
+              <InstallButton />
               <Header />
               <main className="flex-1">{children}</main>
               <Footer />

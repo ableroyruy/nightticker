@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useTranslations, useLocale } from 'next-intl';
-import { TrendingUp, TrendingDown, ArrowRight } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { MarketAsset, MarketType } from '@/lib/types/market';
 import { AnimatedAssetGrid } from '@/components/market/AnimatedAssetGrid';
 import { Button } from '@/components/ui/button';
@@ -69,16 +69,16 @@ export function GainersLosersSection({
           />
           <h2 className="text-2xl font-bold">{marketLabel}</h2>
           {/* Gainer/Loser count indicators */}
-          <div className="flex items-center gap-2 text-sm">
+          <div className="flex items-center gap-2 text-sm font-medium">
             {gainersCount > 0 && (
-              <span className="flex items-center gap-1 text-gain">
-                <TrendingUp className="h-3.5 w-3.5" />
+              <span className="flex items-center gap-0.5 text-gain">
+                <span className="text-[10px] arrow-bounce">▲</span>
                 {gainersCount}
               </span>
             )}
             {losersCount > 0 && (
-              <span className="flex items-center gap-1 text-loss">
-                <TrendingDown className="h-3.5 w-3.5" />
+              <span className="flex items-center gap-0.5 text-loss">
+                <span className="text-[10px] arrow-bounce">▼</span>
                 {losersCount}
               </span>
             )}
@@ -95,7 +95,7 @@ export function GainersLosersSection({
       {/* Gainers */}
       <div className="space-y-4">
         <h3 className="text-lg font-semibold flex items-center gap-2">
-          <TrendingUp className="h-5 w-5 text-gain" />
+          <span className="text-sm text-gain arrow-bounce">▲</span>
           {t('topGainers')}
         </h3>
 
@@ -116,7 +116,7 @@ export function GainersLosersSection({
       {/* Losers */}
       <div className="space-y-4">
         <h3 className="text-lg font-semibold flex items-center gap-2">
-          <TrendingDown className="h-5 w-5 text-loss" />
+          <span className="text-sm text-loss arrow-bounce">▼</span>
           {t('topLosers')}
         </h3>
 

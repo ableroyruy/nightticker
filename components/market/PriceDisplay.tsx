@@ -2,7 +2,6 @@
 
 import { useTranslations } from 'next-intl';
 import { Skeleton } from '@/components/ui/skeleton';
-import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface PriceDisplayProps {
@@ -36,6 +35,12 @@ export function PriceDisplay({
     lg: 'text-xl',
   };
 
+  const triangleSizes = {
+    sm: 'text-xs',
+    md: 'text-sm',
+    lg: 'text-base',
+  };
+
   if (isLoading) {
     return <Skeleton className={`h-10 w-32 ${size === 'lg' ? 'h-14 w-48' : ''}`} />;
   }
@@ -59,29 +64,53 @@ export function PriceDisplay({
   const isPositive = changePercent24h != null && changePercent24h > 0;
   const isNegative = changePercent24h != null && changePercent24h < 0;
 
+  // Format change amount with dollar sign
+  const formattedChange = change24h != null
+    ? `${isPositive ? '+' : '-'}$${Math.abs(change24h).toFixed(2)}`
+    : null;
+
+  // Format change percent
+  const formattedPercent = changePercent24h != null
+    ? `${isPositive ? '+' : ''}${changePercent24h.toFixed(2)}%`
+    : null;
+
   return (
-    <div className="space-y-1">
+    <div className="space-y-2">
       <span className={sizeClasses[size]}>{formattedPrice}</span>
-      {showChange && changePercent24h != null && (
-        <div
-          className={cn(
-            'flex items-center gap-2',
-            changeSizeClasses[size],
-            isPositive && 'text-gain',
-            isNegative && 'text-loss',
-            !isPositive && !isNegative && 'text-muted-foreground'
+      {showChange && (changePercent24h != null || change24h != null) && (
+        <div className="flex items-center gap-3 flex-wrap">
+          {/* Change Amount with background */}
+          {formattedChange && (
+            <span
+              className={cn(
+                'inline-flex items-center gap-1 tabular-nums font-medium px-2 py-1 rounded',
+                changeSizeClasses[size],
+                isPositive && 'text-gain bg-gain',
+                isNegative && 'text-loss bg-loss',
+                !isPositive && !isNegative && 'text-muted-foreground bg-muted'
+              )}
+            >
+              <span className={cn(triangleSizes[size], 'arrow-bounce')}>
+                {isPositive && '▲'}
+                {isNegative && '▼'}
+                {!isPositive && !isNegative && '−'}
+              </span>
+              {formattedChange}
+            </span>
           )}
-        >
-          {isPositive && <TrendingUp className="h-4 w-4" />}
-          {isNegative && <TrendingDown className="h-4 w-4" />}
-          {!isPositive && !isNegative && <Minus className="h-4 w-4" />}
-          <span className="font-medium">
-            {isPositive ? '+' : ''}
-            {changePercent24h.toFixed(2)}%
-          </span>
-          {change24h != null && (
-            <span className="text-muted-foreground">
-              ({isPositive ? '+' : ''}${change24h.toFixed(2)})
+
+          {/* Change Percent */}
+          {formattedPercent && (
+            <span
+              className={cn(
+                'inline-flex items-center tabular-nums font-medium',
+                changeSizeClasses[size],
+                isPositive && 'text-gain',
+                isNegative && 'text-loss',
+                !isPositive && !isNegative && 'text-muted-foreground'
+              )}
+            >
+              {formattedPercent}
             </span>
           )}
         </div>

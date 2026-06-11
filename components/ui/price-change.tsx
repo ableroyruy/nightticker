@@ -42,7 +42,7 @@ export function PriceChange({
   const formattedValue =
     type === 'percent'
       ? `${isPositive ? '+' : ''}${value.toFixed(2)}%`
-      : `${isPositive ? '+' : ''}${value.toLocaleString('en-US', {
+      : `${isPositive ? '+' : '-'}$${Math.abs(value).toLocaleString('en-US', {
           minimumFractionDigits: 2,
           maximumFractionDigits: 2,
         })}`;
@@ -64,8 +64,7 @@ export function PriceChange({
         <span
           className={cn(
             triangleSizes[size],
-            isPositive && 'animate-pulse',
-            isNegative && 'animate-pulse'
+            'arrow-bounce'
           )}
         >
           {isPositive && '▲'}

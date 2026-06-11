@@ -8,7 +8,7 @@ import { AssetTable } from '@/components/market/AssetTable';
 import { ConnectionStatus } from '@/components/ui/connection-status';
 import { ComplianceNotice } from '@/components/common/ComplianceNotice';
 import { Button } from '@/components/ui/button';
-import { TrendingDown, Filter } from 'lucide-react';
+import { Filter } from 'lucide-react';
 import { MarketAsset, MarketType } from '@/lib/types/market';
 import { cn } from '@/lib/utils';
 
@@ -81,8 +81,8 @@ export function LosersPage() {
         {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-3">
-            <div className="p-2 glass-card rounded-lg bg-loss/20">
-              <TrendingDown className="h-6 w-6 text-loss" />
+            <div className="p-3 glass-card rounded-lg bg-loss/20 flex items-center justify-center">
+              <span className="text-2xl text-loss arrow-bounce">▼</span>
             </div>
             <div>
               <h1 className="text-3xl font-bold">{t('title')}</h1>
@@ -117,8 +117,8 @@ export function LosersPage() {
         {/* Content */}
         {filteredLosers.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 space-y-4">
-            <div className="p-4 glass-card rounded-2xl">
-              <TrendingDown className="h-12 w-12 text-muted-foreground" />
+            <div className="p-6 glass-card rounded-2xl flex items-center justify-center">
+              <span className="text-5xl text-muted-foreground">▼</span>
             </div>
             <p className="text-xl font-medium text-muted-foreground">
               {locale === 'ko' ? '현재 하락 종목이 없습니다' : 'No losers at this time'}

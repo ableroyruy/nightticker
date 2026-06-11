@@ -15,6 +15,7 @@
   "nav": {
     "home": "Inicio",
     "favorites": "Favoritos",
+    "popular": "Popular",
     "topGainers": "Maiores Altas",
     "topLosers": "Maiores Baixas",
     "overnightPrices": "Precos Noturnos",
@@ -206,7 +207,9 @@
     "spanish": "Espanol",
     "loading": "Carregando...",
     "error": "Ocorreu um erro",
-    "retry": "Tentar novamente"
+    "retry": "Tentar novamente",
+    "install": "Instalar App",
+    "installHint": "Adicionar a Tela Inicial"
   },
   "marketClock": {
     "localTime": "Hora Local",

@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
-import { TrendingUp, Search, ArrowRight, Clock } from 'lucide-react';
+import { TrendingUp, Search, Clock } from 'lucide-react';
 import { useSearchRanking, SearchRankingItem } from '@/lib/context/SearchRankingContext';
 import { getStockBySymbol, stocks } from '@/lib/markets/stocks';
 import { useHyperliquidTicker } from '@/lib/hooks/useHyperliquidTicker';
@@ -14,7 +14,7 @@ export function PopularSearchesPage() {
   const t = useTranslations('popularSearches');
   const { rankings } = useSearchRanking();
   const { tickers } = useHyperliquidTicker();
-  const prefix = locale === 'ko' ? '/ko' : '';
+  const prefix = locale === 'en' ? '' : `/${locale}`;
 
   // Fallback to default stocks if no ranking data
   const displayRankings = rankings.length > 0 ? rankings : stocks.slice(0, 20).map((stock, index) => ({
@@ -47,101 +47,106 @@ export function PopularSearchesPage() {
         </div>
       </div>
 
-      {/* Rankings Table */}
+      {/* Rankings List */}
       <div className="container py-8">
-        <div className="glass-card rounded-2xl overflow-hidden">
-          {/* Table Header */}
-          <div className="grid grid-cols-12 gap-4 px-6 py-4 border-b border-border/50 text-sm font-medium text-muted-foreground">
-            <div className="col-span-1">{t('rank')}</div>
-            <div className="col-span-5">{t('stock')}</div>
-            <div className="col-span-2 text-right">{t('price')}</div>
-            <div className="col-span-2 text-right">{t('change24h')}</div>
-            <div className="col-span-2 text-right">{t('rankChange')}</div>
-          </div>
+        <div className="space-y-3">
+          {displayRankings.map((item) => {
+            const stock = getStockBySymbol(item.symbol);
+            if (!stock) return null;
 
-          {/* Rankings */}
-          <div className="divide-y divide-border/30">
-            {displayRankings.map((item) => {
-              const stock = getStockBySymbol(item.symbol);
-              if (!stock) return null;
+            const tickerKey = stock.hyperliquidSymbol.replace('xyz:', '');
+            const ticker = tickers[tickerKey];
+            const displayName = locale === 'ko' ? stock.nameKo : stock.name;
 
-              const tickerKey = stock.hyperliquidSymbol.replace('xyz:', '');
-              const ticker = tickers[tickerKey];
-              const displayName = locale === 'ko' ? stock.nameKo : stock.name;
+            const isPositive = ticker?.changePercent24h != null && ticker.changePercent24h > 0;
+            const isNegative = ticker?.changePercent24h != null && ticker.changePercent24h < 0;
 
-              return (
-                <Link
-                  key={item.symbol}
-                  href={`${prefix}/stock/${stock.slug}`}
-                  className="grid grid-cols-12 gap-4 px-6 py-4 hover:bg-accent/30 transition-colors items-center"
-                >
-                  {/* Rank */}
-                  <div className="col-span-1">
+            return (
+              <Link
+                key={item.symbol}
+                href={`${prefix}/stock/${stock.slug}`}
+                className="block"
+              >
+                <div className="glass-card glass-card-hover rounded-xl p-4">
+                  {/* Mobile-friendly layout */}
+                  <div className="flex items-start gap-3">
+                    {/* Rank */}
                     <RankBadge rank={item.rank} />
-                  </div>
 
-                  {/* Stock Info */}
-                  <div className="col-span-5 flex items-center gap-3">
-                    <div className="min-w-0">
-                      <div className="flex items-center gap-2">
+                    {/* Stock Info and Price */}
+                    <div className="flex-1 min-w-0">
+                      {/* Stock Name Row */}
+                      <div className="flex items-center gap-2 flex-wrap mb-1">
                         <span className="font-semibold truncate">{displayName}</span>
-                        <Badge variant="outline" className="text-xs">
+                        <Badge variant="outline" className="text-xs shrink-0">
                           {stock.category}
                         </Badge>
                       </div>
-                      <span className="text-sm text-muted-foreground">{stock.symbol}</span>
-                    </div>
-                  </div>
 
-                  {/* Price */}
-                  <div className="col-span-2 text-right tabular-nums">
-                    {ticker?.price ? (
-                      <span className="font-medium">
-                        ${ticker.price.toLocaleString('en-US', {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: ticker.price < 1 ? 4 : 2,
-                        })}
-                      </span>
-                    ) : (
-                      <span className="text-muted-foreground">-</span>
-                    )}
-                  </div>
+                      {/* Symbol */}
+                      <p className="text-sm text-muted-foreground mb-3">{stock.symbol}</p>
 
-                  {/* 24h Change */}
-                  <div className="col-span-2 text-right">
-                    {ticker?.changePercent24h !== undefined && ticker?.changePercent24h !== null ? (
-                      <div className="flex flex-col items-end gap-0.5">
-                        <span
-                          className={cn(
-                            'font-medium flex items-center gap-1',
-                            ticker.changePercent24h > 0 && 'text-gain',
-                            ticker.changePercent24h < 0 && 'text-loss'
+                      {/* Price Row */}
+                      <div className="flex items-center justify-between gap-3 flex-wrap">
+                        {/* Price */}
+                        <span className="font-semibold tabular-nums">
+                          {ticker?.price ? (
+                            `$${ticker.price.toLocaleString('en-US', {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: ticker.price < 1 ? 4 : 2,
+                            })}`
+                          ) : (
+                            <span className="text-muted-foreground">-</span>
                           )}
-                        >
-                          {ticker.changePercent24h > 0 && <span className="text-xs">&#9650;</span>}
-                          {ticker.changePercent24h < 0 && <span className="text-xs">&#9660;</span>}
-                          {Math.abs(ticker.changePercent24h).toFixed(2)}%
                         </span>
-                        {ticker.change24h !== undefined && (
-                          <span className="text-xs text-muted-foreground">
-                            {ticker.change24h > 0 ? '+' : ''}
-                            ${ticker.change24h.toFixed(2)}
-                          </span>
+
+                        {/* Change Amount + Percent */}
+                        {ticker?.changePercent24h !== undefined && ticker?.changePercent24h !== null && (
+                          <div className="flex items-center gap-2">
+                            {/* Change Amount with background */}
+                            {ticker.change24h !== undefined && (
+                              <span
+                                className={cn(
+                                  'inline-flex items-center gap-1 text-xs font-medium px-1.5 py-0.5 rounded tabular-nums',
+                                  isPositive && 'text-gain bg-gain',
+                                  isNegative && 'text-loss bg-loss',
+                                  !isPositive && !isNegative && 'text-muted-foreground bg-muted'
+                                )}
+                              >
+                                <span className="text-[8px] arrow-bounce">
+                                  {isPositive && '▲'}
+                                  {isNegative && '▼'}
+                                  {!isPositive && !isNegative && '−'}
+                                </span>
+                                {isPositive ? '+' : '-'}${Math.abs(ticker.change24h).toFixed(2)}
+                              </span>
+                            )}
+
+                            {/* Change Percent */}
+                            <span
+                              className={cn(
+                                'text-xs font-medium tabular-nums',
+                                isPositive && 'text-gain',
+                                isNegative && 'text-loss',
+                                !isPositive && !isNegative && 'text-muted-foreground'
+                              )}
+                            >
+                              {isPositive ? '+' : ''}{ticker.changePercent24h.toFixed(2)}%
+                            </span>
+                          </div>
                         )}
                       </div>
-                    ) : (
-                      <span className="text-muted-foreground">-</span>
-                    )}
-                  </div>
+                    </div>
 
-                  {/* Rank Change */}
-                  <div className="col-span-2 text-right">
-                    <RankChangeIndicator change={item.rankChange} />
+                    {/* Rank Change */}
+                    <div className="shrink-0">
+                      <RankChangeIndicator change={item.rankChange} />
+                    </div>
                   </div>
-                </Link>
-              );
-            })}
-          </div>
+                </div>
+              </Link>
+            );
+          })}
         </div>
 
         {/* Empty State */}
@@ -167,7 +172,7 @@ function RankBadge({ rank }: { rank: number }) {
   return (
     <span
       className={cn(
-        'inline-flex items-center justify-center w-8 h-8 rounded-full border font-bold text-sm',
+        'inline-flex items-center justify-center w-8 h-8 rounded-full border font-bold text-sm shrink-0',
         rank <= 3 ? colors[rank as 1 | 2 | 3] : 'bg-muted/30 text-muted-foreground border-border/30'
       )}
     >
@@ -179,7 +184,7 @@ function RankBadge({ rank }: { rank: number }) {
 function RankChangeIndicator({ change }: { change: number | null }) {
   if (change === null) {
     return (
-      <span className="text-sm text-muted-foreground">
+      <span className="text-xs text-primary font-medium px-2 py-1 bg-primary/20 rounded-full">
         NEW
       </span>
     );
@@ -187,7 +192,7 @@ function RankChangeIndicator({ change }: { change: number | null }) {
 
   if (change === 0) {
     return (
-      <span className="text-sm text-muted-foreground">
+      <span className="text-xs text-muted-foreground">
         -
       </span>
     );
@@ -198,22 +203,15 @@ function RankChangeIndicator({ change }: { change: number | null }) {
   return (
     <span
       className={cn(
-        'font-medium flex items-center justify-end gap-1',
+        'text-xs font-medium flex items-center gap-0.5',
         isUp && 'text-gain',
         !isUp && 'text-loss'
       )}
     >
-      {isUp ? (
-        <>
-          <span className="text-xs">&#9650;</span>
-          {change}
-        </>
-      ) : (
-        <>
-          <span className="text-xs">&#9660;</span>
-          {Math.abs(change)}
-        </>
-      )}
+      <span className="text-[8px] arrow-bounce">
+        {isUp ? '▲' : '▼'}
+      </span>
+      {Math.abs(change)}
     </span>
   );
 }

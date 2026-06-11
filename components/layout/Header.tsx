@@ -42,7 +42,7 @@ export function Header() {
   const navLinks = [
     { href: `${prefix}/`, label: t('home'), icon: Home },
     { href: `${prefix}/favorites`, label: t('favorites'), icon: Star },
-    { href: `${prefix}/popular`, label: locale === 'ko' ? '인기순위' : 'Hot', icon: Flame },
+    { href: `${prefix}/popular`, label: t('popular'), icon: Flame },
     { href: `${prefix}/gainers`, label: t('topGainers'), icon: TrendingUp },
     { href: `${prefix}/losers`, label: t('topLosers'), icon: TrendingDown },
   ];

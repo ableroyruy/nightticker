@@ -15,6 +15,7 @@
   "nav": {
     "home": "Home",
     "favorites": "Favorites",
+    "popular": "Hot",
     "topGainers": "Top Gainers",
     "topLosers": "Top Losers",
     "overnightPrices": "Overnight Prices",
@@ -202,7 +203,9 @@
     "korean": "한국어",
     "loading": "Loading...",
     "error": "An error occurred",
-    "retry": "Retry"
+    "retry": "Retry",
+    "install": "Install App",
+    "installHint": "Add to Home Screen"
   },
   "marketClock": {
     "localTime": "Your Local Time",

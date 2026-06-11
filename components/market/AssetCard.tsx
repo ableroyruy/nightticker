@@ -2,6 +2,7 @@
 
 import { memo } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { useLocale } from 'next-intl';
 import { cn } from '@/lib/utils';
@@ -33,6 +34,7 @@ function AssetCardInner({
   className,
 }: AssetCardProps) {
   const locale = useLocale();
+  const router = useRouter();
   const { isFavorite, toggleFavorite } = useFavorites();
   const { rankings } = useSearchRanking();
   const searchRank = rankings.find((r) => r.symbol === asset.symbol);
@@ -98,7 +100,7 @@ function AssetCardInner({
     <Link href={`${prefix}${href}`} className="block group">
       <div
         className={cn(
-          'glass-card glass-card-hover rounded-2xl p-4 h-full cursor-pointer',
+          'glass-card glass-card-hover rounded-2xl p-4 h-full cursor-pointer overflow-hidden',
           'transition-all duration-200 active:scale-[0.98]',
           'group-hover:border-primary/30',
           className
@@ -115,11 +117,15 @@ function AssetCardInner({
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="font-semibold truncate">{displayName}</span>
                 {searchRank && searchRank.rank <= 10 && (
-                  <Link
-                    href={`${prefix}/popular`}
-                    onClick={(e) => e.stopPropagation()}
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      router.push(`${prefix}/popular`);
+                    }}
                     className={cn(
-                      'text-[10px] px-1.5 py-0.5 rounded-full font-medium flex items-center gap-0.5 transition-colors',
+                      'text-[10px] px-1.5 py-0.5 rounded-full font-medium flex items-center gap-0.5 transition-colors cursor-pointer',
                       searchRank.rank <= 3
                         ? 'bg-amber-500/20 text-amber-400 hover:bg-amber-500/30'
                         : 'bg-primary/20 text-primary hover:bg-primary/30'
@@ -127,7 +133,7 @@ function AssetCardInner({
                   >
                     <span className="animate-pulse">🔥</span>
                     #{searchRank.rank}
-                  </Link>
+                  </button>
                 )}
                 {showMarketBadge && (
                   <Badge
@@ -161,9 +167,9 @@ function AssetCardInner({
         </div>
 
         {/* Price and Chart Row */}
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center justify-between gap-3 overflow-hidden">
           {/* Price and Change */}
-          <div className="space-y-1 min-w-0 flex-shrink-0">
+          <div className="space-y-1 min-w-0 flex-shrink">
             <PriceDisplay
               price={displayPrice}
               change={displayChange24h}
@@ -191,7 +197,7 @@ function AssetCardInner({
           </div>
 
           {/* Mini Chart */}
-          <div className="flex-shrink-0">
+          <div className="flex-shrink-0 max-w-[180px] overflow-hidden">
             <MiniChart
               candles={candles}
               loading={chartLoading}

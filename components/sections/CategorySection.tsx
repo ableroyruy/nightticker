@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useTranslations, useLocale } from 'next-intl';
-import { ArrowRight, BarChart3, Coins, DollarSign, Cpu, TrendingUp, TrendingDown } from 'lucide-react';
+import { ArrowRight, BarChart3, Coins, DollarSign, Cpu } from 'lucide-react';
 import { MarketAsset, MarketType } from '@/lib/types/market';
 import { AnimatedAssetGrid } from '@/components/market/AnimatedAssetGrid';
 import { Button } from '@/components/ui/button';
@@ -82,16 +82,16 @@ export function CategorySection({ market, assets, limit = 10 }: CategorySectionP
             <h2 className="text-2xl font-bold">{marketLabel}</h2>
           </div>
           {/* Small indicator showing gainers/losers count */}
-          <div className="flex items-center gap-2 text-sm">
+          <div className="flex items-center gap-2 text-sm font-medium">
             {gainersCount > 0 && (
-              <span className="flex items-center gap-1 text-gain">
-                <TrendingUp className="h-3.5 w-3.5" />
+              <span className="flex items-center gap-0.5 text-gain">
+                <span className="text-[10px] arrow-bounce">▲</span>
                 {gainersCount}
               </span>
             )}
             {losersCount > 0 && (
-              <span className="flex items-center gap-1 text-loss">
-                <TrendingDown className="h-3.5 w-3.5" />
+              <span className="flex items-center gap-0.5 text-loss">
+                <span className="text-[10px] arrow-bounce">▼</span>
                 {losersCount}
               </span>
             )}
