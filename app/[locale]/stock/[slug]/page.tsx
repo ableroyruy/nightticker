@@ -3,10 +3,9 @@ import { notFound } from 'next/navigation';
 import { setRequestLocale } from 'next-intl/server';
 import { Separator } from '@/components/ui/separator';
 import { MarketPriceCard } from '@/components/market/MarketPriceCard';
-import { WatchlistButton } from '@/components/market/WatchlistButton';
-import { HyperliquidBadge } from '@/components/common/HyperliquidBadge';
 import { ComplianceNotice } from '@/components/common/ComplianceNotice';
 import { InternalLinks } from '@/components/stock/InternalLinks';
+import { StockPageHeader } from '@/components/stock/StockPageHeader';
 import { getStockBySlug, getAllSlugs, categoryNames } from '@/lib/markets/stocks';
 import { Stock } from '@/lib/providers/types';
 
@@ -386,24 +385,12 @@ export default async function StockPage({ params }: Props) {
 
       <div className="container py-8 space-y-8">
         {/* H1: Stock Name + Overnight Price */}
-        <div className="flex items-start justify-between">
-          <div>
-            <div className="flex items-center gap-3 mb-1">
-              <h1 className="text-3xl md:text-4xl font-bold">
-                {displayName} {locale === 'ko' ? `야간 ${term}` : locale === 'ja' ? `夜間${term}` : `Overnight ${term}`}
-              </h1>
-              <WatchlistButton
-                symbol={stock.symbol}
-                market={stock.category}
-                name={stock.name}
-                nameKo={stock.nameKo}
-                slug={stock.slug}
-              />
-            </div>
-            <p className="text-lg text-muted-foreground">{stock.symbol}</p>
-          </div>
-          <HyperliquidBadge />
-        </div>
+        <StockPageHeader
+          stock={stock}
+          displayName={displayName}
+          term={term}
+          locale={locale}
+        />
 
         <Separator />
 

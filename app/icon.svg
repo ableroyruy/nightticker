@@ -1,63 +1,30 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   <defs>
     <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#0c0a1d"/>
-      <stop offset="50%" style="stop-color:#1a1635"/>
-      <stop offset="100%" style="stop-color:#0f172a"/>
+      <stop offset="0%" style="stop-color:#0f172a"/>
+      <stop offset="100%" style="stop-color:#1e1b4b"/>
     </linearGradient>
-    <linearGradient id="glowLine" x1="0%" y1="100%" x2="100%" y2="0%">
-      <stop offset="0%" style="stop-color:#22c55e;stop-opacity:0.5"/>
-      <stop offset="100%" style="stop-color:#4ade80;stop-opacity:0.5"/>
-    </linearGradient>
-    <linearGradient id="mainLine" x1="0%" y1="100%" x2="100%" y2="0%">
-      <stop offset="0%" style="stop-color:#22c55e"/>
-      <stop offset="100%" style="stop-color:#86efac"/>
-    </linearGradient>
-    <radialGradient id="greenGlow" cx="0%" cy="50%" r="70%">
-      <stop offset="0%" style="stop-color:#22c55e;stop-opacity:0.15"/>
-      <stop offset="100%" style="stop-color:#22c55e;stop-opacity:0"/>
-    </radialGradient>
-    <radialGradient id="yellowGlow" cx="100%" cy="0%" r="50%">
+    <radialGradient id="moonGlow" cx="60%" cy="35%" r="40%">
       <stop offset="0%" style="stop-color:#fbbf24;stop-opacity:0.2"/>
       <stop offset="100%" style="stop-color:#fbbf24;stop-opacity:0"/>
     </radialGradient>
   </defs>
+
   <!-- Background -->
   <rect width="512" height="512" rx="115" fill="url(#bg)"/>
-  <!-- Glow effects -->
-  <rect width="512" height="512" rx="115" fill="url(#greenGlow)"/>
-  <rect width="512" height="512" rx="115" fill="url(#yellowGlow)"/>
 
-  <!-- Crescent Moon -->
-  <circle cx="385" cy="130" r="75" fill="#fbbf24"/>
-  <circle cx="425" cy="110" r="68" fill="#0c0a1d"/>
+  <!-- Moon glow -->
+  <rect width="512" height="512" rx="115" fill="url(#moonGlow)"/>
 
-  <!-- Stars -->
-  <circle cx="85" cy="85" r="7" fill="#fff" opacity="0.6"/>
-  <circle cx="155" cy="140" r="5" fill="#fff" opacity="0.4"/>
-  <circle cx="240" cy="70" r="4" fill="#fff" opacity="0.5"/>
-  <circle cx="105" cy="190" r="5" fill="#fff" opacity="0.3"/>
+  <!-- Simple Crescent Moon -->
+  <circle cx="256" cy="200" r="120" fill="#fbbf24"/>
+  <circle cx="310" cy="165" r="110" fill="#0f172a"/>
 
-  <!-- Candlesticks -->
-  <!-- Candle 1 (red) -->
-  <rect x="70" y="310" width="40" height="100" rx="6" fill="#ef4444" opacity="0.9"/>
-  <rect x="83" y="285" width="14" height="160" rx="4" fill="#ef4444" opacity="0.9"/>
-  <!-- Candle 2 (green) -->
-  <rect x="145" y="260" width="40" height="120" rx="6" fill="#22c55e" opacity="0.9"/>
-  <rect x="158" y="235" width="14" height="170" rx="4" fill="#22c55e" opacity="0.9"/>
-  <!-- Candle 3 (red) -->
-  <rect x="220" y="295" width="40" height="85" rx="6" fill="#ef4444" opacity="0.9"/>
-  <rect x="233" y="275" width="14" height="130" rx="4" fill="#ef4444" opacity="0.9"/>
-  <!-- Candle 4 (green) -->
-  <rect x="295" y="190" width="40" height="155" rx="6" fill="#22c55e" opacity="0.9"/>
-  <rect x="308" y="165" width="14" height="205" rx="4" fill="#22c55e" opacity="0.9"/>
-  <!-- Candle 5 (green) -->
-  <rect x="370" y="240" width="40" height="100" rx="6" fill="#22c55e" opacity="0.9"/>
-  <rect x="383" y="215" width="14" height="155" rx="4" fill="#22c55e" opacity="0.9"/>
+  <!-- Simple upward trend line -->
+  <path d="M100 400 L220 300 L320 340 L410 240"
+        stroke="#22c55e" stroke-width="16" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
 
-  <!-- Trend line with glow -->
-  <path d="M90 330 L165 295 L240 315 L315 200 L390 260"
-        stroke="url(#glowLine)" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
-  <path d="M90 330 L165 295 L240 315 L315 200 L390 260"
-        stroke="url(#mainLine)" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  <!-- Arrow head -->
+  <path d="M380 255 L410 240 L400 270"
+        stroke="#22c55e" stroke-width="12" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
 </svg>

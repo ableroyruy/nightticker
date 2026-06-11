@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Skeleton } from '@/components/ui/skeleton';
 import { useFavorites } from '@/lib/context/FavoritesContext';
 import { useCandleData } from '@/lib/hooks/useCandleData';
+import { useSearchRanking } from '@/lib/context/SearchRankingContext';
 
 const MiniChart = dynamic(() => import('./MiniChart').then((mod) => mod.MiniChart), {
   ssr: false,
@@ -33,6 +34,8 @@ function AssetCardInner({
 }: AssetCardProps) {
   const locale = useLocale();
   const { isFavorite, toggleFavorite } = useFavorites();
+  const { rankings } = useSearchRanking();
+  const searchRank = rankings.find((r) => r.symbol === asset.symbol);
 
   // Chart data
   const candleSymbol = asset.hyperliquidSymbol?.replace('xyz:', '') ?? asset.symbol;
@@ -109,8 +112,23 @@ function AssetCardInner({
               </span>
             )}
             <div className="min-w-0">
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 flex-wrap">
                 <span className="font-semibold truncate">{displayName}</span>
+                {searchRank && searchRank.rank <= 10 && (
+                  <Link
+                    href={`${prefix}/popular`}
+                    onClick={(e) => e.stopPropagation()}
+                    className={cn(
+                      'text-[10px] px-1.5 py-0.5 rounded-full font-medium flex items-center gap-0.5 transition-colors',
+                      searchRank.rank <= 3
+                        ? 'bg-amber-500/20 text-amber-400 hover:bg-amber-500/30'
+                        : 'bg-primary/20 text-primary hover:bg-primary/30'
+                    )}
+                  >
+                    <span className="animate-pulse">🔥</span>
+                    #{searchRank.rank}
+                  </Link>
+                )}
                 {showMarketBadge && (
                   <Badge
                     variant="outline"
@@ -155,18 +173,20 @@ function AssetCardInner({
             />
 
             <div className="flex items-center gap-2 flex-wrap">
+              {displayChange24h !== null && displayChange24h !== undefined && (
+                <PriceChange
+                  value={displayChange24h}
+                  type="amount"
+                  size="sm"
+                  showBackground
+                />
+              )}
               <PriceChange
                 value={displayChangePercent24h ?? null}
                 type="percent"
                 size="sm"
-                showBackground
+                showIcon={false}
               />
-              {displayChange24h !== null && displayChange24h !== undefined && (
-                <span className="text-xs text-muted-foreground tabular-nums">
-                  {displayChange24h > 0 ? '+' : ''}
-                  ${displayChange24h.toFixed(2)}
-                </span>
-              )}
             </div>
           </div>
 

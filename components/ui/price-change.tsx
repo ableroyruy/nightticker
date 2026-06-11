@@ -61,7 +61,13 @@ export function PriceChange({
       )}
     >
       {showIcon && (
-        <span className={triangleSizes[size]}>
+        <span
+          className={cn(
+            triangleSizes[size],
+            isPositive && 'animate-pulse',
+            isNegative && 'animate-pulse'
+          )}
+        >
           {isPositive && '▲'}
           {isNegative && '▼'}
           {isZero && '−'}

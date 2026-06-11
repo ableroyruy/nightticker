@@ -4,7 +4,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTranslations, useLocale } from 'next-intl';
 import { LanguageSwitcher } from './LanguageSwitcher';
-import { Moon, Menu, X, Home, Star, TrendingUp, TrendingDown, ChevronDown, BarChart3, Coins, Globe, Cpu, Building2, DollarSign } from 'lucide-react';
+import { Moon, Menu, X, Home, Star, TrendingUp, TrendingDown, ChevronDown, BarChart3, Coins, Globe, Cpu, Building2, DollarSign, Flame } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -42,6 +42,7 @@ export function Header() {
   const navLinks = [
     { href: `${prefix}/`, label: t('home'), icon: Home },
     { href: `${prefix}/favorites`, label: t('favorites'), icon: Star },
+    { href: `${prefix}/popular`, label: locale === 'ko' ? '인기순위' : 'Hot', icon: Flame },
     { href: `${prefix}/gainers`, label: t('topGainers'), icon: TrendingUp },
     { href: `${prefix}/losers`, label: t('topLosers'), icon: TrendingDown },
   ];
