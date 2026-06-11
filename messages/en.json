@@ -81,7 +81,6 @@
     "open": "Open",
     "closed": "Closed",
     "viewSourceMarket": "View Source Market",
-    "viewOnHyperliquid": "View Market on Hyperliquid",
     "exploreDetails": "Explore Market Details",
     "priceUnavailable": "Price unavailable",
     "loading": "Loading..."
@@ -107,7 +106,6 @@
   },
   "compliance": {
     "badge": "Hyperliquid Market Prices",
-    "referralDisclosure": "Links to Hyperliquid may contain referral attribution.",
     "forReference": "For reference purposes only.",
     "notOfficial": "Not official stock exchange prices.",
     "mayDiffer": "May differ significantly from traditional exchange prices.",

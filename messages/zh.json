@@ -81,7 +81,6 @@
     "open": "开市",
     "closed": "休市",
     "viewSourceMarket": "查看数据来源",
-    "viewOnHyperliquid": "在Hyperliquid查看",
     "exploreDetails": "查看详情",
     "priceUnavailable": "价格不可用",
     "loading": "加载中..."
@@ -107,7 +106,6 @@
   },
   "compliance": {
     "badge": "Hyperliquid市场价格",
-    "referralDisclosure": "Hyperliquid链接可能包含推荐归属。",
     "forReference": "仅供参考。",
     "notOfficial": "非官方交易所价格。",
     "mayDiffer": "可能与传统交易所价格存在显著差异。",

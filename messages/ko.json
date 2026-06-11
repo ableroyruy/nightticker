@@ -81,7 +81,6 @@
     "open": "개장",
     "closed": "휴장",
     "viewSourceMarket": "소스 마켓 보기",
-    "viewOnHyperliquid": "Hyperliquid에서 보기",
     "exploreDetails": "상세 정보 보기",
     "priceUnavailable": "가격 정보 없음",
     "loading": "로딩 중..."
@@ -107,7 +106,6 @@
   },
   "compliance": {
     "badge": "Hyperliquid Market Prices",
-    "referralDisclosure": "Hyperliquid 링크에는 레퍼럴 속성이 포함될 수 있습니다.",
     "forReference": "참고용 정보입니다.",
     "notOfficial": "공식 거래소 가격이 아닙니다.",
     "mayDiffer": "전통적인 거래소 가격과 크게 다를 수 있습니다.",

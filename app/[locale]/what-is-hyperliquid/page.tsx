@@ -3,7 +3,6 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Separator } from '@/components/ui/separator';
 import { HyperliquidBadge } from '@/components/common/HyperliquidBadge';
 import { ComplianceNotice } from '@/components/common/ComplianceNotice';
-import { SourceMarketLink } from '@/components/common/SourceMarketLink';
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -112,17 +111,6 @@ export default async function WhatIsHyperliquidPage({ params }: Props) {
           </p>
         </section>
 
-        <section>
-          <h2>
-            {locale === 'ko' ? '더 알아보기' : 'Learn More'}
-          </h2>
-          <p>
-            {locale === 'ko'
-              ? '상세한 시장 정보는 Hyperliquid를 직접 방문해 주세요.'
-              : 'For detailed market information, please visit Hyperliquid directly.'}
-          </p>
-          <SourceMarketLink symbol="" showDisclosure />
-        </section>
       </div>
 
       <Separator />

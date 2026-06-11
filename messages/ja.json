@@ -81,7 +81,6 @@
     "open": "開場",
     "closed": "閉場",
     "viewSourceMarket": "ソース市場を見る",
-    "viewOnHyperliquid": "Hyperliquidで見る",
     "exploreDetails": "詳細を見る",
     "priceUnavailable": "価格情報なし",
     "loading": "読み込み中..."
@@ -107,7 +106,6 @@
   },
   "compliance": {
     "badge": "Hyperliquid Market Prices",
-    "referralDisclosure": "Hyperliquidへのリンクにはリファラル属性が含まれる場合があります。",
     "forReference": "参考情報のみ。",
     "notOfficial": "公式取引所価格ではありません。",
     "mayDiffer": "伝統的な取引所価格と大きく異なる場合があります。",

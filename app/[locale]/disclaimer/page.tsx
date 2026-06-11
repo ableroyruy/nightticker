@@ -126,12 +126,23 @@ export default async function DisclaimerPage({ params }: Props) {
 
         <section>
           <h2>
-            {locale === 'ko' ? '레퍼럴 링크' : 'Referral Links'}
+            {locale === 'ko' ? '데이터 출처' : 'Data Source'}
           </h2>
           <p>
             {locale === 'ko'
-              ? 'Hyperliquid로 연결되는 링크에는 레퍼럴 속성이 포함될 수 있습니다.'
-              : 'Links to Hyperliquid may contain referral attribution.'}
+              ? '표시되는 가격은 Hyperliquid Market Prices를 기반으로 합니다. 이는 참고용 정보이며 공식 거래소 가격이 아닙니다.'
+              : 'Displayed prices are based on Hyperliquid Market Prices. This is reference information only and not official exchange prices.'}
+          </p>
+        </section>
+
+        <section>
+          <h2>
+            {locale === 'ko' ? '사용자 책임' : 'User Responsibility'}
+          </h2>
+          <p>
+            {locale === 'ko'
+              ? '사용자는 자신의 투자 결정과 그로 인한 이익 또는 손실에 대해 전적으로 책임집니다. NightTicker는 금전적 손실에 대해 책임지지 않습니다.'
+              : 'Users are solely responsible for their own investment decisions and any resulting gains or losses. NightTicker is not liable for any financial losses.'}
           </p>
         </section>
       </div>

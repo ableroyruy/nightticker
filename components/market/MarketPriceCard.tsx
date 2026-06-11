@@ -7,7 +7,6 @@ import { useHyperliquidTicker } from '@/lib/hooks/useHyperliquidTicker';
 import { useCandleData } from '@/lib/hooks/useCandleData';
 import { ConnectionStatus } from '@/components/ui/connection-status';
 import { PriceDisplay } from '@/components/market/PriceDisplay';
-import { SourceMarketLink } from '@/components/common/SourceMarketLink';
 import { formatLastUpdated } from '@/lib/markets/hours';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -73,9 +72,6 @@ export function MarketPriceCard({ hyperliquidSymbol, locale }: MarketPriceCardPr
             <span>{formatLastUpdated(lastUpdate, locale)}</span>
           </div>
         )}
-
-        {/* Referral Link Button */}
-        <SourceMarketLink symbol={tickerKey} />
       </CardContent>
     </Card>
   );

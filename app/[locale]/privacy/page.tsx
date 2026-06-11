@@ -110,12 +110,34 @@ export default async function PrivacyPage({ params }: Props) {
 
         <section>
           <h2>
-            {locale === 'ko' ? '제3자 링크' : 'Third-Party Links'}
+            {locale === 'ko' ? '계정 및 로그인' : 'Account and Login'}
           </h2>
           <p>
             {locale === 'ko'
-              ? 'NightTicker는 Hyperliquid로 연결되는 링크를 포함합니다. 이러한 링크에는 레퍼럴 속성이 포함될 수 있습니다. Hyperliquid의 개인정보처리방침은 NightTicker의 통제 범위 밖입니다.'
-              : 'NightTicker contains links to Hyperliquid. These links may contain referral attribution. Hyperliquid\'s privacy practices are outside NightTicker\'s control.'}
+              ? 'NightTicker는 계정 생성이나 로그인을 요구하지 않습니다. 개인 식별 정보를 수집하지 않습니다.'
+              : 'NightTicker does not require account creation or login. We do not collect any personal identification information.'}
+          </p>
+        </section>
+
+        <section>
+          <h2>
+            {locale === 'ko' ? '네트워크 요청' : 'Network Requests'}
+          </h2>
+          <p>
+            {locale === 'ko'
+              ? '가격 데이터를 조회하기 위해 Hyperliquid API로 네트워크 요청이 발생합니다. 이러한 요청은 시세 정보를 가져오기 위한 것이며, 사용자의 개인 정보는 전송되지 않습니다.'
+              : 'Network requests are made to the Hyperliquid API to fetch price data. These requests are solely for retrieving market information, and no personal user data is transmitted.'}
+          </p>
+        </section>
+
+        <section>
+          <h2>
+            {locale === 'ko' ? '향후 광고 도입 시' : 'Future Advertising'}
+          </h2>
+          <p>
+            {locale === 'ko'
+              ? '향후 광고가 도입될 경우, 별도의 고지 및 개인정보처리방침 업데이트가 제공됩니다.'
+              : 'If advertising is introduced in the future, a separate notice and privacy policy update will be provided.'}
           </p>
         </section>
 

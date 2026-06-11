@@ -3,7 +3,6 @@ import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Separator } from '@/components/ui/separator';
 import { HyperliquidBadge } from '@/components/common/HyperliquidBadge';
 import { ComplianceNotice } from '@/components/common/ComplianceNotice';
-import { ReferralDisclosure } from '@/components/common/ReferralDisclosure';
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -118,21 +117,9 @@ export default async function HowDataWorksPage({ params }: Props) {
           </h2>
           <p>
             {locale === 'ko'
-              ? '상세한 차트, 과거 데이터 및 고급 시장 정보는 Hyperliquid를 직접 방문해 주세요.'
-              : 'For detailed charts, historical data, and advanced market information, please visit Hyperliquid directly.'}
+              ? '상세한 차트, 과거 데이터 및 고급 시장 정보는 Hyperliquid 공식 사이트를 방문해 주세요.'
+              : 'For detailed charts, historical data, and advanced market information, please visit the official Hyperliquid website.'}
           </p>
-        </section>
-
-        <section>
-          <h2>
-            {locale === 'ko' ? '레퍼럴 링크' : 'Referral Links'}
-          </h2>
-          <p>
-            {locale === 'ko'
-              ? 'Hyperliquid로 연결되는 링크에는 레퍼럴 속성이 포함될 수 있습니다.'
-              : 'Links to Hyperliquid may contain referral attribution.'}
-          </p>
-          <ReferralDisclosure />
         </section>
       </div>
 
