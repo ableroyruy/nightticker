@@ -212,5 +212,17 @@
     "closed": "휴장",
     "opens": "개장",
     "closes": "마감"
+  },
+  "popularSearches": {
+    "title": "인기 검색 순위",
+    "description": "최근 24시간 동안 가장 많이 검색된 종목",
+    "timeframe": "최근 24시간 검색 데이터 기준",
+    "rank": "순위",
+    "stock": "종목",
+    "price": "현재가",
+    "change24h": "24시간 변동",
+    "rankChange": "순위 변동 (48시간 전 대비)",
+    "noData": "검색 데이터가 없습니다",
+    "noDataDescription": "사용자들이 검색을 시작하면 데이터가 표시됩니다"
   }
 }

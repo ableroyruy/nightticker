@@ -1,7 +1,6 @@
 'use client';
 
 import { cn } from '@/lib/utils';
-import { TrendingUp, TrendingDown, Minus } from 'lucide-react';
 
 interface PriceChangeProps {
   value: number | null;
@@ -34,10 +33,10 @@ export function PriceChange({
     lg: 'text-base',
   };
 
-  const iconSizes = {
-    sm: 'h-3 w-3',
-    md: 'h-3.5 w-3.5',
-    lg: 'h-4 w-4',
+  const triangleSizes = {
+    sm: 'text-[8px]',
+    md: 'text-[10px]',
+    lg: 'text-xs',
   };
 
   const formattedValue =
@@ -51,7 +50,7 @@ export function PriceChange({
   return (
     <span
       className={cn(
-        'inline-flex items-center gap-1 tabular-nums font-medium',
+        'inline-flex items-center gap-0.5 tabular-nums font-medium',
         sizeClasses[size],
         isPositive && 'text-gain',
         isNegative && 'text-loss',
@@ -62,11 +61,11 @@ export function PriceChange({
       )}
     >
       {showIcon && (
-        <>
-          {isPositive && <TrendingUp className={iconSizes[size]} />}
-          {isNegative && <TrendingDown className={iconSizes[size]} />}
-          {isZero && <Minus className={iconSizes[size]} />}
-        </>
+        <span className={triangleSizes[size]}>
+          {isPositive && '▲'}
+          {isNegative && '▼'}
+          {isZero && '−'}
+        </span>
       )}
       {formattedValue}
     </span>

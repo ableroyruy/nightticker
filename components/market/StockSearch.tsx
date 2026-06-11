@@ -7,13 +7,16 @@ import { Search, TrendingUp, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { stocks } from '@/lib/markets/stocks';
 import { cn } from '@/lib/utils';
+import { useSearchRanking } from '@/lib/context/SearchRankingContext';
+import { TrendingTicker } from './TrendingTicker';
 
 interface StockSearchProps {
   className?: string;
   onSelect?: () => void;
+  showTrending?: boolean;
 }
 
-export function StockSearch({ className, onSelect }: StockSearchProps) {
+export function StockSearch({ className, onSelect, showTrending = true }: StockSearchProps) {
   const [query, setQuery] = useState('');
   const [isOpen, setIsOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
@@ -22,6 +25,7 @@ export function StockSearch({ className, onSelect }: StockSearchProps) {
   const t = useTranslations('search');
   const locale = useLocale();
   const prefix = locale === 'ko' ? '/ko' : '';
+  const { recordSearch } = useSearchRanking();
 
   const filteredStocks = useMemo(() => {
     if (!query.trim()) {
@@ -43,7 +47,9 @@ export function StockSearch({ className, onSelect }: StockSearchProps) {
     setSelectedIndex(0);
   }, [filteredStocks]);
 
-  const handleSelect = (slug: string) => {
+  const handleSelect = (slug: string, symbol: string) => {
+    // Record the search for trending
+    recordSearch(symbol);
     router.push(`${prefix}/stock/${slug}`);
     setQuery('');
     setIsOpen(false);
@@ -69,7 +75,7 @@ export function StockSearch({ className, onSelect }: StockSearchProps) {
       case 'Enter':
         e.preventDefault();
         if (filteredStocks[selectedIndex]) {
-          handleSelect(filteredStocks[selectedIndex].slug);
+          handleSelect(filteredStocks[selectedIndex].slug, filteredStocks[selectedIndex].symbol);
         }
         break;
       case 'Escape':
@@ -113,6 +119,20 @@ export function StockSearch({ className, onSelect }: StockSearchProps) {
         )}
       </div>
 
+      {/* Trending Ticker */}
+      {showTrending && !isOpen && (
+        <TrendingTicker
+          className="mt-3"
+          limit={10}
+          onSelect={(slug) => {
+            const stock = stocks.find((s) => s.slug === slug);
+            if (stock) {
+              recordSearch(stock.symbol);
+            }
+          }}
+        />
+      )}
+
       {isOpen && (
         <div className="absolute top-full mt-2 w-full glass-card border border-border/50 rounded-xl shadow-2xl z-50 max-h-80 overflow-auto">
           {!query.trim() && (
@@ -132,7 +152,7 @@ export function StockSearch({ className, onSelect }: StockSearchProps) {
                       ? 'bg-accent'
                       : 'hover:bg-accent/50'
                   )}
-                  onClick={() => handleSelect(stock.slug)}
+                  onClick={() => handleSelect(stock.slug, stock.symbol)}
                   onMouseEnter={() => setSelectedIndex(index)}
                 >
                   <div className="p-1.5 rounded-lg bg-primary/10">

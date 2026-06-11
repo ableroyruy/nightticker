@@ -12,7 +12,7 @@ import { TrendingUp, Filter } from 'lucide-react';
 import { MarketAsset, MarketType } from '@/lib/types/market';
 import { cn } from '@/lib/utils';
 
-type FilterType = 'all' | 'kr' | 'us' | 'jp';
+type FilterType = 'all' | 'kr' | 'us' | 'jp' | 'index' | 'etf' | 'commodity' | 'fx' | 'semiconductor';
 
 export function GainersPage() {
   const t = useTranslations('pages.gainers');
@@ -53,14 +53,26 @@ export function GainersPage() {
     if (filter === 'kr') return asset.market === 'KR';
     if (filter === 'us') return asset.market === 'US';
     if (filter === 'jp') return asset.market === 'JP';
+    if (filter === 'index') return asset.market === 'INDEX';
+    if (filter === 'etf') return asset.market === 'ETF';
+    if (filter === 'commodity') return asset.market === 'COMMODITY';
+    if (filter === 'fx') return asset.market === 'FX';
+    if (filter === 'semiconductor') return asset.market === 'SEMICONDUCTOR' || stocks.find(s => s.symbol === asset.symbol)?.sector === 'Semiconductors';
     return true;
   });
 
+  const categoryT = useTranslations('categories');
+
   const filters: { key: FilterType; label: string }[] = [
     { key: 'all', label: filterT('all') },
-    { key: 'kr', label: filterT('kr') },
-    { key: 'us', label: filterT('us') },
-    { key: 'jp', label: filterT('jp') },
+    { key: 'us', label: categoryT('US') },
+    { key: 'kr', label: categoryT('KR') },
+    { key: 'jp', label: categoryT('JP') },
+    { key: 'index', label: categoryT('INDEX') },
+    { key: 'etf', label: categoryT('ETF') },
+    { key: 'commodity', label: categoryT('COMMODITY') },
+    { key: 'fx', label: categoryT('FX') },
+    { key: 'semiconductor', label: categoryT('SEMICONDUCTOR') },
   ];
 
   return (
@@ -82,9 +94,9 @@ export function GainersPage() {
         </div>
 
         {/* Filters */}
-        <div className="flex items-center gap-2">
-          <Filter className="h-4 w-4 text-muted-foreground" />
-          <div className="flex gap-1">
+        <div className="flex items-center gap-2 overflow-x-auto pb-2">
+          <Filter className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+          <div className="flex gap-1 flex-nowrap">
             {filters.map((f) => (
               <Button
                 key={f.key}
@@ -92,7 +104,7 @@ export function GainersPage() {
                 size="sm"
                 onClick={() => setFilter(f.key)}
                 className={cn(
-                  'text-xs',
+                  'text-xs whitespace-nowrap',
                   filter === f.key && 'bg-accent'
                 )}
               >

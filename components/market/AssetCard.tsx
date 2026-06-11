@@ -154,13 +154,19 @@ function AssetCardInner({
               showChange={false}
             />
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 flex-wrap">
               <PriceChange
                 value={displayChangePercent24h ?? null}
                 type="percent"
                 size="sm"
                 showBackground
               />
+              {displayChange24h !== null && displayChange24h !== undefined && (
+                <span className="text-xs text-muted-foreground tabular-nums">
+                  {displayChange24h > 0 ? '+' : ''}
+                  ${displayChange24h.toFixed(2)}
+                </span>
+              )}
             </div>
           </div>
 

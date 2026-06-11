@@ -16,6 +16,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     '/favorites',
     '/gainers',
     '/losers',
+    '/popular',
     '/overnight-prices',
     '/weekend-prices',
     '/holiday-prices',

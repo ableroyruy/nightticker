@@ -212,5 +212,17 @@
     "closed": "Closed",
     "opens": "Opens",
     "closes": "Closes"
+  },
+  "popularSearches": {
+    "title": "Popular Searches",
+    "description": "Top searched stocks in the last 24 hours",
+    "timeframe": "Based on search data from the last 24 hours",
+    "rank": "Rank",
+    "stock": "Stock",
+    "price": "Price",
+    "change24h": "24h Change",
+    "rankChange": "Rank Change (vs 48h ago)",
+    "noData": "No search data yet",
+    "noDataDescription": "Search data will appear after users start searching"
   }
 }
