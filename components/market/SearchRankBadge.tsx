@@ -14,7 +14,7 @@ interface SearchRankBadgeProps {
 export function SearchRankBadge({ symbol, className }: SearchRankBadgeProps) {
   const locale = useLocale();
   const { rankings } = useSearchRanking();
-  const prefix = locale === 'ko' ? '/ko' : '';
+  const prefix = locale === 'en' ? '' : `/${locale}`;
 
   const item = rankings.find((r) => r.symbol === symbol);
 
@@ -40,7 +40,7 @@ export function SearchRankBadge({ symbol, className }: SearchRankBadgeProps) {
         <TrendingUp className="h-3 w-3" />
       )}
       <span>
-        {locale === 'ko' ? '인기' : 'Hot'} #{item.rank}
+        #{item.rank}
       </span>
       {item.rankChange !== null && item.rankChange !== 0 && (
         <span

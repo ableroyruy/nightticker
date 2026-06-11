@@ -40,9 +40,25 @@ export default async function Image({
     );
   }
 
-  const name = locale === 'ko' ? stock.nameKo : stock.name;
-  const priceLabel = locale === 'ko' ? '야간 시세' : 'Night Price';
-  const source = locale === 'ko' ? 'Hyperliquid 기준 참고가격' : 'Hyperliquid Market Price';
+  const name =
+    locale === 'ko' ? stock.nameKo :
+    locale === 'ja' ? (stock.nameJa ?? stock.name) :
+    locale === 'zh' ? (stock.nameZh ?? stock.name) :
+    locale === 'pt' ? (stock.namePt ?? stock.name) :
+    locale === 'es' ? (stock.nameEs ?? stock.name) :
+    stock.name;
+  const priceLabel =
+    locale === 'ko' ? '야간 시세' :
+    locale === 'ja' ? '夜間相場' :
+    locale === 'zh' ? '夜间行情' :
+    locale === 'pt' ? 'Preço Noturno' :
+    locale === 'es' ? 'Precio Nocturno' :
+    'Night Price';
+  const source =
+    locale === 'ko' ? 'Hyperliquid 기준 참고가격' :
+    locale === 'ja' ? 'Hyperliquid 参考価格' :
+    locale === 'zh' ? 'Hyperliquid 参考价格' :
+    'Hyperliquid Market Price';
 
   return new ImageResponse(
     (

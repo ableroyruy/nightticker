@@ -8,6 +8,18 @@ import { Input } from '@/components/ui/input';
 import { stocks } from '@/lib/markets/stocks';
 import { cn } from '@/lib/utils';
 import { TrendingTicker } from './TrendingTicker';
+import { Stock } from '@/lib/providers/types';
+
+function getLocalizedName(stock: Stock, locale: string): string {
+  switch (locale) {
+    case 'ko': return stock.nameKo || stock.name;
+    case 'ja': return stock.nameJa || stock.name;
+    case 'zh': return stock.nameZh || stock.name;
+    case 'pt': return stock.namePt || stock.name;
+    case 'es': return stock.nameEs || stock.name;
+    default: return stock.name;
+  }
+}
 
 interface StockSearchProps {
   className?: string;
@@ -22,8 +34,9 @@ export function StockSearch({ className, onSelect, showTrending = true }: StockS
   const inputRef = useRef<HTMLInputElement>(null);
   const router = useRouter();
   const t = useTranslations('search');
+  const tNav = useTranslations('nav');
   const locale = useLocale();
-  const prefix = locale === 'ko' ? '/ko' : '';
+  const prefix = locale === 'en' ? '' : `/${locale}`;
 
   const filteredStocks = useMemo(() => {
     if (!query.trim()) {
@@ -128,7 +141,7 @@ export function StockSearch({ className, onSelect, showTrending = true }: StockS
         <div className="absolute top-full mt-2 w-full glass-card border border-border/50 rounded-xl shadow-2xl z-50 max-h-80 overflow-auto">
           {!query.trim() && (
             <div className="px-4 py-2 text-xs font-medium text-muted-foreground uppercase tracking-wide border-b border-border/50">
-              {locale === 'ko' ? '인기 종목' : 'Popular'}
+              {tNav('popular')}
             </div>
           )}
 
@@ -151,7 +164,7 @@ export function StockSearch({ className, onSelect, showTrending = true }: StockS
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="font-semibold">{locale === 'ko' ? stock.nameKo : stock.name}</span>
+                      <span className="font-semibold">{getLocalizedName(stock, locale)}</span>
                       <span className="text-xs px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
                         {stock.category}
                       </span>

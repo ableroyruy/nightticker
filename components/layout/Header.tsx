@@ -37,7 +37,7 @@ export function Header() {
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
-  const prefix = locale === 'ko' ? '/ko' : '';
+  const prefix = locale === 'en' ? '' : `/${locale}`;
 
   const navLinks = [
     { href: `${prefix}/`, label: t('home'), icon: Home },

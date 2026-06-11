@@ -2,12 +2,26 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { motion, AnimatePresence } from 'framer-motion';
 import { TrendingUp } from 'lucide-react';
 import { useSearchRanking, SearchRankingItem } from '@/lib/context/SearchRankingContext';
+import { useHyperliquidTicker } from '@/lib/hooks/useHyperliquidTicker';
 import { getStockBySymbol } from '@/lib/markets/stocks';
+import { Stock } from '@/lib/providers/types';
 import { cn } from '@/lib/utils';
+
+// Helper function to get localized stock name
+function getLocalizedName(stock: Stock, locale: string): string {
+  switch (locale) {
+    case 'ko': return stock.nameKo || stock.name;
+    case 'ja': return stock.nameJa || stock.name;
+    case 'zh': return stock.nameZh || stock.name;
+    case 'pt': return stock.namePt || stock.name;
+    case 'es': return stock.nameEs || stock.name;
+    default: return stock.name;
+  }
+}
 
 interface TrendingTickerProps {
   className?: string;
@@ -21,9 +35,11 @@ export function TrendingTicker({
   onSelect,
 }: TrendingTickerProps) {
   const locale = useLocale();
+  const t = useTranslations('nav');
   const { getTopRankings } = useSearchRanking();
+  const { tickers } = useHyperliquidTicker();
   const [currentIndex, setCurrentIndex] = useState(0);
-  const prefix = locale === 'ko' ? '/ko' : '';
+  const prefix = locale === 'en' ? '' : `/${locale}`;
 
   const topRankings = useMemo(() => getTopRankings(limit), [getTopRankings, limit]);
 
@@ -44,7 +60,11 @@ export function TrendingTicker({
   const stock = getStockBySymbol(currentItem.symbol);
   if (!stock) return null;
 
-  const displayName = locale === 'ko' ? stock.nameKo : stock.name;
+  const displayName = getLocalizedName(stock, locale);
+  const tickerKey = stock.hyperliquidSymbol.replace('xyz:', '');
+  const ticker = tickers[tickerKey];
+  const isPositive = ticker?.changePercent24h != null && ticker.changePercent24h > 0;
+  const isNegative = ticker?.changePercent24h != null && ticker.changePercent24h < 0;
 
   const handleClick = () => {
     onSelect?.(stock.slug);
@@ -54,7 +74,7 @@ export function TrendingTicker({
     <div className={cn('flex items-center gap-2 text-sm', className)}>
       <div className="flex items-center gap-1 text-muted-foreground">
         <TrendingUp className="h-3.5 w-3.5" />
-        <span className="text-xs">{locale === 'ko' ? '인기' : 'Hot'}</span>
+        <span className="text-xs">{t('popular')}</span>
       </div>
 
       <div className="relative h-5 overflow-hidden flex-1">
@@ -75,12 +95,27 @@ export function TrendingTicker({
               <span className="font-medium text-primary">
                 #{currentItem.rank}
               </span>
-              <span className="truncate">{displayName}</span>
-              <span className="text-muted-foreground text-xs">
-                {stock.symbol}
-              </span>
-              {currentItem.rankChange !== null && currentItem.rankChange !== 0 && (
-                <RankChangeIndicator change={currentItem.rankChange} />
+              <span className="truncate font-medium">{displayName}</span>
+              {/* Price */}
+              {ticker?.price && (
+                <span className="text-xs tabular-nums">
+                  ${ticker.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                </span>
+              )}
+              {/* Change */}
+              {ticker?.changePercent24h != null && (
+                <span className={cn(
+                  'text-xs tabular-nums flex items-center gap-0.5',
+                  isPositive && 'text-gain',
+                  isNegative && 'text-loss',
+                  !isPositive && !isNegative && 'text-muted-foreground'
+                )}>
+                  <span className="text-[8px] arrow-bounce">
+                    {isPositive && '▲'}
+                    {isNegative && '▼'}
+                  </span>
+                  {isPositive ? '+' : ''}{ticker.changePercent24h.toFixed(2)}%
+                </span>
               )}
             </Link>
           </motion.div>
@@ -142,8 +177,10 @@ export function TrendingMarquee({
   onSelect,
 }: TrendingTickerProps) {
   const locale = useLocale();
+  const t = useTranslations('nav');
   const { getTopRankings } = useSearchRanking();
-  const prefix = locale === 'ko' ? '/ko' : '';
+  const { tickers } = useHyperliquidTicker();
+  const prefix = locale === 'en' ? '' : `/${locale}`;
 
   const topRankings = useMemo(() => getTopRankings(limit), [getTopRankings, limit]);
 
@@ -160,7 +197,7 @@ export function TrendingMarquee({
     <div className={cn('overflow-hidden', className)}>
       <div className="flex items-center gap-1 text-xs text-muted-foreground mb-1">
         <TrendingUp className="h-3 w-3" />
-        <span>{locale === 'ko' ? '인기순위' : 'Trending'}</span>
+        <span>{t('popular')}</span>
       </div>
 
       <div className="relative overflow-hidden">
@@ -180,7 +217,11 @@ export function TrendingMarquee({
         >
           {/* Double the items for seamless loop */}
           {[...items, ...items].map((item, index) => {
-            const displayName = locale === 'ko' ? item.stock.nameKo : item.stock.name;
+            const displayName = getLocalizedName(item.stock, locale);
+            const tickerKey = item.stock.hyperliquidSymbol.replace('xyz:', '');
+            const ticker = tickers[tickerKey];
+            const isPositive = ticker?.changePercent24h != null && ticker.changePercent24h > 0;
+            const isNegative = ticker?.changePercent24h != null && ticker.changePercent24h < 0;
 
             return (
               <Link
@@ -191,8 +232,18 @@ export function TrendingMarquee({
               >
                 <span className="text-primary font-medium">#{item.rank}</span>
                 <span className="font-medium">{displayName}</span>
-                {item.rankChange !== null && item.rankChange !== 0 && (
-                  <RankChangeIndicator change={item.rankChange} />
+                {ticker?.changePercent24h != null && (
+                  <span className={cn(
+                    'text-xs tabular-nums flex items-center gap-0.5',
+                    isPositive && 'text-gain',
+                    isNegative && 'text-loss'
+                  )}>
+                    <span className="text-[8px] arrow-bounce">
+                      {isPositive && '▲'}
+                      {isNegative && '▼'}
+                    </span>
+                    {isPositive ? '+' : ''}{ticker.changePercent24h.toFixed(1)}%
+                  </span>
                 )}
               </Link>
             );

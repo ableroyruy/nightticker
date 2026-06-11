@@ -5,7 +5,7 @@ import { Separator } from '@/components/ui/separator';
 export function Footer() {
   const t = useTranslations();
   const locale = useLocale();
-  const prefix = locale === 'ko' ? '/ko' : '';
+  const prefix = locale === 'en' ? '' : `/${locale}`;
 
   const footerLinks = [
     { href: `${prefix}/about`, label: t('nav.about') },

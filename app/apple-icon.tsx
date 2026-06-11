@@ -14,55 +14,43 @@ export default function AppleIcon() {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
-          background: 'linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%)',
+          background: 'linear-gradient(145deg, #1a1a2e 0%, #16213e 100%)',
           borderRadius: 40,
-          position: 'relative',
-          overflow: 'hidden',
         }}
       >
-        {/* Subtle glow */}
+        {/* Simple "N" with accent */}
         <div
           style={{
-            position: 'absolute',
-            width: '120px',
-            height: '120px',
-            background: 'radial-gradient(circle, rgba(251, 191, 36, 0.2) 0%, transparent 70%)',
-            top: '15%',
-            right: '15%',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            position: 'relative',
           }}
-        />
-
-        <svg
-          width="120"
-          height="120"
-          viewBox="0 0 120 120"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
         >
-          {/* Simple Crescent Moon */}
-          <circle cx="60" cy="50" r="35" fill="#fbbf24" />
-          <circle cx="75" cy="40" r="32" fill="#0f172a" />
-
-          {/* Simple upward trend line */}
-          <path
-            d="M25 95 L55 70 L75 80 L95 55"
-            stroke="#22c55e"
-            strokeWidth="4"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            fill="none"
+          <span
+            style={{
+              fontSize: 100,
+              fontWeight: 800,
+              color: '#ffffff',
+              fontFamily: 'system-ui, -apple-system, sans-serif',
+              letterSpacing: '-4px',
+            }}
+          >
+            N
+          </span>
+          {/* Small accent dot */}
+          <div
+            style={{
+              position: 'absolute',
+              top: 25,
+              right: -10,
+              width: 20,
+              height: 20,
+              borderRadius: '50%',
+              background: '#22c55e',
+            }}
           />
-
-          {/* Arrow head */}
-          <path
-            d="M88 58 L95 55 L92 62"
-            stroke="#22c55e"
-            strokeWidth="3"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            fill="none"
-          />
-        </svg>
+        </div>
       </div>
     ),
     { ...size }

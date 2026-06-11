@@ -8,6 +8,17 @@ import { WatchlistButton } from './WatchlistButton';
 import { Stock } from '@/lib/providers/types';
 import { MarketPrice } from '@/lib/providers/types';
 
+function getLocalizedName(stock: Stock, locale: string): string {
+  switch (locale) {
+    case 'ko': return stock.nameKo || stock.name;
+    case 'ja': return stock.nameJa || stock.name;
+    case 'zh': return stock.nameZh || stock.name;
+    case 'pt': return stock.namePt || stock.name;
+    case 'es': return stock.nameEs || stock.name;
+    default: return stock.name;
+  }
+}
+
 interface StockCardProps {
   stock: Stock;
   price: MarketPrice | null;
@@ -25,7 +36,7 @@ export function StockCard({ stock, price }: StockCardProps) {
             href={`${prefix}/stock/${stock.slug}`}
             className="hover:underline"
           >
-            <h3 className="font-bold text-lg">{locale === 'ko' ? stock.nameKo : stock.name}</h3>
+            <h3 className="font-bold text-lg">{getLocalizedName(stock, locale)}</h3>
             <p className="text-sm text-muted-foreground">
               {stock.symbol}
             </p>

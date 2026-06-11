@@ -3,11 +3,24 @@
 import Link from 'next/link';
 import { useLocale, useTranslations } from 'next-intl';
 import { TrendingUp, Search, Clock } from 'lucide-react';
-import { useSearchRanking, SearchRankingItem } from '@/lib/context/SearchRankingContext';
+import { useSearchRanking } from '@/lib/context/SearchRankingContext';
 import { getStockBySymbol, stocks } from '@/lib/markets/stocks';
+import { Stock } from '@/lib/providers/types';
 import { useHyperliquidTicker } from '@/lib/hooks/useHyperliquidTicker';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
+
+// Helper function to get localized stock name
+function getLocalizedName(stock: Stock, locale: string): string {
+  switch (locale) {
+    case 'ko': return stock.nameKo || stock.name;
+    case 'ja': return stock.nameJa || stock.name;
+    case 'zh': return stock.nameZh || stock.name;
+    case 'pt': return stock.namePt || stock.name;
+    case 'es': return stock.nameEs || stock.name;
+    default: return stock.name;
+  }
+}
 
 export function PopularSearchesPage() {
   const locale = useLocale();
@@ -56,7 +69,7 @@ export function PopularSearchesPage() {
 
             const tickerKey = stock.hyperliquidSymbol.replace('xyz:', '');
             const ticker = tickers[tickerKey];
-            const displayName = locale === 'ko' ? stock.nameKo : stock.name;
+            const displayName = getLocalizedName(stock, locale);
 
             const isPositive = ticker?.changePercent24h != null && ticker.changePercent24h > 0;
             const isNegative = ticker?.changePercent24h != null && ticker.changePercent24h < 0;
@@ -83,8 +96,6 @@ export function PopularSearchesPage() {
                         </Badge>
                       </div>
 
-                      {/* Symbol */}
-                      <p className="text-sm text-muted-foreground mb-3">{stock.symbol}</p>
 
                       {/* Price Row */}
                       <div className="flex items-center justify-between gap-3 flex-wrap">
