@@ -160,7 +160,7 @@ export function TrendingMarquee({
     <div className={cn('overflow-hidden', className)}>
       <div className="flex items-center gap-1 text-xs text-muted-foreground mb-1">
         <TrendingUp className="h-3 w-3" />
-        <span>{locale === 'ko' ? '인기검색' : 'Trending'}</span>
+        <span>{locale === 'ko' ? '인기순위' : 'Trending'}</span>
       </div>
 
       <div className="relative overflow-hidden">

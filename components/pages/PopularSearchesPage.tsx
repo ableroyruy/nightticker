@@ -11,7 +11,7 @@ import { Badge } from '@/components/ui/badge';
 
 export function PopularSearchesPage() {
   const locale = useLocale();
-  const t = useTranslations('popularSearches');
+  const t = useTranslations('popularRanking');
   const { rankings } = useSearchRanking();
   const { tickers } = useHyperliquidTicker();
   const prefix = locale === 'en' ? '' : `/${locale}`;

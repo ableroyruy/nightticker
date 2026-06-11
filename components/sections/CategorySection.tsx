@@ -25,6 +25,7 @@ const marketIcons: Record<string, React.ElementType> = {
 
 export function CategorySection({ market, assets, limit = 10 }: CategorySectionProps) {
   const t = useTranslations('categories');
+  const sectionsT = useTranslations('sections');
   const locale = useLocale();
 
   const marketLabels: Record<MarketType, { en: string; ko: string; ja: string; zh: string }> = {
@@ -99,7 +100,7 @@ export function CategorySection({ market, assets, limit = 10 }: CategorySectionP
         </div>
         <Link href={`/category/${market.toLowerCase()}`}>
           <Button variant="ghost" size="sm" className="gap-1">
-            {locale === 'ko' ? '전체 보기' : 'View All'}
+            {sectionsT('viewAll')}
             <ArrowRight className="h-4 w-4" />
           </Button>
         </Link>

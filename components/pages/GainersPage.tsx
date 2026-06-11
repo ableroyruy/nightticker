@@ -17,6 +17,7 @@ type FilterType = 'all' | 'kr' | 'us' | 'jp' | 'index' | 'etf' | 'commodity' | '
 export function GainersPage() {
   const t = useTranslations('pages.gainers');
   const filterT = useTranslations('favorites.filter');
+  const sectionsT = useTranslations('sections');
   const locale = useLocale();
   const { tickers, status, lastUpdate } = useHyperliquidTicker();
   const [filter, setFilter] = useState<FilterType>('all');
@@ -121,7 +122,7 @@ export function GainersPage() {
               <span className="text-5xl text-muted-foreground">▲</span>
             </div>
             <p className="text-xl font-medium text-muted-foreground">
-              {locale === 'ko' ? '현재 상승 종목이 없습니다' : 'No gainers at this time'}
+              {sectionsT('noGainers')}
             </p>
           </div>
         ) : (

@@ -7,7 +7,6 @@ import { Search, TrendingUp, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { stocks } from '@/lib/markets/stocks';
 import { cn } from '@/lib/utils';
-import { useSearchRanking } from '@/lib/context/SearchRankingContext';
 import { TrendingTicker } from './TrendingTicker';
 
 interface StockSearchProps {
@@ -25,7 +24,6 @@ export function StockSearch({ className, onSelect, showTrending = true }: StockS
   const t = useTranslations('search');
   const locale = useLocale();
   const prefix = locale === 'ko' ? '/ko' : '';
-  const { recordSearch } = useSearchRanking();
 
   const filteredStocks = useMemo(() => {
     if (!query.trim()) {
@@ -47,9 +45,8 @@ export function StockSearch({ className, onSelect, showTrending = true }: StockS
     setSelectedIndex(0);
   }, [filteredStocks]);
 
-  const handleSelect = (slug: string, symbol: string) => {
-    // Record the search for trending
-    recordSearch(symbol);
+  const handleSelect = (slug: string) => {
+    // Page view is tracked on the stock detail page
     router.push(`${prefix}/stock/${slug}`);
     setQuery('');
     setIsOpen(false);
@@ -75,7 +72,7 @@ export function StockSearch({ className, onSelect, showTrending = true }: StockS
       case 'Enter':
         e.preventDefault();
         if (filteredStocks[selectedIndex]) {
-          handleSelect(filteredStocks[selectedIndex].slug, filteredStocks[selectedIndex].symbol);
+          handleSelect(filteredStocks[selectedIndex].slug);
         }
         break;
       case 'Escape':
@@ -124,12 +121,6 @@ export function StockSearch({ className, onSelect, showTrending = true }: StockS
         <TrendingTicker
           className="mt-3"
           limit={10}
-          onSelect={(slug) => {
-            const stock = stocks.find((s) => s.slug === slug);
-            if (stock) {
-              recordSearch(stock.symbol);
-            }
-          }}
         />
       )}
 
@@ -152,7 +143,7 @@ export function StockSearch({ className, onSelect, showTrending = true }: StockS
                       ? 'bg-accent'
                       : 'hover:bg-accent/50'
                   )}
-                  onClick={() => handleSelect(stock.slug, stock.symbol)}
+                  onClick={() => handleSelect(stock.slug)}
                   onMouseEnter={() => setSelectedIndex(index)}
                 >
                   <div className="p-1.5 rounded-lg bg-primary/10">

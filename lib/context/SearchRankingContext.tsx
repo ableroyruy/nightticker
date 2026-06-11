@@ -11,10 +11,10 @@ import {
 } from 'react';
 import { stocks } from '@/lib/markets/stocks';
 
-const STORAGE_KEY = 'nightticker_search_ranking';
-const RANKING_SNAPSHOT_KEY = 'nightticker_search_ranking_snapshot';
+const STORAGE_KEY = 'nightticker_page_views';
+const RANKING_SNAPSHOT_KEY = 'nightticker_page_views_snapshot';
 
-interface SearchRecord {
+interface PageViewRecord {
   symbol: string;
   timestamp: number;
 }
@@ -34,7 +34,7 @@ export interface SearchRankingItem {
 
 interface SearchRankingContextValue {
   rankings: SearchRankingItem[];
-  recordSearch: (symbol: string) => void;
+  recordPageView: (symbol: string) => void;
   getTopRankings: (limit?: number) => SearchRankingItem[];
 }
 
@@ -53,20 +53,20 @@ export function SearchRankingProvider({ children }: { children: ReactNode }) {
     const last24h = now - 24 * 60 * 60 * 1000;
     const last48h = now - 48 * 60 * 60 * 1000;
 
-    // Get search records
+    // Get page view records
     const stored = localStorage.getItem(STORAGE_KEY);
-    const records: SearchRecord[] = stored ? JSON.parse(stored) : [];
+    const records: PageViewRecord[] = stored ? JSON.parse(stored) : [];
 
     // Filter records from last 24h
     const recentRecords = records.filter((r) => r.timestamp > last24h);
 
-    // Count searches per symbol
+    // Count views per symbol
     const countMap = new Map<string, number>();
     recentRecords.forEach((r) => {
       countMap.set(r.symbol, (countMap.get(r.symbol) || 0) + 1);
     });
 
-    // If no search data, return popular stocks as default
+    // If no view data, return popular stocks as default
     if (countMap.size === 0) {
       const defaultStocks = stocks.slice(0, 10);
       return defaultStocks.map((stock, index) => ({
@@ -112,8 +112,8 @@ export function SearchRankingProvider({ children }: { children: ReactNode }) {
     });
   }, []);
 
-  // Record a search
-  const recordSearch = useCallback(
+  // Record a page view
+  const recordPageView = useCallback(
     (symbol: string) => {
       if (typeof window === 'undefined') return;
 
@@ -122,7 +122,7 @@ export function SearchRankingProvider({ children }: { children: ReactNode }) {
 
       // Get existing records
       const stored = localStorage.getItem(STORAGE_KEY);
-      const records: SearchRecord[] = stored ? JSON.parse(stored) : [];
+      const records: PageViewRecord[] = stored ? JSON.parse(stored) : [];
 
       // Add new record
       records.push({ symbol, timestamp: now });
@@ -147,7 +147,7 @@ export function SearchRankingProvider({ children }: { children: ReactNode }) {
     const last24h = now - 24 * 60 * 60 * 1000;
 
     const stored = localStorage.getItem(STORAGE_KEY);
-    const records: SearchRecord[] = stored ? JSON.parse(stored) : [];
+    const records: PageViewRecord[] = stored ? JSON.parse(stored) : [];
 
     const recentRecords = records.filter((r) => r.timestamp > last24h);
 
@@ -189,10 +189,10 @@ export function SearchRankingProvider({ children }: { children: ReactNode }) {
   const value = useMemo(
     () => ({
       rankings,
-      recordSearch,
+      recordPageView,
       getTopRankings,
     }),
-    [rankings, recordSearch, getTopRankings]
+    [rankings, recordPageView, getTopRankings]
   );
 
   return (

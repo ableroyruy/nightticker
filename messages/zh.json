@@ -34,6 +34,7 @@
     "title": "收藏",
     "empty": "暂无收藏",
     "emptyHint": "点击任意资产上的星标图标将其添加到收藏",
+    "sortLabel": "排序:",
     "filter": {
       "all": "全部",
       "kr": "韩国",
@@ -217,5 +218,17 @@
     "closed": "休市",
     "opens": "开市时间",
     "closes": "休市时间"
+  },
+  "popularRanking": {
+    "title": "热门排行",
+    "description": "过去24小时内浏览最多的股票",
+    "timeframe": "基于过去24小时的页面浏览数据",
+    "rank": "排名",
+    "stock": "股票",
+    "price": "价格",
+    "change24h": "24小时涨跌",
+    "rankChange": "排名变化（与48小时前相比）",
+    "noData": "暂无排名数据",
+    "noDataDescription": "用户开始浏览股票后将显示数据"
   }
 }

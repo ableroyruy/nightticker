@@ -17,6 +17,7 @@ type FilterType = 'all' | 'kr' | 'us' | 'jp' | 'index' | 'etf' | 'commodity' | '
 export function LosersPage() {
   const t = useTranslations('pages.losers');
   const filterT = useTranslations('favorites.filter');
+  const sectionsT = useTranslations('sections');
   const locale = useLocale();
   const { tickers, status, lastUpdate } = useHyperliquidTicker();
   const [filter, setFilter] = useState<FilterType>('all');
@@ -121,7 +122,7 @@ export function LosersPage() {
               <span className="text-5xl text-muted-foreground">▼</span>
             </div>
             <p className="text-xl font-medium text-muted-foreground">
-              {locale === 'ko' ? '현재 하락 종목이 없습니다' : 'No losers at this time'}
+              {sectionsT('noLosers')}
             </p>
           </div>
         ) : (

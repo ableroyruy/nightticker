@@ -34,6 +34,7 @@
     "title": "Favorites",
     "empty": "No favorites yet",
     "emptyHint": "Click the star icon on any asset to add it to your favorites",
+    "sortLabel": "Sort:",
     "filter": {
       "all": "All",
       "kr": "Korea",
@@ -216,16 +217,16 @@
     "opens": "Opens",
     "closes": "Closes"
   },
-  "popularSearches": {
-    "title": "Popular Searches",
-    "description": "Top searched stocks in the last 24 hours",
-    "timeframe": "Based on search data from the last 24 hours",
+  "popularRanking": {
+    "title": "Popular Ranking",
+    "description": "Top viewed stocks in the last 24 hours",
+    "timeframe": "Based on page view data from the last 24 hours",
     "rank": "Rank",
     "stock": "Stock",
     "price": "Price",
     "change24h": "24h Change",
     "rankChange": "Rank Change (vs 48h ago)",
-    "noData": "No search data yet",
-    "noDataDescription": "Search data will appear after users start searching"
+    "noData": "No ranking data yet",
+    "noDataDescription": "Ranking data will appear after users start viewing stocks"
   }
 }

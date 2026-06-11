@@ -1,9 +1,11 @@
 'use client';
 
+import { useEffect } from 'react';
 import { WatchlistButton } from '@/components/market/WatchlistButton';
 import { SearchRankBadge } from '@/components/market/SearchRankBadge';
 import { HyperliquidBadge } from '@/components/common/HyperliquidBadge';
 import { Stock } from '@/lib/providers/types';
+import { useSearchRanking } from '@/lib/context/SearchRankingContext';
 
 interface StockPageHeaderProps {
   stock: Stock;
@@ -18,6 +20,13 @@ export function StockPageHeader({
   term,
   locale,
 }: StockPageHeaderProps) {
+  const { recordPageView } = useSearchRanking();
+
+  // Track page view when component mounts
+  useEffect(() => {
+    recordPageView(stock.symbol);
+  }, [stock.symbol, recordPageView]);
+
   const titleSuffix =
     locale === 'ko'
       ? `야간 ${term}`

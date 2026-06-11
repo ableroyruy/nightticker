@@ -34,6 +34,7 @@
     "title": "お気に入り",
     "empty": "お気に入りがありません",
     "emptyHint": "銘柄の星アイコンをクリックしてお気に入りに追加してください",
+    "sortLabel": "並び替え:",
     "filter": {
       "all": "すべて",
       "kr": "韓国",
@@ -216,5 +217,17 @@
     "closed": "閉場",
     "opens": "開場",
     "closes": "閉場"
+  },
+  "popularRanking": {
+    "title": "人気ランキング",
+    "description": "過去24時間で最も閲覧された銘柄",
+    "timeframe": "過去24時間のページビューデータに基づく",
+    "rank": "順位",
+    "stock": "銘柄",
+    "price": "価格",
+    "change24h": "24時間変動",
+    "rankChange": "順位変動（48時間前比）",
+    "noData": "ランキングデータがありません",
+    "noDataDescription": "ユーザーが銘柄を閲覧するとデータが表示されます"
   }
 }

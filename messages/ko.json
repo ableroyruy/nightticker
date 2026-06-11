@@ -34,6 +34,7 @@
     "title": "즐겨찾기",
     "empty": "즐겨찾기한 종목이 없습니다",
     "emptyHint": "종목의 별 아이콘을 클릭하여 즐겨찾기에 추가하세요",
+    "sortLabel": "정렬:",
     "filter": {
       "all": "전체",
       "kr": "한국",
@@ -216,16 +217,16 @@
     "opens": "개장",
     "closes": "마감"
   },
-  "popularSearches": {
-    "title": "인기 검색 순위",
-    "description": "최근 24시간 동안 가장 많이 검색된 종목",
-    "timeframe": "최근 24시간 검색 데이터 기준",
+  "popularRanking": {
+    "title": "인기 순위",
+    "description": "최근 24시간 동안 가장 많이 조회된 종목",
+    "timeframe": "최근 24시간 페이지 조회 데이터 기준",
     "rank": "순위",
     "stock": "종목",
     "price": "현재가",
     "change24h": "24시간 변동",
     "rankChange": "순위 변동 (48시간 전 대비)",
-    "noData": "검색 데이터가 없습니다",
-    "noDataDescription": "사용자들이 검색을 시작하면 데이터가 표시됩니다"
+    "noData": "순위 데이터가 없습니다",
+    "noDataDescription": "사용자들이 종목을 조회하면 데이터가 표시됩니다"
   }
 }

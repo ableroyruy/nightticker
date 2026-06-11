@@ -34,6 +34,7 @@
     "title": "Favoritos",
     "empty": "Nenhum favorito ainda",
     "emptyHint": "Clique no icone de estrela em qualquer ativo para adiciona-lo aos favoritos",
+    "sortLabel": "Ordenar:",
     "filter": {
       "all": "Todos",
       "kr": "Coreia",
@@ -219,5 +220,17 @@
     "closed": "Fechado",
     "opens": "Abre",
     "closes": "Fecha"
+  },
+  "popularRanking": {
+    "title": "Ranking Popular",
+    "description": "Acoes mais visualizadas nas ultimas 24 horas",
+    "timeframe": "Baseado em dados de visualizacao das ultimas 24 horas",
+    "rank": "Posicao",
+    "stock": "Acao",
+    "price": "Preco",
+    "change24h": "Variacao 24h",
+    "rankChange": "Mudanca no Ranking (vs 48h atras)",
+    "noData": "Sem dados de ranking ainda",
+    "noDataDescription": "Dados de ranking aparecerao apos usuarios comecarem a visualizar acoes"
   }
 }

@@ -146,7 +146,7 @@ export function FavoritesPage() {
             {/* Sort dropdown */}
             <div className="flex items-center gap-2">
               <span className="text-sm text-muted-foreground">
-                {locale === 'ko' ? '정렬:' : 'Sort:'}
+                {t('sortLabel')}
               </span>
               <div className="flex gap-1">
                 {sorts.map((s) => (
