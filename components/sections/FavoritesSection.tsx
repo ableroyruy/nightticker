@@ -80,7 +80,7 @@ export function FavoritesSection({ tickers }: FavoritesSectionProps) {
           {t('title')}
         </h2>
         <span className="text-sm text-muted-foreground">
-          {favorites.length} {locale === 'ko' ? '개' : 'items'}
+          {favorites.length} {t('itemCount')}
         </span>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">

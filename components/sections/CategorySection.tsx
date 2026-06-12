@@ -26,6 +26,7 @@ const marketIcons: Record<string, React.ElementType> = {
 export function CategorySection({ market, assets, limit = 10 }: CategorySectionProps) {
   const t = useTranslations('categories');
   const sectionsT = useTranslations('sections');
+  const commonT = useTranslations('common');
   const locale = useLocale();
 
   const marketLabels: Record<MarketType, { en: string; ko: string; ja: string; zh: string }> = {
@@ -117,7 +118,7 @@ export function CategorySection({ market, assets, limit = 10 }: CategorySectionP
       ) : (
         <div className="glass-card rounded-2xl p-6 text-center">
           <p className="text-muted-foreground">
-            {locale === 'ko' ? '데이터 없음' : 'No data available'}
+            {commonT('noData')}
           </p>
         </div>
       )}

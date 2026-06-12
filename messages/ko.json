@@ -35,6 +35,7 @@
     "empty": "즐겨찾기한 종목이 없습니다",
     "emptyHint": "종목의 별 아이콘을 클릭하여 즐겨찾기에 추가하세요",
     "sortLabel": "정렬:",
+    "itemCount": "개",
     "filter": {
       "all": "전체",
       "kr": "한국",
@@ -92,6 +93,7 @@
     "market": "시장",
     "price": "가격",
     "change24h": "24시간 변동",
+    "change": "변동액",
     "volume": "거래량",
     "noData": "데이터 없음"
   },
@@ -206,7 +208,10 @@
     "error": "오류가 발생했습니다",
     "retry": "다시 시도",
     "install": "앱 설치",
-    "installHint": "홈 화면에 추가"
+    "installHint": "홈 화면에 추가",
+    "assets": "종목",
+    "items": "개",
+    "noData": "데이터 없음"
   },
   "marketClock": {
     "localTime": "현재 시간",

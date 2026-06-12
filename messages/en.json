@@ -35,6 +35,7 @@
     "empty": "No favorites yet",
     "emptyHint": "Click the star icon on any asset to add it to your favorites",
     "sortLabel": "Sort:",
+    "itemCount": "items",
     "filter": {
       "all": "All",
       "kr": "Korea",
@@ -92,6 +93,7 @@
     "market": "Market",
     "price": "Price",
     "change24h": "24h Change",
+    "change": "Change",
     "volume": "Volume",
     "noData": "No data available"
   },
@@ -206,7 +208,10 @@
     "error": "An error occurred",
     "retry": "Retry",
     "install": "Install App",
-    "installHint": "Add to Home Screen"
+    "installHint": "Add to Home Screen",
+    "assets": "assets",
+    "items": "items",
+    "noData": "No data available"
   },
   "marketClock": {
     "localTime": "Your Local Time",

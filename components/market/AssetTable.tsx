@@ -90,7 +90,7 @@ export function AssetTable({
               <th className="text-right py-3 px-4">{t('price')}</th>
               <th className="text-right py-3 px-4">{t('change24h')}</th>
               <th className="text-right py-3 px-4 hidden md:table-cell">
-                {locale === 'ko' ? '변동액' : 'Change'}
+                {t('change')}
               </th>
               <th className="w-12 py-3 px-4"></th>
             </tr>
@@ -98,7 +98,12 @@ export function AssetTable({
           <tbody>
             {assets.map((asset, index) => {
               const displayName =
-                locale === 'ko' && asset.nameKo ? asset.nameKo : asset.name;
+                locale === 'ko' && asset.nameKo ? asset.nameKo :
+                locale === 'ja' && asset.nameJa ? asset.nameJa :
+                locale === 'zh' && asset.nameZh ? asset.nameZh :
+                locale === 'pt' && asset.namePt ? asset.namePt :
+                locale === 'es' && asset.nameEs ? asset.nameEs :
+                asset.name;
               const isFav = isFavorite(asset.symbol, asset.market);
               const href = `${prefix}/stock/${asset.slug}`;
 

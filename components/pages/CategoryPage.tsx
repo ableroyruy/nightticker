@@ -28,6 +28,7 @@ interface CategoryPageProps {
 
 export function CategoryPage({ category }: CategoryPageProps) {
   const t = useTranslations('categories');
+  const commonT = useTranslations('common');
   const locale = useLocale();
   const { tickers, status, lastUpdate } = useHyperliquidTicker();
 
@@ -77,7 +78,7 @@ export function CategoryPage({ category }: CategoryPageProps) {
               <div>
                 <h1 className="text-3xl font-bold">{t(category)}</h1>
                 <p className="text-muted-foreground mt-1">
-                  {sortedAssets.length} {locale === 'ko' ? '종목' : 'assets'}
+                  {sortedAssets.length} {commonT('assets')}
                 </p>
               </div>
             </div>
