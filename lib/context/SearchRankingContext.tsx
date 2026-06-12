@@ -7,33 +7,46 @@ import {
   useEffect,
   useCallback,
   useMemo,
-  useRef,
   ReactNode,
 } from 'react';
-import { stocks } from '@/lib/markets/stocks';
 
-const STORAGE_KEY = 'nightticker_page_views';
-const RANKING_CACHE_KEY = 'nightticker_ranking_cache';
+// Storage keys
+const STORAGE_KEY = 'nightticker_ranking_v2';
+const LEGACY_STORAGE_KEY = 'nightticker_page_views';
+const LEGACY_CACHE_KEY = 'nightticker_ranking_cache';
 
 // Time constants
-const FIVE_MINUTES = 5 * 60 * 1000;
-const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
-const FORTY_EIGHT_HOURS = 48 * 60 * 60 * 1000;
-const SEVENTY_TWO_HOURS = 72 * 60 * 60 * 1000;
+const ONE_HOUR_MS = 60 * 60 * 1000;
+const FIVE_MINUTES_MS = 5 * 60 * 1000;
+const MAX_BUCKETS = 72; // 72 hours of data
 
-interface PageViewRecord {
-  symbol: string;
-  timestamp: number;
+// Scoring constants
+const HALF_LIFE_HOURS = 6; // Time weight half-life
+const EMA_ALPHA = 0.3; // Smoothing factor (30% new data)
+
+// Default popular stocks for cold start (based on typical market interest)
+const DEFAULT_POPULAR_STOCKS = [
+  'NVDA', 'TSLA', 'AAPL', 'SMSN', 'SP500',
+  'MSFT', 'GOOGL', 'AMZN', 'META', 'AMD',
+];
+
+// Types
+interface HourlyBucket {
+  hour: number; // Unix hour (timestamp / 3600000)
+  counts: Record<string, number>; // symbol -> view count
 }
 
-interface RankingCache {
-  rankings: SearchRankingItem[];
-  timestamp: number;
+interface RankingData {
+  buckets: HourlyBucket[];
+  smoothedScores: Record<string, number>;
+  previousRanks: Record<string, number>;
+  lastCalculation: number;
+  version: number;
 }
 
 export interface SearchRankingItem {
   symbol: string;
-  count: number;
+  score: number;
   rank: number;
   previousRank: number | null;
   rankChange: number | null;
@@ -43,156 +56,315 @@ interface SearchRankingContextValue {
   rankings: SearchRankingItem[];
   recordPageView: (symbol: string) => void;
   getTopRankings: (limit?: number) => SearchRankingItem[];
+  isUsingFallback: boolean;
 }
 
-const SearchRankingContext = createContext<SearchRankingContextValue | null>(
-  null
-);
+const SearchRankingContext = createContext<SearchRankingContextValue | null>(null);
 
-export function SearchRankingProvider({ children }: { children: ReactNode }) {
-  const [rankings, setRankings] = useState<SearchRankingItem[]>([]);
-  const lastCalculationRef = useRef<number>(0);
+// Calculate time weight using exponential decay
+const getTimeWeight = (hoursAgo: number): number => {
+  return Math.pow(0.5, hoursAgo / HALF_LIFE_HOURS);
+};
 
-  // Calculate rankings from stored data with 5-minute cache
-  // 현재 순위: T-24h ~ T (최근 24시간)
-  // 전일 순위: T-48h ~ T-24h (그 전 24시간)
-  const calculateRankings = useCallback((forceRecalculate = false): SearchRankingItem[] => {
-    if (typeof window === 'undefined') return [];
+// Get current Unix hour
+const getCurrentHour = (): number => Math.floor(Date.now() / ONE_HOUR_MS);
 
-    const now = Date.now();
+// Initialize empty ranking data
+const createEmptyData = (): RankingData => ({
+  buckets: [],
+  smoothedScores: {},
+  previousRanks: {},
+  lastCalculation: 0,
+  version: 2,
+});
 
-    // Check cache first (5-minute cache)
-    if (!forceRecalculate) {
-      const cachedData = localStorage.getItem(RANKING_CACHE_KEY);
-      if (cachedData) {
-        const cache: RankingCache = JSON.parse(cachedData);
-        if (now - cache.timestamp < FIVE_MINUTES) {
-          return cache.rankings;
-        }
+// Load ranking data from storage
+const loadRankingData = (): RankingData => {
+  if (typeof window === 'undefined') return createEmptyData();
+
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+      const data: RankingData = JSON.parse(stored);
+      if (data.version === 2) {
+        return data;
       }
     }
 
-    const last24h = now - TWENTY_FOUR_HOURS;
-    const last48h = now - FORTY_EIGHT_HOURS;
+    // Migrate from legacy format if exists
+    const legacyData = localStorage.getItem(LEGACY_STORAGE_KEY);
+    if (legacyData) {
+      const records: { symbol: string; timestamp: number }[] = JSON.parse(legacyData);
+      const currentHour = getCurrentHour();
+      const bucketMap = new Map<number, Record<string, number>>();
 
-    // Get page view records
-    const stored = localStorage.getItem(STORAGE_KEY);
-    const records: PageViewRecord[] = stored ? JSON.parse(stored) : [];
+      records.forEach((record) => {
+        const recordHour = Math.floor(record.timestamp / ONE_HOUR_MS);
+        if (currentHour - recordHour <= MAX_BUCKETS) {
+          const bucket = bucketMap.get(recordHour) || {};
+          bucket[record.symbol] = (bucket[record.symbol] || 0) + 1;
+          bucketMap.set(recordHour, bucket);
+        }
+      });
 
-    // ========================================
-    // 현재 순위: 최근 24시간 (T-24h ~ T)
-    // ========================================
-    const currentRecords = records.filter((r) => r.timestamp > last24h);
-    const currentCountMap = new Map<string, number>();
-    currentRecords.forEach((r) => {
-      currentCountMap.set(r.symbol, (currentCountMap.get(r.symbol) || 0) + 1);
-    });
+      const buckets: HourlyBucket[] = Array.from(bucketMap.entries())
+        .map(([hour, counts]) => ({ hour, counts }))
+        .sort((a, b) => b.hour - a.hour);
 
-    // If no view data, return popular stocks as default
-    if (currentCountMap.size === 0) {
-      const defaultStocks = stocks.slice(0, 10);
-      const defaultRankings = defaultStocks.map((stock, index) => ({
-        symbol: stock.symbol,
-        count: 10 - index,
-        rank: index + 1,
-        previousRank: null,
-        rankChange: null,
-      }));
-      return defaultRankings;
-    }
+      // Load previous smoothed scores from legacy cache
+      let smoothedScores: Record<string, number> = {};
+      let previousRanks: Record<string, number> = {};
+      const legacyCache = localStorage.getItem(LEGACY_CACHE_KEY);
+      if (legacyCache) {
+        const cache = JSON.parse(legacyCache);
+        if (cache.rankings) {
+          cache.rankings.forEach((item: { symbol: string; count: number; rank: number }) => {
+            smoothedScores[item.symbol] = item.count;
+            previousRanks[item.symbol] = item.rank;
+          });
+        }
+      }
 
-    // Create current rankings (based on 24h views)
-    const currentRankings = Array.from(currentCountMap.entries())
-      .map(([symbol, count]) => ({ symbol, count }))
-      .sort((a, b) => b.count - a.count);
-
-    // ========================================
-    // 전일 순위: 24-48시간 전 (T-48h ~ T-24h)
-    // ========================================
-    const previousRecords = records.filter(
-      (r) => r.timestamp > last48h && r.timestamp <= last24h
-    );
-    const previousCountMap = new Map<string, number>();
-    previousRecords.forEach((r) => {
-      previousCountMap.set(r.symbol, (previousCountMap.get(r.symbol) || 0) + 1);
-    });
-
-    // Create previous rankings (based on 24-48h views)
-    const previousRankings = Array.from(previousCountMap.entries())
-      .map(([symbol, count]) => ({ symbol, count }))
-      .sort((a, b) => b.count - a.count);
-
-    // Create previous rank map
-    const previousRankMap = new Map<string, number>();
-    previousRankings.forEach((item, index) => {
-      previousRankMap.set(item.symbol, index + 1);
-    });
-
-    // Build final rankings with rank changes
-    const finalRankings = currentRankings.map((item, index) => {
-      const rank = index + 1;
-      const previousRank = previousRankMap.get(item.symbol) ?? null;
-      // rankChange: 양수면 순위 상승, 음수면 순위 하락
-      const rankChange = previousRank !== null ? previousRank - rank : null;
-      return {
-        symbol: item.symbol,
-        count: item.count,
-        rank,
-        previousRank,
-        rankChange,
+      const migratedData: RankingData = {
+        buckets,
+        smoothedScores,
+        previousRanks,
+        lastCalculation: Date.now(),
+        version: 2,
       };
-    });
 
-    // Save to cache
-    const cache: RankingCache = {
-      rankings: finalRankings,
-      timestamp: now,
-    };
-    localStorage.setItem(RANKING_CACHE_KEY, JSON.stringify(cache));
-    lastCalculationRef.current = now;
+      // Save migrated data and clean up legacy
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(migratedData));
+      localStorage.removeItem(LEGACY_STORAGE_KEY);
+      localStorage.removeItem(LEGACY_CACHE_KEY);
 
-    return finalRankings;
-  }, []);
+      return migratedData;
+    }
+  } catch (e) {
+    console.error('Failed to load ranking data:', e);
+  }
+
+  return createEmptyData();
+};
+
+// Save ranking data to storage
+const saveRankingData = (data: RankingData): void => {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  } catch (e) {
+    console.error('Failed to save ranking data:', e);
+  }
+};
+
+export function SearchRankingProvider({ children }: { children: ReactNode }) {
+  const [rankings, setRankings] = useState<SearchRankingItem[]>([]);
+  const [isUsingFallback, setIsUsingFallback] = useState(false);
+  const [rankingData, setRankingData] = useState<RankingData>(createEmptyData);
+
+  // Calculate rankings with time-weighted scoring and EMA smoothing
+  const calculateRankings = useCallback(
+    (data: RankingData, forceRecalculate = false): { rankings: SearchRankingItem[]; updatedData: RankingData; usingFallback: boolean } => {
+      const now = Date.now();
+      const currentHour = getCurrentHour();
+
+      // Check if we can use cached calculation (5-minute cache)
+      if (!forceRecalculate && now - data.lastCalculation < FIVE_MINUTES_MS) {
+        // Reconstruct rankings from smoothed scores
+        const cachedRankings = Object.entries(data.smoothedScores)
+          .sort((a, b) => b[1] - a[1])
+          .map(([symbol, score], index) => {
+            const rank = index + 1;
+            const previousRank = data.previousRanks[symbol] ?? null;
+            const rankChange = previousRank !== null ? previousRank - rank : null;
+            return { symbol, score, rank, previousRank, rankChange };
+          });
+
+        if (cachedRankings.length > 0) {
+          return { rankings: cachedRankings, updatedData: data, usingFallback: false };
+        }
+      }
+
+      // Filter valid buckets (within 72 hours)
+      const validBuckets = data.buckets.filter((b) => currentHour - b.hour <= MAX_BUCKETS);
+
+      // Calculate time-weighted scores
+      const weightedScores: Record<string, number> = {};
+      let hasRecentData = false;
+
+      validBuckets.forEach((bucket) => {
+        const hoursAgo = currentHour - bucket.hour;
+        const weight = getTimeWeight(hoursAgo);
+
+        // Check if we have data within last 24 hours
+        if (hoursAgo <= 24) {
+          hasRecentData = true;
+        }
+
+        Object.entries(bucket.counts).forEach(([symbol, count]) => {
+          weightedScores[symbol] = (weightedScores[symbol] || 0) + count * weight;
+        });
+      });
+
+      // Determine fallback strategy
+      let finalScores = weightedScores;
+      let usingFallback = false;
+
+      if (Object.keys(weightedScores).length === 0) {
+        // Fallback 1: Use previous smoothed scores
+        if (Object.keys(data.smoothedScores).length > 0) {
+          finalScores = { ...data.smoothedScores };
+          usingFallback = true;
+        }
+        // Fallback 2: Use default popular stocks
+        else {
+          DEFAULT_POPULAR_STOCKS.forEach((symbol, i) => {
+            finalScores[symbol] = DEFAULT_POPULAR_STOCKS.length - i;
+          });
+          usingFallback = true;
+        }
+      } else if (!hasRecentData) {
+        // Have old data but nothing recent - blend with previous scores
+        Object.entries(data.smoothedScores).forEach(([symbol, score]) => {
+          if (!(symbol in finalScores)) {
+            finalScores[symbol] = score * 0.5; // Decay old scores
+          }
+        });
+      }
+
+      // Apply EMA smoothing (only if we have real data)
+      const newSmoothedScores: Record<string, number> = {};
+
+      Object.entries(finalScores).forEach(([symbol, score]) => {
+        const prevSmoothed = data.smoothedScores[symbol];
+        if (usingFallback || prevSmoothed === undefined) {
+          // No smoothing for fallback or new entries
+          newSmoothedScores[symbol] = score;
+        } else {
+          // EMA: new_value = alpha * current + (1 - alpha) * previous
+          newSmoothedScores[symbol] = EMA_ALPHA * score + (1 - EMA_ALPHA) * prevSmoothed;
+        }
+      });
+
+      // Build rankings
+      const newRankings = Object.entries(newSmoothedScores)
+        .sort((a, b) => b[1] - a[1])
+        .map(([symbol, score], index) => {
+          const rank = index + 1;
+          const previousRank = data.previousRanks[symbol] ?? null;
+          const rankChange = previousRank !== null ? previousRank - rank : null;
+          return {
+            symbol,
+            score: Math.round(score * 100) / 100,
+            rank,
+            previousRank,
+            rankChange,
+          };
+        });
+
+      // Update previous ranks for next calculation
+      const newPreviousRanks: Record<string, number> = {};
+      newRankings.forEach((item) => {
+        newPreviousRanks[item.symbol] = item.rank;
+      });
+
+      const updatedData: RankingData = {
+        buckets: validBuckets,
+        smoothedScores: newSmoothedScores,
+        previousRanks: newPreviousRanks,
+        lastCalculation: now,
+        version: 2,
+      };
+
+      return { rankings: newRankings, updatedData, usingFallback };
+    },
+    []
+  );
 
   // Record a page view
   const recordPageView = useCallback(
     (symbol: string) => {
       if (typeof window === 'undefined') return;
 
-      const now = Date.now();
-      const last72h = now - SEVENTY_TWO_HOURS;
+      const currentHour = getCurrentHour();
 
-      // Get existing records
-      const stored = localStorage.getItem(STORAGE_KEY);
-      const records: PageViewRecord[] = stored ? JSON.parse(stored) : [];
+      setRankingData((prevData) => {
+        // Find or create current hour bucket
+        let buckets = [...prevData.buckets];
+        let currentBucket = buckets.find((b) => b.hour === currentHour);
 
-      // Add new record
-      records.push({ symbol, timestamp: now });
+        if (currentBucket) {
+          // Update existing bucket
+          currentBucket = {
+            ...currentBucket,
+            counts: {
+              ...currentBucket.counts,
+              [symbol]: (currentBucket.counts[symbol] || 0) + 1,
+            },
+          };
+          buckets = buckets.map((b) => (b.hour === currentHour ? currentBucket! : b));
+        } else {
+          // Create new bucket
+          currentBucket = {
+            hour: currentHour,
+            counts: { [symbol]: 1 },
+          };
+          buckets = [currentBucket, ...buckets];
+        }
 
-      // Clean up old records (keep only last 72h for data retention)
-      const cleanedRecords = records.filter((r) => r.timestamp > last72h);
+        // Keep only valid buckets
+        buckets = buckets
+          .filter((b) => currentHour - b.hour <= MAX_BUCKETS)
+          .sort((a, b) => b.hour - a.hour);
 
-      // Save
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(cleanedRecords));
+        const newData: RankingData = {
+          ...prevData,
+          buckets,
+          lastCalculation: 0, // Force recalculation
+        };
 
-      // Update rankings (force recalculation on new page view)
-      setRankings(calculateRankings(true));
+        // Calculate new rankings
+        const { rankings: newRankings, updatedData, usingFallback } = calculateRankings(newData, true);
+
+        // Save to storage
+        saveRankingData(updatedData);
+
+        // Update state
+        setRankings(newRankings);
+        setIsUsingFallback(usingFallback);
+
+        return updatedData;
+      });
     },
     [calculateRankings]
   );
 
-  // Load initial rankings and set up intervals
+  // Load initial data and set up intervals
   useEffect(() => {
-    setRankings(calculateRankings());
+    const data = loadRankingData();
+    setRankingData(data);
+
+    const { rankings: initialRankings, updatedData, usingFallback } = calculateRankings(data);
+    setRankings(initialRankings);
+    setIsUsingFallback(usingFallback);
+
+    if (updatedData !== data) {
+      saveRankingData(updatedData);
+      setRankingData(updatedData);
+    }
 
     // Update rankings every 5 minutes
-    const rankingInterval = setInterval(() => {
-      setRankings(calculateRankings(true));
-    }, FIVE_MINUTES);
+    const interval = setInterval(() => {
+      setRankingData((prevData) => {
+        const { rankings: newRankings, updatedData, usingFallback } = calculateRankings(prevData, true);
+        setRankings(newRankings);
+        setIsUsingFallback(usingFallback);
+        saveRankingData(updatedData);
+        return updatedData;
+      });
+    }, FIVE_MINUTES_MS);
 
-    return () => {
-      clearInterval(rankingInterval);
-    };
+    return () => clearInterval(interval);
   }, [calculateRankings]);
 
   // Get top N rankings
@@ -208,8 +380,9 @@ export function SearchRankingProvider({ children }: { children: ReactNode }) {
       rankings,
       recordPageView,
       getTopRankings,
+      isUsingFallback,
     }),
-    [rankings, recordPageView, getTopRankings]
+    [rankings, recordPageView, getTopRankings, isUsingFallback]
   );
 
   return (

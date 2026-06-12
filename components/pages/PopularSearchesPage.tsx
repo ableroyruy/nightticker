@@ -32,7 +32,7 @@ export function PopularSearchesPage() {
   // Fallback to default stocks if no ranking data
   const displayRankings = rankings.length > 0 ? rankings : stocks.slice(0, 20).map((stock, index) => ({
     symbol: stock.symbol,
-    count: 20 - index,
+    score: 20 - index,
     rank: index + 1,
     previousRank: null,
     rankChange: null,
