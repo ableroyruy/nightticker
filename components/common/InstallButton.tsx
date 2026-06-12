@@ -12,6 +12,7 @@ interface BeforeInstallPromptEvent extends Event {
 
 export function InstallButton() {
   const t = useTranslations('common');
+  const [mounted, setMounted] = useState(false);
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [isIOS, setIsIOS] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
@@ -19,6 +20,7 @@ export function InstallButton() {
   const [showHint, setShowHint] = useState(false);
 
   useEffect(() => {
+    setMounted(true);
     // Check if already installed (standalone mode)
     const isInStandaloneMode = window.matchMedia('(display-mode: standalone)').matches
       || (window.navigator as Navigator & { standalone?: boolean }).standalone === true;
@@ -60,8 +62,9 @@ export function InstallButton() {
     }
   };
 
+  // Don't render until mounted (avoid hydration mismatch)
   // Don't show if already installed
-  if (isStandalone) {
+  if (!mounted || isStandalone) {
     return null;
   }
 
