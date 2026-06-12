@@ -18,7 +18,6 @@
     "popular": "Popular",
     "topGainers": "Maiores Altas",
     "topLosers": "Maiores Baixas",
-    "exchangeRates": "Taxas",
     "overnightPrices": "Precos Noturnos",
     "weekendPrices": "Precos de Fim de Semana",
     "holidayPrices": "Precos de Feriado",
@@ -370,15 +369,5 @@
     "rankChange": "Mudanca no Ranking (vs 48h atras)",
     "noData": "Sem dados de ranking ainda",
     "noDataDescription": "Dados de ranking aparecerao apos usuarios comecarem a visualizar acoes"
-  },
-  "exchangeRate": {
-    "title": "Taxas de Cambio ao Vivo",
-    "description": "Confira as taxas de cambio em tempo real para as principais moedas. Selecione uma moeda para exibir todos os precos nessa moeda.",
-    "lastUpdated": "Ultima atualizacao",
-    "selectCurrencyHint": "Clique em uma moeda para converter todos os precos do site para essa moeda.",
-    "selected": "Selecionado",
-    "vs24h": "vs 24h atras",
-    "disclaimer": "Aviso sobre Taxas de Cambio",
-    "disclaimerContent": "As taxas de cambio exibidas sao apenas para referencia e podem diferir das taxas reais ao trocar moeda. Nao use essas taxas para decisoes de investimento ou negociacao."
   }
 }

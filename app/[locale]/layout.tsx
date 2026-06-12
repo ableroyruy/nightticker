@@ -9,8 +9,7 @@ import { InstallButton } from '@/components/layout/InstallButton';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { FavoritesProvider } from '@/lib/context/FavoritesContext';
 import { SearchRankingProvider } from '@/lib/context/SearchRankingContext';
-import { CurrencyProvider } from '@/lib/context/CurrencyContext';
-import { ExchangeRateTicker } from '@/components/common/ExchangeRateTicker';
+import { StockTicker } from '@/components/common/StockTicker';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -63,13 +62,11 @@ export default async function LocaleLayout({ children, params }: Props) {
         <NextIntlClientProvider messages={messages} locale={locale}>
           <FavoritesProvider>
             <SearchRankingProvider>
-              <CurrencyProvider>
-                <InstallButton />
-                <Header />
-                <ExchangeRateTicker />
-                <main className="flex-1">{children}</main>
-                <Footer />
-              </CurrencyProvider>
+              <InstallButton />
+              <Header />
+              <StockTicker />
+              <main className="flex-1">{children}</main>
+              <Footer />
             </SearchRankingProvider>
           </FavoritesProvider>
         </NextIntlClientProvider>

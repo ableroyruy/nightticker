@@ -18,7 +18,6 @@
     "popular": "Hot",
     "topGainers": "Top Gainers",
     "topLosers": "Top Losers",
-    "exchangeRates": "Rates",
     "overnightPrices": "Overnight Prices",
     "weekendPrices": "Weekend Prices",
     "holidayPrices": "Holiday Prices",
@@ -366,15 +365,5 @@
     "rankChange": "Rank Change (vs 48h ago)",
     "noData": "No ranking data yet",
     "noDataDescription": "Ranking data will appear after users start viewing stocks"
-  },
-  "exchangeRate": {
-    "title": "Live Exchange Rates",
-    "description": "Check real-time exchange rates for major currencies. Select a currency to display all prices in that currency.",
-    "lastUpdated": "Last updated",
-    "selectCurrencyHint": "Click a currency to convert all prices on the site to that currency.",
-    "selected": "Selected",
-    "vs24h": "vs 24h ago",
-    "disclaimer": "Exchange Rate Disclaimer",
-    "disclaimerContent": "Exchange rates shown are for reference only and may differ from actual rates when exchanging currency. Do not use these rates for investment or trading decisions."
   }
 }

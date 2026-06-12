@@ -1,7 +1,13 @@
 'use client';
 
 import { cn } from '@/lib/utils';
-import { useCurrency } from '@/lib/context/CurrencyContext';
+
+function formatPriceUSD(value: number): string {
+  return '$' + value.toLocaleString('en-US', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+}
 
 interface PriceChangeProps {
   value: number | null;
@@ -20,7 +26,6 @@ export function PriceChange({
   size = 'md',
   className,
 }: PriceChangeProps) {
-  const { formatPrice, convertPrice } = useCurrency();
 
   if (value === null || value === undefined) {
     return <span className="text-muted-foreground">—</span>;
@@ -42,11 +47,11 @@ export function PriceChange({
     lg: 'text-xs',
   };
 
-  // For amount type, convert to selected currency
+  // For amount type, show in USD
   const formattedValue =
     type === 'percent'
       ? `${isPositive ? '+' : ''}${value.toFixed(2)}%`
-      : `${isPositive ? '+' : ''}${formatPrice(value)}`;
+      : `${isPositive ? '+' : ''}${formatPriceUSD(value)}`;
 
   return (
     <span
@@ -97,7 +102,6 @@ export function PriceDisplay({
   showChange = true,
   className,
 }: PriceDisplayProps) {
-  const { formatPrice } = useCurrency();
 
   const sizeClasses = {
     sm: 'text-sm',
@@ -114,8 +118,8 @@ export function PriceDisplay({
     );
   }
 
-  // Format price using selected currency
-  const formattedPrice = formatPrice(price);
+  // Format price in USD
+  const formattedPrice = formatPriceUSD(price);
 
   // Calculate change from previous price if not provided
   const calculatedChange =

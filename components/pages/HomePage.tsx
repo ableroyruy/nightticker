@@ -1,7 +1,7 @@
 'use client';
 
-import { useLocale, useTranslations } from 'next-intl';
-import { useState, useMemo } from 'react';
+import { useLocale } from 'next-intl';
+import { useMemo } from 'react';
 import {
   DndContext,
   closestCenter,
@@ -18,7 +18,6 @@ import {
   arrayMove,
 } from '@dnd-kit/sortable';
 import { useHyperliquidTicker } from '@/lib/hooks/useHyperliquidTicker';
-import { getMarketOrder } from '@/lib/utils/getPreferredMarketOrder';
 import { useSectionOrder, SectionId } from '@/lib/hooks/useSectionOrder';
 import { HeroSection } from '@/components/sections/HeroSection';
 import { FavoritesSection } from '@/components/sections/FavoritesSection';
@@ -29,7 +28,6 @@ import { DraggableSection } from '@/components/common/DraggableSection';
 import { stocks, getStocksBySectorForCategory } from '@/lib/markets/stocks';
 import { MarketAsset, MarketType } from '@/lib/types/market';
 import { cn } from '@/lib/utils';
-import { RotateCcw, GripVertical } from 'lucide-react';
 
 // Section background colors - alternating warm/cool for better contrast
 const sectionBgColors: Record<SectionId, string> = {
@@ -45,10 +43,8 @@ const sectionBgColors: Record<SectionId, string> = {
 
 export function HomePage() {
   const locale = useLocale();
-  const t = useTranslations();
   const { tickers, status, lastUpdate } = useHyperliquidTicker();
-  const { order, updateOrder, resetOrder, isLoaded } = useSectionOrder(locale);
-  const [isEditMode, setIsEditMode] = useState(false);
+  const { order, updateOrder, isLoaded } = useSectionOrder(locale);
 
   // Sensors for drag and drop (mouse, touch, keyboard)
   const sensors = useSensors(
@@ -59,7 +55,7 @@ export function HomePage() {
     }),
     useSensor(TouchSensor, {
       activationConstraint: {
-        delay: 200,
+        delay: 250,
         tolerance: 5,
       },
     }),
@@ -188,37 +184,7 @@ export function HomePage() {
       <HeroSection connectionStatus={status} lastUpdate={lastUpdate} />
 
       <div className="py-4 space-y-2">
-        {/* Edit Mode Toggle */}
-        <div className="container flex items-center justify-end gap-2 mb-2">
-          <button
-            onClick={() => setIsEditMode(!isEditMode)}
-            className={cn(
-              'flex items-center gap-2 px-3 py-1.5 rounded-full text-sm',
-              'border transition-all duration-200',
-              isEditMode
-                ? 'bg-primary text-primary-foreground border-primary'
-                : 'bg-muted/50 hover:bg-muted border-border/50'
-            )}
-          >
-            <GripVertical className="w-4 h-4" />
-            <span className="hidden sm:inline">
-              {isEditMode ? t('sections.editMode') || 'Done' : t('sections.reorder') || 'Reorder'}
-            </span>
-          </button>
-          {isEditMode && (
-            <button
-              onClick={resetOrder}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm bg-muted/50 hover:bg-muted border border-border/50 transition-colors"
-            >
-              <RotateCcw className="w-4 h-4" />
-              <span className="hidden sm:inline">
-                {t('sections.reset') || 'Reset'}
-              </span>
-            </button>
-          )}
-        </div>
-
-        {/* Draggable Sections */}
+        {/* Draggable Sections - Always draggable */}
         {isLoaded && (
           <DndContext
             sensors={sensors}
@@ -233,11 +199,10 @@ export function HomePage() {
                 <DraggableSection
                   key={sectionId}
                   id={sectionId}
-                  isDragEnabled={isEditMode}
+                  isDragEnabled={true}
                   className={cn(
                     'py-8 rounded-3xl transition-all duration-300',
-                    sectionBgColors[sectionId],
-                    isEditMode && 'ring-2 ring-primary/20 ring-offset-2 ring-offset-background'
+                    sectionBgColors[sectionId]
                   )}
                 >
                   <div className="container">{renderSectionContent(sectionId)}</div>
