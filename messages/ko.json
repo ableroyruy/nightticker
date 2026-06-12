@@ -231,6 +231,7 @@
   },
   "compliance": {
     "badge": "Hyperliquid Market Prices",
+    "forReferenceTitle": "참고용 정보",
     "forReference": "참고용 정보입니다.",
     "notOfficial": "공식 거래소 가격이 아닙니다.",
     "mayDiffer": "전통적인 거래소 가격과 크게 다를 수 있습니다.",

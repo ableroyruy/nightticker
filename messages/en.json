@@ -231,6 +231,7 @@
   },
   "compliance": {
     "badge": "Hyperliquid Market Prices",
+    "forReferenceTitle": "FOR REFERENCE PURPOSES ONLY",
     "forReference": "For reference purposes only.",
     "notOfficial": "Not official stock exchange prices.",
     "mayDiffer": "May differ significantly from traditional exchange prices.",

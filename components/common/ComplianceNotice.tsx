@@ -20,7 +20,7 @@ export function ComplianceNotice({ variant = 'full' }: ComplianceNoticeProps) {
 
   return (
     <div className="text-sm text-muted-foreground space-y-2 p-6 bg-muted/50 rounded-lg border">
-      <h3 className="font-semibold text-foreground">FOR REFERENCE PURPOSES ONLY</h3>
+      <h3 className="font-semibold text-foreground">{t('forReferenceTitle')}</h3>
       <p>{t('fullNotice')}</p>
     </div>
   );
