@@ -2,32 +2,17 @@
 
 import { useLocale } from 'next-intl';
 import { useMemo } from 'react';
-import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  TouchSensor,
-  useSensor,
-  useSensors,
-  DragEndEvent,
-} from '@dnd-kit/core';
-import {
-  SortableContext,
-  verticalListSortingStrategy,
-  arrayMove,
-} from '@dnd-kit/sortable';
 import { useHyperliquidTicker } from '@/lib/hooks/useHyperliquidTicker';
-import { useSectionOrder, SectionId } from '@/lib/hooks/useSectionOrder';
 import { HeroSection } from '@/components/sections/HeroSection';
 import { FavoritesSection } from '@/components/sections/FavoritesSection';
 import { GainersLosersSection } from '@/components/sections/GainersLosersSection';
 import { CategorySection } from '@/components/sections/CategorySection';
 import { ComplianceNotice } from '@/components/common/ComplianceNotice';
-import { DraggableSection } from '@/components/common/DraggableSection';
 import { stocks, getStocksBySectorForCategory } from '@/lib/markets/stocks';
 import { MarketAsset, MarketType } from '@/lib/types/market';
 import { cn } from '@/lib/utils';
+
+type SectionId = 'favorites' | 'KR' | 'US' | 'SEMICONDUCTOR' | 'INDEX' | 'ETF' | 'COMMODITY' | 'FX';
 
 // Section background colors - alternating warm/cool for better contrast
 const sectionBgColors: Record<SectionId, string> = {
@@ -41,26 +26,18 @@ const sectionBgColors: Record<SectionId, string> = {
   FX: 'bg-gradient-to-br from-sky-500/8 to-blue-500/5',
 };
 
+// Fixed section order based on locale
+const getSectionOrder = (locale: string): SectionId[] => {
+  if (locale === 'ko') {
+    return ['favorites', 'KR', 'US', 'SEMICONDUCTOR', 'INDEX', 'ETF', 'COMMODITY', 'FX'];
+  }
+  return ['favorites', 'US', 'KR', 'SEMICONDUCTOR', 'INDEX', 'ETF', 'COMMODITY', 'FX'];
+};
+
 export function HomePage() {
   const locale = useLocale();
   const { tickers, status, lastUpdate } = useHyperliquidTicker();
-  const { order, updateOrder, isLoaded } = useSectionOrder(locale);
-
-  // Sensors for drag and drop (mouse, touch, keyboard)
-  const sensors = useSensors(
-    useSensor(PointerSensor, {
-      activationConstraint: {
-        distance: 8,
-      },
-    }),
-    useSensor(TouchSensor, {
-      activationConstraint: {
-        delay: 250,
-        tolerance: 5,
-      },
-    }),
-    useSensor(KeyboardSensor)
-  );
+  const sectionOrder = getSectionOrder(locale);
 
   // Convert stock data to MarketAsset format with live prices and 24h data
   const allAssets: MarketAsset[] = useMemo(
@@ -142,19 +119,6 @@ export function HomePage() {
       .filter((a) => a.changePercent24h != null && a.changePercent24h < 0)
       .sort((a, b) => (a.changePercent24h ?? 0) - (b.changePercent24h ?? 0));
 
-  // Handle drag end
-  const handleDragEnd = (event: DragEndEvent) => {
-    const { active, over } = event;
-    if (!over || active.id === over.id) return;
-
-    const oldIndex = order.indexOf(active.id as SectionId);
-    const newIndex = order.indexOf(over.id as SectionId);
-
-    if (oldIndex !== -1 && newIndex !== -1) {
-      updateOrder(arrayMove(order, oldIndex, newIndex));
-    }
-  };
-
   // Render section content based on ID
   const renderSectionContent = (sectionId: SectionId) => {
     if (sectionId === 'favorites') {
@@ -184,33 +148,18 @@ export function HomePage() {
       <HeroSection connectionStatus={status} lastUpdate={lastUpdate} />
 
       <div className="py-4 space-y-2">
-        {/* Draggable Sections - Always draggable */}
-        {isLoaded && (
-          <DndContext
-            sensors={sensors}
-            collisionDetection={closestCenter}
-            onDragEnd={handleDragEnd}
+        {/* Sections */}
+        {sectionOrder.map((sectionId) => (
+          <div
+            key={sectionId}
+            className={cn(
+              'py-8 rounded-3xl transition-all duration-300',
+              sectionBgColors[sectionId]
+            )}
           >
-            <SortableContext
-              items={order}
-              strategy={verticalListSortingStrategy}
-            >
-              {order.map((sectionId) => (
-                <DraggableSection
-                  key={sectionId}
-                  id={sectionId}
-                  isDragEnabled={true}
-                  className={cn(
-                    'py-8 rounded-3xl transition-all duration-300',
-                    sectionBgColors[sectionId]
-                  )}
-                >
-                  <div className="container">{renderSectionContent(sectionId)}</div>
-                </DraggableSection>
-              ))}
-            </SortableContext>
-          </DndContext>
-        )}
+            <div className="container">{renderSectionContent(sectionId)}</div>
+          </div>
+        ))}
 
         {/* Compliance Notice */}
         <div className="container py-8">
