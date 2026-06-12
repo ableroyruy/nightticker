@@ -34,6 +34,7 @@
     "title": "收藏",
     "empty": "暂无收藏",
     "emptyHint": "点击任意资产上的星标图标将其添加到收藏",
+    "itemCount": "个",
     "sortLabel": "排序:",
     "filter": {
       "all": "全部",
@@ -325,11 +326,16 @@
     "korean": "한국어",
     "japanese": "日本語",
     "chinese": "简体中文",
+    "portuguese": "Português",
+    "spanish": "Español",
     "loading": "加载中...",
     "error": "发生错误",
     "retry": "重试",
     "install": "安装应用",
-    "installHint": "添加到主屏幕"
+    "installHint": "添加到主屏幕",
+    "assets": "资产",
+    "items": "个",
+    "noData": "暂无数据"
   },
   "marketClock": {
     "localTime": "当地时间",

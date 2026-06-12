@@ -64,6 +64,7 @@ export default async function WhatIsHyperliquidPage({ params }: Props) {
   setRequestLocale(locale);
 
   const t = await getTranslations('pages.whatIsHyperliquid');
+  const tInfo = await getTranslations('infoPages.whatIsHyperliquid');
 
   return (
     <div className="container py-8 space-y-8">
@@ -79,38 +80,19 @@ export default async function WhatIsHyperliquidPage({ params }: Props) {
 
       <div className="prose dark:prose-invert max-w-3xl space-y-8">
         <section>
-          <h2>
-            {locale === 'ko' ? 'Hyperliquid 소개' : 'About Hyperliquid'}
-          </h2>
-          <p>
-            {locale === 'ko'
-              ? 'Hyperliquid는 NightTicker에 표시되는 시장 가격의 소스입니다. NightTicker는 Hyperliquid Market Prices를 참고용으로 표시합니다.'
-              : 'Hyperliquid is the source of market prices displayed on NightTicker. NightTicker displays Hyperliquid Market Prices for reference purposes.'}
-          </p>
+          <h2>{tInfo('about')}</h2>
+          <p>{tInfo('aboutContent')}</p>
         </section>
 
         <section>
-          <h2>
-            {locale === 'ko' ? '왜 Hyperliquid인가?' : 'Why Hyperliquid?'}
-          </h2>
-          <p>
-            {locale === 'ko'
-              ? 'Hyperliquid는 전통적인 거래소가 닫혀 있는 시간에도 시장 활동을 반영할 수 있습니다. 이를 통해 사용자는 야간, 주말, 휴일에도 시장 동향을 참고할 수 있습니다.'
-              : 'Hyperliquid can reflect market activity even when traditional exchanges are closed. This allows users to monitor market trends during overnight hours, weekends, and holidays.'}
-          </p>
+          <h2>{tInfo('why')}</h2>
+          <p>{tInfo('whyContent')}</p>
         </section>
 
         <section>
-          <h2>
-            {locale === 'ko' ? '중요 안내' : 'Important Notice'}
-          </h2>
-          <p>
-            {locale === 'ko'
-              ? 'Hyperliquid Market Prices는 공식 거래소 가격이 아닙니다. 가격은 전통적인 거래소 가격과 크게 다를 수 있습니다. 투자 또는 거래 결정에 이 정보를 사용하지 마세요.'
-              : 'Hyperliquid Market Prices are not official exchange prices. Prices may differ significantly from traditional exchange prices. Do not use this information for investment or trading decisions.'}
-          </p>
+          <h2>{tInfo('notice')}</h2>
+          <p>{tInfo('noticeContent')}</p>
         </section>
-
       </div>
 
       <Separator />

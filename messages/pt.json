@@ -33,7 +33,8 @@
   "favorites": {
     "title": "Favoritos",
     "empty": "Nenhum favorito ainda",
-    "emptyHint": "Clique no icone de estrela em qualquer ativo para adiciona-lo aos favoritos",
+    "emptyHint": "Clique no ícone de estrela em qualquer ativo para adicioná-lo aos favoritos",
+    "itemCount": "itens",
     "sortLabel": "Ordenar:",
     "filter": {
       "all": "Todos",
@@ -325,13 +326,16 @@
     "korean": "한국어",
     "japanese": "日本語",
     "chinese": "简体中文",
-    "portuguese": "Portugues",
-    "spanish": "Espanol",
+    "portuguese": "Português",
+    "spanish": "Español",
     "loading": "Carregando...",
     "error": "Ocorreu um erro",
     "retry": "Tentar novamente",
     "install": "Instalar App",
-    "installHint": "Adicionar a Tela Inicial"
+    "installHint": "Adicionar a Tela Inicial",
+    "assets": "ativos",
+    "items": "itens",
+    "noData": "Sem dados disponíveis"
   },
   "marketClock": {
     "localTime": "Hora Local",
