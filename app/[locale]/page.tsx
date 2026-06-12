@@ -31,8 +31,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       ],
     },
     en: {
-      title: 'Night Stock Prices - Weekend & Holiday Quotes | NightTicker',
-      description: 'Check US and Korean night stock prices. Get weekend, holiday, and after-hours quotes for Tesla, Nvidia, Apple, Samsung and more. Powered by Hyperliquid.',
+      title: 'Overnight Stock Prices - Weekend & Holiday Market Prices | NightTicker',
+      description: 'Check US and Korean overnight stock prices. Get weekend, holiday, and after-hours market prices for Tesla, Nvidia, Apple, Samsung and more. Powered by Hyperliquid.',
       keywords: [
         'night stock price',
         'Tesla night price',
