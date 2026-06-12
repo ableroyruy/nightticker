@@ -7,20 +7,27 @@ import {
   useEffect,
   useCallback,
   useMemo,
+  useRef,
   ReactNode,
 } from 'react';
 import { stocks } from '@/lib/markets/stocks';
 
 const STORAGE_KEY = 'nightticker_page_views';
-const RANKING_SNAPSHOT_KEY = 'nightticker_page_views_snapshot';
+const RANKING_CACHE_KEY = 'nightticker_ranking_cache';
+
+// Time constants
+const FIVE_MINUTES = 5 * 60 * 1000;
+const TWENTY_FOUR_HOURS = 24 * 60 * 60 * 1000;
+const FORTY_EIGHT_HOURS = 48 * 60 * 60 * 1000;
+const SEVENTY_TWO_HOURS = 72 * 60 * 60 * 1000;
 
 interface PageViewRecord {
   symbol: string;
   timestamp: number;
 }
 
-interface RankingSnapshot {
-  rankings: { symbol: string; count: number }[];
+interface RankingCache {
+  rankings: SearchRankingItem[];
   timestamp: number;
 }
 
@@ -44,63 +51,88 @@ const SearchRankingContext = createContext<SearchRankingContextValue | null>(
 
 export function SearchRankingProvider({ children }: { children: ReactNode }) {
   const [rankings, setRankings] = useState<SearchRankingItem[]>([]);
+  const lastCalculationRef = useRef<number>(0);
 
-  // Calculate rankings from stored data
-  const calculateRankings = useCallback((): SearchRankingItem[] => {
+  // Calculate rankings from stored data with 5-minute cache
+  // 현재 순위: T-24h ~ T (최근 24시간)
+  // 전일 순위: T-48h ~ T-24h (그 전 24시간)
+  const calculateRankings = useCallback((forceRecalculate = false): SearchRankingItem[] => {
     if (typeof window === 'undefined') return [];
 
     const now = Date.now();
-    const last24h = now - 24 * 60 * 60 * 1000;
-    const last48h = now - 48 * 60 * 60 * 1000;
+
+    // Check cache first (5-minute cache)
+    if (!forceRecalculate) {
+      const cachedData = localStorage.getItem(RANKING_CACHE_KEY);
+      if (cachedData) {
+        const cache: RankingCache = JSON.parse(cachedData);
+        if (now - cache.timestamp < FIVE_MINUTES) {
+          return cache.rankings;
+        }
+      }
+    }
+
+    const last24h = now - TWENTY_FOUR_HOURS;
+    const last48h = now - FORTY_EIGHT_HOURS;
 
     // Get page view records
     const stored = localStorage.getItem(STORAGE_KEY);
     const records: PageViewRecord[] = stored ? JSON.parse(stored) : [];
 
-    // Filter records from last 24h
-    const recentRecords = records.filter((r) => r.timestamp > last24h);
-
-    // Count views per symbol
-    const countMap = new Map<string, number>();
-    recentRecords.forEach((r) => {
-      countMap.set(r.symbol, (countMap.get(r.symbol) || 0) + 1);
+    // ========================================
+    // 현재 순위: 최근 24시간 (T-24h ~ T)
+    // ========================================
+    const currentRecords = records.filter((r) => r.timestamp > last24h);
+    const currentCountMap = new Map<string, number>();
+    currentRecords.forEach((r) => {
+      currentCountMap.set(r.symbol, (currentCountMap.get(r.symbol) || 0) + 1);
     });
 
     // If no view data, return popular stocks as default
-    if (countMap.size === 0) {
+    if (currentCountMap.size === 0) {
       const defaultStocks = stocks.slice(0, 10);
-      return defaultStocks.map((stock, index) => ({
+      const defaultRankings = defaultStocks.map((stock, index) => ({
         symbol: stock.symbol,
         count: 10 - index,
         rank: index + 1,
         previousRank: null,
         rankChange: null,
       }));
+      return defaultRankings;
     }
 
-    // Create current rankings
-    const currentRankings = Array.from(countMap.entries())
+    // Create current rankings (based on 24h views)
+    const currentRankings = Array.from(currentCountMap.entries())
       .map(([symbol, count]) => ({ symbol, count }))
       .sort((a, b) => b.count - a.count);
 
-    // Get 48h snapshot for comparison
-    const snapshotStored = localStorage.getItem(RANKING_SNAPSHOT_KEY);
-    const snapshot: RankingSnapshot | null = snapshotStored
-      ? JSON.parse(snapshotStored)
-      : null;
+    // ========================================
+    // 전일 순위: 24-48시간 전 (T-48h ~ T-24h)
+    // ========================================
+    const previousRecords = records.filter(
+      (r) => r.timestamp > last48h && r.timestamp <= last24h
+    );
+    const previousCountMap = new Map<string, number>();
+    previousRecords.forEach((r) => {
+      previousCountMap.set(r.symbol, (previousCountMap.get(r.symbol) || 0) + 1);
+    });
+
+    // Create previous rankings (based on 24-48h views)
+    const previousRankings = Array.from(previousCountMap.entries())
+      .map(([symbol, count]) => ({ symbol, count }))
+      .sort((a, b) => b.count - a.count);
 
     // Create previous rank map
     const previousRankMap = new Map<string, number>();
-    if (snapshot && snapshot.timestamp > last48h) {
-      snapshot.rankings.forEach((item, index) => {
-        previousRankMap.set(item.symbol, index + 1);
-      });
-    }
+    previousRankings.forEach((item, index) => {
+      previousRankMap.set(item.symbol, index + 1);
+    });
 
     // Build final rankings with rank changes
-    return currentRankings.map((item, index) => {
+    const finalRankings = currentRankings.map((item, index) => {
       const rank = index + 1;
       const previousRank = previousRankMap.get(item.symbol) ?? null;
+      // rankChange: 양수면 순위 상승, 음수면 순위 하락
       const rankChange = previousRank !== null ? previousRank - rank : null;
       return {
         symbol: item.symbol,
@@ -110,6 +142,16 @@ export function SearchRankingProvider({ children }: { children: ReactNode }) {
         rankChange,
       };
     });
+
+    // Save to cache
+    const cache: RankingCache = {
+      rankings: finalRankings,
+      timestamp: now,
+    };
+    localStorage.setItem(RANKING_CACHE_KEY, JSON.stringify(cache));
+    lastCalculationRef.current = now;
+
+    return finalRankings;
   }, []);
 
   // Record a page view
@@ -118,7 +160,7 @@ export function SearchRankingProvider({ children }: { children: ReactNode }) {
       if (typeof window === 'undefined') return;
 
       const now = Date.now();
-      const last48h = now - 48 * 60 * 60 * 1000;
+      const last72h = now - SEVENTY_TWO_HOURS;
 
       // Get existing records
       const stored = localStorage.getItem(STORAGE_KEY);
@@ -127,56 +169,31 @@ export function SearchRankingProvider({ children }: { children: ReactNode }) {
       // Add new record
       records.push({ symbol, timestamp: now });
 
-      // Clean up old records (keep only last 48h)
-      const cleanedRecords = records.filter((r) => r.timestamp > last48h);
+      // Clean up old records (keep only last 72h for data retention)
+      const cleanedRecords = records.filter((r) => r.timestamp > last72h);
 
       // Save
       localStorage.setItem(STORAGE_KEY, JSON.stringify(cleanedRecords));
 
-      // Update rankings
-      setRankings(calculateRankings());
+      // Update rankings (force recalculation on new page view)
+      setRankings(calculateRankings(true));
     },
     [calculateRankings]
   );
 
-  // Save snapshot for 48h comparison
-  const saveSnapshot = useCallback(() => {
-    if (typeof window === 'undefined') return;
-
-    const now = Date.now();
-    const last24h = now - 24 * 60 * 60 * 1000;
-
-    const stored = localStorage.getItem(STORAGE_KEY);
-    const records: PageViewRecord[] = stored ? JSON.parse(stored) : [];
-
-    const recentRecords = records.filter((r) => r.timestamp > last24h);
-
-    const countMap = new Map<string, number>();
-    recentRecords.forEach((r) => {
-      countMap.set(r.symbol, (countMap.get(r.symbol) || 0) + 1);
-    });
-
-    const snapshotRankings = Array.from(countMap.entries())
-      .map(([symbol, count]) => ({ symbol, count }))
-      .sort((a, b) => b.count - a.count);
-
-    const snapshot: RankingSnapshot = {
-      rankings: snapshotRankings,
-      timestamp: now,
-    };
-
-    localStorage.setItem(RANKING_SNAPSHOT_KEY, JSON.stringify(snapshot));
-  }, []);
-
-  // Load initial rankings
+  // Load initial rankings and set up intervals
   useEffect(() => {
     setRankings(calculateRankings());
 
-    // Save snapshot every hour
-    const snapshotInterval = setInterval(saveSnapshot, 60 * 60 * 1000);
+    // Update rankings every 5 minutes
+    const rankingInterval = setInterval(() => {
+      setRankings(calculateRankings(true));
+    }, FIVE_MINUTES);
 
-    return () => clearInterval(snapshotInterval);
-  }, [calculateRankings, saveSnapshot]);
+    return () => {
+      clearInterval(rankingInterval);
+    };
+  }, [calculateRankings]);
 
   // Get top N rankings
   const getTopRankings = useCallback(

@@ -321,6 +321,13 @@
     "placeholder": "銘柄を検索...",
     "noResults": "検索結果がありません"
   },
+  "share": {
+    "share": "共有",
+    "shareNative": "共有する",
+    "copyLink": "リンクをコピー",
+    "copied": "コピーしました!",
+    "shareTwitter": "Xで共有"
+  },
   "common": {
     "language": "言語",
     "english": "English",

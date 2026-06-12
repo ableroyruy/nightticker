@@ -322,6 +322,13 @@
     "placeholder": "Search stocks...",
     "noResults": "No results found"
   },
+  "share": {
+    "share": "Share",
+    "shareNative": "Share",
+    "copyLink": "Copy Link",
+    "copied": "Copied!",
+    "shareTwitter": "Share on X"
+  },
   "common": {
     "language": "Language",
     "english": "English",

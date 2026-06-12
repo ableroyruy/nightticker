@@ -320,6 +320,13 @@
     "placeholder": "Buscar acciones...",
     "noResults": "Sin resultados"
   },
+  "share": {
+    "share": "Compartir",
+    "shareNative": "Compartir",
+    "copyLink": "Copiar enlace",
+    "copied": "Copiado!",
+    "shareTwitter": "Compartir en X"
+  },
   "common": {
     "language": "Idioma",
     "english": "English",

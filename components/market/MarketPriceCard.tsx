@@ -2,11 +2,12 @@
 
 import dynamic from 'next/dynamic';
 import { useTranslations } from 'next-intl';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { useHyperliquidTicker } from '@/lib/hooks/useHyperliquidTicker';
 import { useCandleData } from '@/lib/hooks/useCandleData';
 import { ConnectionStatus } from '@/components/ui/connection-status';
 import { PriceDisplay } from '@/components/market/PriceDisplay';
+import { HyperliquidBadge } from '@/components/common/HyperliquidBadge';
 import { formatLastUpdated } from '@/lib/markets/hours';
 import { Skeleton } from '@/components/ui/skeleton';
 
@@ -37,7 +38,7 @@ export function MarketPriceCard({ hyperliquidSymbol, locale }: MarketPriceCardPr
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle>{t('currentPrice')}</CardTitle>
+        <HyperliquidBadge />
         <ConnectionStatus status={status} lastUpdate={lastUpdate} />
       </CardHeader>
       <CardContent className="space-y-6">
