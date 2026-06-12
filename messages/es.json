@@ -73,6 +73,127 @@
     "SPECIAL": "Especial",
     "SEMICONDUCTOR": "Semiconductores"
   },
+  "marketBadge": {
+    "KR": "Corea",
+    "US": "EEUU",
+    "JP": "Japon",
+    "INDEX": "Indice",
+    "ETF": "ETF",
+    "COMMODITY": "Commodity",
+    "FX": "Divisa",
+    "SPECIAL": "Especial",
+    "SEMICONDUCTOR": "Semiconductor"
+  },
+  "stockDetail": {
+    "overnight": "Nocturno",
+    "weekend": "Fin de Semana",
+    "holiday": "Festivo",
+    "relatedStocks": "Relacionados",
+    "faq": "FAQ",
+    "afterHours": "Fuera de Horario",
+    "nightPrice": "Precio Nocturno"
+  },
+  "internalLinks": {
+    "overnightPrices": "Precios Nocturnos",
+    "weekendPrices": "Precios de Fin de Semana",
+    "holidayPrices": "Precios de Festivos",
+    "howDataWorks": "Como Funcionan los Datos",
+    "whatIsHyperliquid": "Que es Hyperliquid"
+  },
+  "infoPages": {
+    "about": {
+      "whatIs": "Que es NightTicker?",
+      "whatIsContent": "NightTicker es un servicio de informacion financiera premium que muestra Hyperliquid Market Prices cuando las bolsas tradicionales estan cerradas.",
+      "mission": "Nuestra Mision",
+      "missionContent": "Proporcionar informacion de precios de referencia accesible para inversores que desean monitorear la actividad del mercado fuera del horario regular de negociacion.",
+      "whatWeAreNot": "Lo que NightTicker NO es",
+      "notBroker": "Un broker",
+      "notExchange": "Una bolsa",
+      "notSecuritiesFirm": "Una firma de valores",
+      "notTradingPlatform": "Una plataforma de trading",
+      "notFinancialAdvisor": "Un asesor financiero",
+      "notInvestmentService": "Un servicio de inversion",
+      "notOfficialPrices": "Una fuente de precios oficiales de bolsa",
+      "notChartPlatform": "Una plataforma de graficos de acciones",
+      "dataSource": "Fuente de Datos",
+      "dataSourceContent": "NightTicker muestra Hyperliquid Market Prices. Estos son solo precios de referencia y no precios oficiales de bolsa de valores."
+    },
+    "disclaimer": {
+      "general": "Aviso General",
+      "generalContent": "NightTicker proporciona Hyperliquid Market Prices solo con fines informativos. Esto no es asesoramiento financiero.",
+      "dataAccuracy": "Precision de Datos",
+      "dataAccuracyContent": "Los precios mostrados pueden estar retrasados, ser imprecisos o diferir significativamente de los precios oficiales de la bolsa.",
+      "dataAccuracyNote": "NightTicker no garantiza la precision de los datos mostrados.",
+      "notAdvice": "No es Asesoramiento de Inversion",
+      "notAdviceContent": "La informacion en NightTicker no debe considerarse como asesoramiento de inversion. Siempre consulte a un asesor financiero calificado.",
+      "liability": "Limitacion de Responsabilidad",
+      "liabilityContent": "NightTicker no es responsable de ninguna perdida resultante del uso de la informacion mostrada en este sitio.",
+      "source": "Fuente de Datos",
+      "sourceContent": "Los precios se obtienen de Hyperliquid y pueden diferir de los precios de las bolsas tradicionales.",
+      "userResponsibility": "Responsabilidad del Usuario",
+      "userResponsibilityContent": "Los usuarios son los unicos responsables de sus decisiones de inversion."
+    },
+    "privacy": {
+      "collection": "Informacion que Recopilamos",
+      "collectionContent": "NightTicker no recopila informacion de identificacion personal. No requerimos creacion de cuenta ni inicio de sesion.",
+      "localStorage": "Uso de localStorage",
+      "localStorageContent": "Usamos localStorage del navegador para guardar sus favoritos y preferencias. Estos datos se almacenan solo localmente en su dispositivo.",
+      "analytics": "Analytics y Cookies",
+      "analyticsContent": "Podemos usar analytics para entender como los usuarios interactuan con nuestro servicio. No se recopila informacion de identificacion personal.",
+      "account": "Cuenta e Inicio de Sesion",
+      "accountContent": "NightTicker no requiere creacion de cuenta. Todas las funciones estan disponibles sin inicio de sesion.",
+      "network": "Solicitudes de Red",
+      "networkContent": "Se realizan solicitudes de red para obtener datos de precios de Hyperliquid. No se transmiten datos personales.",
+      "futureAds": "Publicidad Futura",
+      "futureAdsContent": "Si se introduce publicidad en el futuro, actualizaremos esta politica y proporcionaremos aviso.",
+      "changes": "Cambios en esta Politica",
+      "changesContent": "Podemos actualizar esta politica de privacidad de vez en cuando. Los cambios se publicaran en esta pagina."
+    },
+    "terms": {
+      "acceptance": "Aceptacion de Terminos",
+      "acceptanceContent": "Al usar NightTicker, usted acepta estos terminos de servicio.",
+      "service": "Descripcion del Servicio",
+      "serviceContent": "NightTicker muestra Hyperliquid Market Prices solo con fines informativos.",
+      "disclaimer": "Aviso Legal",
+      "disclaimerContent": "Toda la informacion se proporciona tal cual, sin garantia. Los precios pueden ser imprecisos o estar retrasados.",
+      "liability": "Limitacion de Responsabilidad",
+      "liabilityContent": "NightTicker no es responsable de ningun dano resultante del uso de este servicio.",
+      "ip": "Propiedad Intelectual",
+      "ipContent": "Todo el contenido y las marcas registradas son propiedad de sus respectivos duenos.",
+      "changes": "Cambios en los Terminos",
+      "changesContent": "Nos reservamos el derecho de modificar estos terminos en cualquier momento."
+    },
+    "marketHours": {
+      "regularHours": "Horario Regular de Negociacion",
+      "time": "Hora:",
+      "days": "Dias:",
+      "mondayFriday": "Lunes - Viernes",
+      "timezone": "Zona Horaria:",
+      "majorExchange": "Bolsa Principal",
+      "majorExchanges": "Bolsas Principales",
+      "note1": "La negociacion en horario extendido puede estar disponible.",
+      "note2": "Los mercados estan cerrados los fines de semana y festivos.",
+      "note3": "Consulte fuentes oficiales para calendarios de festivos."
+    },
+    "howDataWorks": {
+      "dataSource": "Fuente de Datos",
+      "dataSourceContent": "NightTicker muestra precios de Hyperliquid, una plataforma de exchange descentralizada.",
+      "referencePrices": "Precios de Referencia",
+      "referencePricesContent": "Los precios mostrados son solo precios de referencia y pueden diferir de los precios oficiales de la bolsa.",
+      "accuracy": "Precision de Datos",
+      "accuracyContent": "Aunque buscamos precision, los datos pueden estar retrasados o contener errores.",
+      "details": "Informacion Detallada",
+      "detailsContent": "Para graficos detallados y datos historicos, visite Hyperliquid directamente."
+    },
+    "whatIsHyperliquid": {
+      "about": "Acerca de Hyperliquid",
+      "aboutContent": "Hyperliquid es una plataforma de exchange descentralizada que ofrece negociacion en varios activos.",
+      "why": "Por que Hyperliquid?",
+      "whyContent": "Hyperliquid proporciona acceso al mercado 24/7, permitiendo descubrimiento de precios cuando las bolsas tradicionales estan cerradas.",
+      "notice": "Aviso Importante",
+      "noticeContent": "Los precios de Hyperliquid no son precios oficiales de bolsa y deben usarse solo como referencia."
+    }
+  },
   "market": {
     "nightPrice": "Precio Nocturno",
     "overnightPrice": "Precio Nocturno",

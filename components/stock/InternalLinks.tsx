@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 import { Stock, StockCategory } from '@/lib/providers/types';
 import {
   getRelatedStocks,
@@ -18,20 +19,24 @@ interface InternalLinksProps {
 const allCategories: StockCategory[] = ['US', 'KR', 'JP', 'INDEX', 'ETF', 'COMMODITY', 'FX'];
 
 export function InternalLinks({ stock, locale }: InternalLinksProps) {
+  const t = useTranslations('stockDetail');
+  const tLinks = useTranslations('internalLinks');
+  const tCategories = useTranslations('categories');
+
   const relatedStocks = getRelatedStocks(stock, 5);
   const popularInCategory = getPopularByCategory(stock.category, 5).filter(
     (s) => s.symbol !== stock.symbol
   );
 
   const getName = (s: Stock) =>
-    locale === 'ko' ? s.nameKo : locale === 'ja' ? (s.nameJa ?? s.name) : s.name;
+    locale === 'ko' ? s.nameKo :
+    locale === 'ja' ? (s.nameJa ?? s.name) :
+    locale === 'zh' ? (s.nameZh ?? s.name) :
+    locale === 'pt' ? (s.namePt ?? s.name) :
+    locale === 'es' ? (s.nameEs ?? s.name) :
+    s.name;
 
-  const getCategoryName = (cat: StockCategory) =>
-    locale === 'ko'
-      ? categoryNames[cat].ko
-      : locale === 'ja'
-        ? categoryNames[cat].ja
-        : categoryNames[cat].en;
+  const getCategoryName = (cat: StockCategory) => tCategories(cat);
 
   const getSectorName = () => {
     if (!stock.sector) return null;
@@ -44,45 +49,12 @@ export function InternalLinks({ stock, locale }: InternalLinksProps) {
 
   const linkPrefix = locale === 'en' ? '' : `/${locale}`;
 
-  const labels = {
-    relatedStocks: {
-      en: 'Related Stocks',
-      ko: '관련 종목',
-      ja: '関連銘柄',
-    },
-    popularInCategory: {
-      en: `Popular ${getCategoryName(stock.category)}`,
-      ko: `인기 ${getCategoryName(stock.category)}`,
-      ja: `人気${getCategoryName(stock.category)}`,
-    },
-    sameSector: {
-      en: `${getSectorName()} Sector`,
-      ko: `${getSectorName()} 섹터`,
-      ja: `${getSectorName()}セクター`,
-    },
-    categories: {
-      en: 'Browse by Category',
-      ko: '카테고리별 보기',
-      ja: 'カテゴリー別',
-    },
-    infoPages: {
-      en: 'Learn More',
-      ko: '더 알아보기',
-      ja: 'もっと知る',
-    },
-  };
-
-  const getLabel = (key: keyof typeof labels) => {
-    const label = labels[key];
-    return locale === 'ko' ? label.ko : locale === 'ja' ? label.ja : label.en;
-  };
-
   return (
     <div className="space-y-8">
       {/* Related Stocks (Same Sector) */}
       {relatedStocks.length > 0 && (
         <section>
-          <h3 className="text-lg font-semibold mb-4">{getLabel('relatedStocks')}</h3>
+          <h3 className="text-lg font-semibold mb-4">{t('relatedStocks')}</h3>
           <div className="flex flex-wrap gap-2">
             {relatedStocks.map((s) => (
               <Link
@@ -100,7 +72,7 @@ export function InternalLinks({ stock, locale }: InternalLinksProps) {
       {/* Popular in Same Category */}
       {popularInCategory.length > 0 && (
         <section>
-          <h3 className="text-lg font-semibold mb-4">{getLabel('popularInCategory')}</h3>
+          <h3 className="text-lg font-semibold mb-4">{getCategoryName(stock.category)}</h3>
           <div className="flex flex-wrap gap-2">
             {popularInCategory.map((s) => (
               <Link
@@ -117,7 +89,7 @@ export function InternalLinks({ stock, locale }: InternalLinksProps) {
 
       {/* Category Links */}
       <section>
-        <h3 className="text-lg font-semibold mb-4">{getLabel('categories')}</h3>
+        <h3 className="text-lg font-semibold mb-4">{tCategories('all')}</h3>
         <div className="flex flex-wrap gap-2">
           {allCategories.map((cat) => (
             <Link
@@ -133,37 +105,37 @@ export function InternalLinks({ stock, locale }: InternalLinksProps) {
 
       {/* Info Page Links */}
       <section>
-        <h3 className="text-lg font-semibold mb-4">{getLabel('infoPages')}</h3>
+        <h3 className="text-lg font-semibold mb-4">{t('faq')}</h3>
         <div className="flex flex-wrap gap-2">
           <Link
             href={`${linkPrefix}/overnight-prices`}
             className="px-3 py-1.5 bg-muted hover:bg-muted/80 rounded-md text-sm transition-colors"
           >
-            {locale === 'ko' ? '야간 가격' : locale === 'ja' ? '夜間価格' : 'Overnight Prices'}
+            {tLinks('overnightPrices')}
           </Link>
           <Link
             href={`${linkPrefix}/weekend-prices`}
             className="px-3 py-1.5 bg-muted hover:bg-muted/80 rounded-md text-sm transition-colors"
           >
-            {locale === 'ko' ? '주말 가격' : locale === 'ja' ? '週末価格' : 'Weekend Prices'}
+            {tLinks('weekendPrices')}
           </Link>
           <Link
             href={`${linkPrefix}/holiday-prices`}
             className="px-3 py-1.5 bg-muted hover:bg-muted/80 rounded-md text-sm transition-colors"
           >
-            {locale === 'ko' ? '휴일 가격' : locale === 'ja' ? '休日価格' : 'Holiday Prices'}
+            {tLinks('holidayPrices')}
           </Link>
           <Link
             href={`${linkPrefix}/how-data-works`}
             className="px-3 py-1.5 bg-muted hover:bg-muted/80 rounded-md text-sm transition-colors"
           >
-            {locale === 'ko' ? '데이터 작동 방식' : locale === 'ja' ? 'データの仕組み' : 'How Data Works'}
+            {tLinks('howDataWorks')}
           </Link>
           <Link
             href={`${linkPrefix}/what-is-hyperliquid`}
             className="px-3 py-1.5 bg-muted hover:bg-muted/80 rounded-md text-sm transition-colors"
           >
-            {locale === 'ko' ? '하이퍼리퀴드란' : locale === 'ja' ? 'ハイパーリキッドとは' : 'What is Hyperliquid'}
+            {tLinks('whatIsHyperliquid')}
           </Link>
         </div>
       </section>

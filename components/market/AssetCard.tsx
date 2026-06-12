@@ -4,7 +4,7 @@ import { memo } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
-import { useLocale } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 import { MarketAsset, MarketType } from '@/lib/types/market';
 import { PriceDisplay, PriceChange } from '@/components/ui/price-change';
@@ -35,6 +35,7 @@ function AssetCardInner({
 }: AssetCardProps) {
   const locale = useLocale();
   const router = useRouter();
+  const t = useTranslations('marketBadge');
   const { isFavorite, toggleFavorite } = useFavorites();
   const { rankings } = useSearchRanking();
   const searchRank = rankings.find((r) => r.symbol === asset.symbol);
@@ -81,17 +82,7 @@ function AssetCardInner({
     SEMICONDUCTOR: '💎',
   };
 
-  const marketLabels: Record<MarketType, string> = {
-    KR: locale === 'ko' ? '한국' : locale === 'ja' ? '韓国' : locale === 'zh' ? '韩国' : 'KR',
-    US: locale === 'ko' ? '미국' : locale === 'ja' ? '米国' : locale === 'zh' ? '美国' : 'US',
-    JP: locale === 'ko' ? '일본' : locale === 'ja' ? '日本' : locale === 'zh' ? '日本' : 'JP',
-    INDEX: locale === 'ko' ? '지수' : locale === 'ja' ? '指数' : locale === 'zh' ? '指数' : 'Index',
-    ETF: 'ETF',
-    COMMODITY: locale === 'ko' ? '원자재' : locale === 'ja' ? '商品' : locale === 'zh' ? '商品' : 'Commodity',
-    FX: locale === 'ko' ? '통화' : locale === 'ja' ? '通貨' : locale === 'zh' ? '外汇' : 'FX',
-    SPECIAL: locale === 'ko' ? '특별' : locale === 'ja' ? '特別' : locale === 'zh' ? '特殊' : 'Special',
-    SEMICONDUCTOR: locale === 'ko' ? '반도체' : locale === 'ja' ? '半導体' : locale === 'zh' ? '半导体' : 'Semiconductor',
-  };
+  const getMarketLabel = (market: MarketType) => t(market);
 
   const href = `/stock/${asset.slug}`;
   const prefix = locale === 'en' ? '' : `/${locale}`;
@@ -144,7 +135,7 @@ function AssetCardInner({
                     )}
                   >
                     <span className="mr-0.5">{marketFlags[asset.market]}</span>
-                    {marketLabels[asset.market]}
+                    {getMarketLabel(asset.market)}
                   </Badge>
                 )}
               </div>

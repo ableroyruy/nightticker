@@ -73,6 +73,127 @@
     "SPECIAL": "特別",
     "SEMICONDUCTOR": "半導体"
   },
+  "marketBadge": {
+    "KR": "韓国",
+    "US": "米国",
+    "JP": "日本",
+    "INDEX": "指数",
+    "ETF": "ETF",
+    "COMMODITY": "商品",
+    "FX": "通貨",
+    "SPECIAL": "特別",
+    "SEMICONDUCTOR": "半導体"
+  },
+  "stockDetail": {
+    "overnight": "夜間",
+    "weekend": "週末",
+    "holiday": "祝日",
+    "relatedStocks": "関連銘柄",
+    "faq": "FAQ",
+    "afterHours": "時間外",
+    "nightPrice": "夜間価格"
+  },
+  "internalLinks": {
+    "overnightPrices": "夜間価格",
+    "weekendPrices": "週末価格",
+    "holidayPrices": "祝日価格",
+    "howDataWorks": "データの仕組み",
+    "whatIsHyperliquid": "Hyperliquidとは"
+  },
+  "infoPages": {
+    "about": {
+      "whatIs": "NightTickerとは？",
+      "whatIsContent": "NightTickerは、伝統的な取引所が閉まっている時にHyperliquid Market Pricesを表示するプレミアム金融情報サービスです。",
+      "mission": "私たちのミッション",
+      "missionContent": "通常の取引時間外に市場活動をモニタリングしたい投資家に、アクセスしやすい参考価格情報を提供すること。",
+      "whatWeAreNot": "NightTickerが違うもの",
+      "notBroker": "ブローカー",
+      "notExchange": "取引所",
+      "notSecuritiesFirm": "証券会社",
+      "notTradingPlatform": "取引プラットフォーム",
+      "notFinancialAdvisor": "ファイナンシャルアドバイザー",
+      "notInvestmentService": "投資サービス",
+      "notOfficialPrices": "公式取引所価格の提供元",
+      "notChartPlatform": "株式チャートプラットフォーム",
+      "dataSource": "データソース",
+      "dataSourceContent": "NightTickerはHyperliquid Market Pricesを表示しています。これらは参考価格のみであり、公式取引所価格ではありません。"
+    },
+    "disclaimer": {
+      "general": "一般免責事項",
+      "generalContent": "NightTickerは情報提供目的のみでHyperliquid Market Pricesを提供しています。これは投資アドバイスではありません。",
+      "dataAccuracy": "データの正確性",
+      "dataAccuracyContent": "表示される価格は遅延、不正確、または公式取引所価格と大きく異なる場合があります。",
+      "dataAccuracyNote": "NightTickerは表示されるデータの正確性を保証しません。",
+      "notAdvice": "投資アドバイスではありません",
+      "notAdviceContent": "NightTickerの情報は投資アドバイスとみなされるべきではありません。常に資格のあるファイナンシャルアドバイザーに相談してください。",
+      "liability": "責任の制限",
+      "liabilityContent": "NightTickerは、このサイトに表示される情報の使用から生じる損失について責任を負いません。",
+      "source": "データソース",
+      "sourceContent": "価格はHyperliquidから提供され、伝統的な取引所価格と異なる場合があります。",
+      "userResponsibility": "ユーザーの責任",
+      "userResponsibilityContent": "ユーザーは自身の投資判断に対して全責任を負います。"
+    },
+    "privacy": {
+      "collection": "収集する情報",
+      "collectionContent": "NightTickerは個人識別情報を収集しません。アカウント作成やログインは不要です。",
+      "localStorage": "localStorageの使用",
+      "localStorageContent": "お気に入りと設定を保存するためにブラウザのlocalStorageを使用しています。このデータはあなたのデバイスにのみローカルに保存されます。",
+      "analytics": "分析とCookie",
+      "analyticsContent": "サービスの利用方法を理解するために分析を使用する場合があります。個人識別情報は収集されません。",
+      "account": "アカウントとログイン",
+      "accountContent": "NightTickerはアカウント作成を必要としません。すべての機能はログインなしで利用可能です。",
+      "network": "ネットワークリクエスト",
+      "networkContent": "Hyperliquidから価格データを取得するためにネットワークリクエストが行われます。個人データは送信されません。",
+      "futureAds": "将来の広告",
+      "futureAdsContent": "将来広告が導入される場合、このポリシーを更新し、通知を提供します。",
+      "changes": "ポリシーの変更",
+      "changesContent": "このプライバシーポリシーは随時更新される場合があります。変更はこのページに掲載されます。"
+    },
+    "terms": {
+      "acceptance": "利用規約の承諾",
+      "acceptanceContent": "NightTickerを使用することで、この利用規約に同意したことになります。",
+      "service": "サービスの説明",
+      "serviceContent": "NightTickerは情報提供目的のみでHyperliquid Market Pricesを表示します。",
+      "disclaimer": "免責事項",
+      "disclaimerContent": "すべての情報は保証なしで現状のまま提供されます。価格は不正確または遅延している場合があります。",
+      "liability": "責任の制限",
+      "liabilityContent": "NightTickerは、このサービスの使用から生じる損害について責任を負いません。",
+      "ip": "知的財産権",
+      "ipContent": "すべてのコンテンツと商標はそれぞれの所有者の財産です。",
+      "changes": "利用規約の変更",
+      "changesContent": "この利用規約はいつでも変更される場合があります。"
+    },
+    "marketHours": {
+      "regularHours": "通常取引時間",
+      "time": "時間:",
+      "days": "取引日:",
+      "mondayFriday": "月曜日 - 金曜日",
+      "timezone": "タイムゾーン:",
+      "majorExchange": "主要取引所",
+      "majorExchanges": "主要取引所",
+      "note1": "時間外取引が利用可能な場合があります。",
+      "note2": "市場は週末と祝日は閉場しています。",
+      "note3": "祝日スケジュールは公式ソースをご確認ください。"
+    },
+    "howDataWorks": {
+      "dataSource": "データソース",
+      "dataSourceContent": "NightTickerは、分散型取引所プラットフォームであるHyperliquidの価格を表示しています。",
+      "referencePrices": "参考価格",
+      "referencePricesContent": "表示される価格は参考価格のみであり、公式取引所価格と異なる場合があります。",
+      "accuracy": "データの正確性",
+      "accuracyContent": "正確性を目指していますが、データが遅延したりエラーが含まれる場合があります。",
+      "details": "詳細情報",
+      "detailsContent": "詳細なチャートや過去のデータについては、Hyperliquidを直接ご覧ください。"
+    },
+    "whatIsHyperliquid": {
+      "about": "Hyperliquidについて",
+      "aboutContent": "Hyperliquidは、様々な資産の取引を提供する分散型取引所プラットフォームです。",
+      "why": "なぜHyperliquid？",
+      "whyContent": "Hyperliquidは24時間365日の市場アクセスを提供し、伝統的な取引所が閉まっている時でも価格発見を可能にします。",
+      "notice": "重要なお知らせ",
+      "noticeContent": "Hyperliquid価格は公式取引所価格ではなく、参考のみに使用してください。"
+    }
+  },
   "market": {
     "nightPrice": "夜間価格",
     "overnightPrice": "夜間参考価格",

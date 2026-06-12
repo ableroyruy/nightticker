@@ -73,6 +73,127 @@
     "SPECIAL": "特殊资产",
     "SEMICONDUCTOR": "半导体"
   },
+  "marketBadge": {
+    "KR": "韩国",
+    "US": "美国",
+    "JP": "日本",
+    "INDEX": "指数",
+    "ETF": "ETF",
+    "COMMODITY": "商品",
+    "FX": "外汇",
+    "SPECIAL": "特殊",
+    "SEMICONDUCTOR": "半导体"
+  },
+  "stockDetail": {
+    "overnight": "夜间",
+    "weekend": "周末",
+    "holiday": "节假日",
+    "relatedStocks": "相关股票",
+    "faq": "常见问题",
+    "afterHours": "盘后",
+    "nightPrice": "夜间价格"
+  },
+  "internalLinks": {
+    "overnightPrices": "夜间价格",
+    "weekendPrices": "周末价格",
+    "holidayPrices": "节假日价格",
+    "howDataWorks": "数据原理",
+    "whatIsHyperliquid": "什么是Hyperliquid"
+  },
+  "infoPages": {
+    "about": {
+      "whatIs": "什么是NightTicker？",
+      "whatIsContent": "NightTicker是一项高端金融信息服务，在传统交易所休市时显示Hyperliquid市场价格。",
+      "mission": "我们的使命",
+      "missionContent": "为希望在正常交易时间以外监控市场活动的投资者提供便捷的参考价格信息。",
+      "whatWeAreNot": "NightTicker不是",
+      "notBroker": "经纪商",
+      "notExchange": "交易所",
+      "notSecuritiesFirm": "证券公司",
+      "notTradingPlatform": "交易平台",
+      "notFinancialAdvisor": "财务顾问",
+      "notInvestmentService": "投资服务",
+      "notOfficialPrices": "官方交易所价格来源",
+      "notChartPlatform": "股票图表平台",
+      "dataSource": "数据来源",
+      "dataSourceContent": "NightTicker显示Hyperliquid市场价格。这些仅为参考价格，非官方交易所价格。"
+    },
+    "disclaimer": {
+      "general": "一般免责声明",
+      "generalContent": "NightTicker仅出于信息目的提供Hyperliquid市场价格。这不是投资建议。",
+      "dataAccuracy": "数据准确性",
+      "dataAccuracyContent": "显示的价格可能存在延迟、不准确或与官方交易所价格显著不同。",
+      "dataAccuracyNote": "NightTicker不保证所显示数据的准确性。",
+      "notAdvice": "非投资建议",
+      "notAdviceContent": "NightTicker的信息不应被视为投资建议。请始终咨询合格的财务顾问。",
+      "liability": "责任限制",
+      "liabilityContent": "NightTicker对使用本网站信息造成的任何损失不承担责任。",
+      "source": "数据来源",
+      "sourceContent": "价格来自Hyperliquid，可能与传统交易所价格不同。",
+      "userResponsibility": "用户责任",
+      "userResponsibilityContent": "用户对自己的投资决策承担全部责任。"
+    },
+    "privacy": {
+      "collection": "我们收集的信息",
+      "collectionContent": "NightTicker不收集个人身份信息。无需创建账户或登录。",
+      "localStorage": "localStorage的使用",
+      "localStorageContent": "我们使用浏览器localStorage保存您的收藏和偏好设置。此数据仅存储在您的本地设备上。",
+      "analytics": "分析和Cookie",
+      "analyticsContent": "我们可能使用分析来了解用户如何使用我们的服务。不收集个人身份信息。",
+      "account": "账户和登录",
+      "accountContent": "NightTicker不需要创建账户。所有功能无需登录即可使用。",
+      "network": "网络请求",
+      "networkContent": "会发起网络请求从Hyperliquid获取价格数据。不会传输个人数据。",
+      "futureAds": "未来广告",
+      "futureAdsContent": "如果将来引入广告，我们将更新此政策并提供通知。",
+      "changes": "政策变更",
+      "changesContent": "本隐私政策可能会不时更新。变更将在此页面发布。"
+    },
+    "terms": {
+      "acceptance": "接受条款",
+      "acceptanceContent": "使用NightTicker即表示您同意这些服务条款。",
+      "service": "服务描述",
+      "serviceContent": "NightTicker仅出于信息目的显示Hyperliquid市场价格。",
+      "disclaimer": "免责声明",
+      "disclaimerContent": "所有信息按原样提供，不作任何保证。价格可能不准确或存在延迟。",
+      "liability": "责任限制",
+      "liabilityContent": "NightTicker对使用本服务造成的任何损害不承担责任。",
+      "ip": "知识产权",
+      "ipContent": "所有内容和商标均为其各自所有者的财产。",
+      "changes": "条款变更",
+      "changesContent": "我们保留随时修改这些条款的权利。"
+    },
+    "marketHours": {
+      "regularHours": "常规交易时间",
+      "time": "时间：",
+      "days": "交易日：",
+      "mondayFriday": "周一 - 周五",
+      "timezone": "时区：",
+      "majorExchange": "主要交易所",
+      "majorExchanges": "主要交易所",
+      "note1": "可能提供盘后交易。",
+      "note2": "市场在周末和节假日休市。",
+      "note3": "请查看官方来源了解节假日安排。"
+    },
+    "howDataWorks": {
+      "dataSource": "数据来源",
+      "dataSourceContent": "NightTicker显示来自去中心化交易平台Hyperliquid的价格。",
+      "referencePrices": "参考价格",
+      "referencePricesContent": "显示的价格仅为参考价格，可能与官方交易所价格不同。",
+      "accuracy": "数据准确性",
+      "accuracyContent": "虽然我们努力确保准确性，但数据可能存在延迟或错误。",
+      "details": "详细信息",
+      "detailsContent": "如需详细图表和历史数据，请直接访问Hyperliquid。"
+    },
+    "whatIsHyperliquid": {
+      "about": "关于Hyperliquid",
+      "aboutContent": "Hyperliquid是一个提供各种资产交易的去中心化交易平台。",
+      "why": "为什么选择Hyperliquid？",
+      "whyContent": "Hyperliquid提供全天候24/7市场访问，即使在传统交易所休市时也能实现价格发现。",
+      "notice": "重要提示",
+      "noticeContent": "Hyperliquid价格不是官方交易所价格，仅供参考使用。"
+    }
+  },
   "market": {
     "nightPrice": "夜间价格",
     "overnightPrice": "夜间价格",
