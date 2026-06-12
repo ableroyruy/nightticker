@@ -27,6 +27,45 @@ interface AssetCardProps {
   className?: string;
 }
 
+// Category-based gradient backgrounds for price/chart area
+const marketGradients: Record<MarketType, string> = {
+  KR: 'from-blue-500/10 via-blue-600/5 to-transparent',
+  US: 'from-purple-500/10 via-purple-600/5 to-transparent',
+  JP: 'from-red-500/10 via-rose-600/5 to-transparent',
+  INDEX: 'from-emerald-500/10 via-emerald-600/5 to-transparent',
+  ETF: 'from-teal-500/10 via-teal-600/5 to-transparent',
+  COMMODITY: 'from-amber-500/10 via-orange-600/5 to-transparent',
+  FX: 'from-cyan-500/10 via-cyan-600/5 to-transparent',
+  SPECIAL: 'from-pink-500/10 via-rose-600/5 to-transparent',
+  SEMICONDUCTOR: 'from-violet-500/10 via-purple-600/5 to-transparent',
+};
+
+// Category-based accent colors for border glow
+const marketAccentBorders: Record<MarketType, string> = {
+  KR: 'group-hover:border-blue-500/40 group-hover:shadow-blue-500/10',
+  US: 'group-hover:border-purple-500/40 group-hover:shadow-purple-500/10',
+  JP: 'group-hover:border-red-500/40 group-hover:shadow-red-500/10',
+  INDEX: 'group-hover:border-emerald-500/40 group-hover:shadow-emerald-500/10',
+  ETF: 'group-hover:border-teal-500/40 group-hover:shadow-teal-500/10',
+  COMMODITY: 'group-hover:border-amber-500/40 group-hover:shadow-amber-500/10',
+  FX: 'group-hover:border-cyan-500/40 group-hover:shadow-cyan-500/10',
+  SPECIAL: 'group-hover:border-pink-500/40 group-hover:shadow-pink-500/10',
+  SEMICONDUCTOR: 'group-hover:border-violet-500/40 group-hover:shadow-violet-500/10',
+};
+
+// Category-based subtle glow for price area
+const marketGlowColors: Record<MarketType, string> = {
+  KR: 'shadow-blue-500/5',
+  US: 'shadow-purple-500/5',
+  JP: 'shadow-red-500/5',
+  INDEX: 'shadow-emerald-500/5',
+  ETF: 'shadow-teal-500/5',
+  COMMODITY: 'shadow-amber-500/5',
+  FX: 'shadow-cyan-500/5',
+  SPECIAL: 'shadow-pink-500/5',
+  SEMICONDUCTOR: 'shadow-violet-500/5',
+};
+
 function AssetCardInner({
   asset,
   rank,
@@ -92,8 +131,9 @@ function AssetCardInner({
       <div
         className={cn(
           'glass-card glass-card-hover rounded-2xl p-4 h-full cursor-pointer overflow-hidden',
-          'transition-all duration-200 active:scale-[0.98]',
-          'group-hover:border-primary/30',
+          'transition-all duration-300 active:scale-[0.98]',
+          'group-hover:shadow-lg',
+          marketAccentBorders[asset.market],
           className
         )}
       >
@@ -157,45 +197,69 @@ function AssetCardInner({
           />
         </div>
 
-        {/* Price and Chart Row */}
-        <div className="flex items-center justify-between gap-3 overflow-hidden">
-          {/* Price and Change */}
-          <div className="space-y-1 min-w-0 flex-shrink">
-            <PriceDisplay
-              price={displayPrice}
-              change={displayChange24h}
-              changePercent={displayChangePercent24h}
-              size="md"
-              showChange={false}
-            />
+        {/* Price and Chart Row - Category colored background */}
+        <div
+          className={cn(
+            'relative -mx-4 -mb-4 px-4 py-3 overflow-hidden',
+            'bg-gradient-to-r',
+            marketGradients[asset.market],
+            'rounded-b-2xl',
+            'border-t border-border/30'
+          )}
+        >
+          {/* Subtle inner glow effect */}
+          <div
+            className={cn(
+              'absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500',
+              'bg-gradient-to-br from-white/5 via-transparent to-transparent'
+            )}
+          />
 
-            <div className="flex items-center gap-2 flex-wrap">
-              {displayChange24h !== null && displayChange24h !== undefined && (
+          <div className="relative flex items-center justify-between gap-3 overflow-hidden">
+            {/* Price and Change */}
+            <div className="space-y-1 min-w-0 flex-shrink">
+              <PriceDisplay
+                price={displayPrice}
+                change={displayChange24h}
+                changePercent={displayChangePercent24h}
+                size="md"
+                showChange={false}
+              />
+
+              <div className="flex items-center gap-2 flex-wrap">
+                {displayChange24h !== null && displayChange24h !== undefined && (
+                  <PriceChange
+                    value={displayChange24h}
+                    type="amount"
+                    size="sm"
+                    showBackground
+                  />
+                )}
                 <PriceChange
-                  value={displayChange24h}
-                  type="amount"
+                  value={displayChangePercent24h ?? null}
+                  type="percent"
                   size="sm"
-                  showBackground
+                  showIcon={false}
                 />
+              </div>
+            </div>
+
+            {/* Mini Chart with glow container */}
+            <div
+              className={cn(
+                'flex-shrink-0 max-w-[180px] overflow-hidden rounded-lg',
+                'shadow-inner',
+                marketGlowColors[asset.market]
               )}
-              <PriceChange
-                value={displayChangePercent24h ?? null}
-                type="percent"
-                size="sm"
-                showIcon={false}
+            >
+              <MiniChart
+                candles={candles}
+                loading={chartLoading}
+                error={chartError}
+                width={180}
+                height={72}
               />
             </div>
-          </div>
-
-          {/* Mini Chart */}
-          <div className="flex-shrink-0 max-w-[180px] overflow-hidden">
-            <MiniChart
-              candles={candles}
-              loading={chartLoading}
-              error={chartError}
-              width={180}
-              height={72}
-            />
           </div>
         </div>
       </div>
