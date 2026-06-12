@@ -18,6 +18,7 @@
     "popular": "人気",
     "topGainers": "値上がり",
     "topLosers": "値下がり",
+    "exchangeRates": "為替",
     "overnightPrices": "夜間価格",
     "weekendPrices": "週末価格",
     "holidayPrices": "祝日価格",
@@ -214,6 +215,7 @@
     "market": "市場",
     "price": "価格",
     "change24h": "24時間変動",
+    "change": "変動額",
     "volume": "出来高",
     "noData": "データなし"
   },
@@ -365,5 +367,15 @@
     "rankChange": "順位変動（48時間前比）",
     "noData": "ランキングデータがありません",
     "noDataDescription": "ユーザーが銘柄を閲覧するとデータが表示されます"
+  },
+  "exchangeRate": {
+    "title": "リアルタイム為替レート",
+    "description": "主要通貨のリアルタイム為替レートを確認できます。通貨を選択すると、すべての価格がその通貨で表示されます。",
+    "lastUpdated": "最終更新",
+    "selectCurrencyHint": "通貨をクリックすると、サイト全体の価格がその通貨に変換されます。",
+    "selected": "選択中",
+    "vs24h": "24時間前比",
+    "disclaimer": "為替レートに関する免責事項",
+    "disclaimerContent": "表示される為替レートは参考情報のみであり、実際の両替レートと異なる場合があります。投資または取引の判断にこれらのレートを使用しないでください。"
   }
 }

@@ -18,6 +18,7 @@
     "popular": "인기순위",
     "topGainers": "상승주",
     "topLosers": "하락주",
+    "exchangeRates": "환율",
     "overnightPrices": "야간 가격",
     "weekendPrices": "주말 가격",
     "holidayPrices": "휴일 가격",
@@ -362,5 +363,15 @@
     "rankChange": "순위 변동 (48시간 전 대비)",
     "noData": "순위 데이터가 없습니다",
     "noDataDescription": "사용자들이 종목을 조회하면 데이터가 표시됩니다"
+  },
+  "exchangeRate": {
+    "title": "실시간 환율",
+    "description": "주요 통화의 실시간 환율을 확인하세요. 통화를 선택하면 모든 가격이 해당 통화로 표시됩니다.",
+    "lastUpdated": "마지막 업데이트",
+    "selectCurrencyHint": "통화를 클릭하면 사이트 전체의 가격 표시가 해당 통화로 변환됩니다.",
+    "selected": "선택됨",
+    "vs24h": "24시간 전 대비",
+    "disclaimer": "환율 면책조항",
+    "disclaimerContent": "표시된 환율은 참고용이며 실제 환전 시 적용되는 환율과 다를 수 있습니다. 투자 또는 거래 결정에 이 환율을 사용하지 마세요."
   }
 }

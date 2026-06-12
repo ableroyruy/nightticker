@@ -4,7 +4,8 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useTranslations, useLocale } from 'next-intl';
 import { LanguageSwitcher } from './LanguageSwitcher';
-import { Moon, Menu, X, Home, Star, TrendingUp, TrendingDown, ChevronDown, BarChart3, Coins, Globe, Cpu, Building2, DollarSign, Flame } from 'lucide-react';
+import { CurrencySelector } from '@/components/common/CurrencySelector';
+import { Moon, Menu, X, Home, Star, TrendingUp, TrendingDown, ChevronDown, BarChart3, Coins, Globe, Cpu, Building2, DollarSign, Flame, Wallet } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -45,6 +46,7 @@ export function Header() {
     { href: `${prefix}/popular`, label: t('popular'), icon: Flame },
     { href: `${prefix}/gainers`, label: t('topGainers'), icon: TrendingUp },
     { href: `${prefix}/losers`, label: t('topLosers'), icon: TrendingDown },
+    { href: `${prefix}/exchange-rates`, label: t('exchangeRates'), icon: Wallet },
   ];
 
   const categories: (StockCategory | 'all')[] = ['all', 'US', 'KR', 'JP', 'INDEX', 'ETF', 'COMMODITY', 'FX', 'SEMICONDUCTOR'];
@@ -126,6 +128,7 @@ export function Header() {
 
         <div className="flex items-center gap-2">
           <LanguageSwitcher />
+          <CurrencySelector />
 
           {/* Mobile menu button */}
           <Button

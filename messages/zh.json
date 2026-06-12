@@ -18,6 +18,7 @@
     "popular": "热门",
     "topGainers": "涨幅榜",
     "topLosers": "跌幅榜",
+    "exchangeRates": "汇率",
     "overnightPrices": "夜间价格",
     "weekendPrices": "周末价格",
     "holidayPrices": "节假日价格",
@@ -214,6 +215,7 @@
     "market": "市场",
     "price": "价格",
     "change24h": "24小时涨跌",
+    "change": "涨跌额",
     "volume": "成交量",
     "noData": "暂无数据"
   },
@@ -230,6 +232,7 @@
   },
   "compliance": {
     "badge": "Hyperliquid市场价格",
+    "forReferenceTitle": "仅供参考",
     "forReference": "仅供参考。",
     "notOfficial": "非官方交易所价格。",
     "mayDiffer": "可能与传统交易所价格存在显著差异。",
@@ -364,5 +367,15 @@
     "rankChange": "排名变化（与48小时前相比）",
     "noData": "暂无排名数据",
     "noDataDescription": "用户开始浏览股票后将显示数据"
+  },
+  "exchangeRate": {
+    "title": "实时汇率",
+    "description": "查看主要货币的实时汇率。选择一种货币，所有价格将以该货币显示。",
+    "lastUpdated": "最后更新",
+    "selectCurrencyHint": "点击一种货币，将网站上所有价格转换为该货币。",
+    "selected": "已选择",
+    "vs24h": "与24小时前相比",
+    "disclaimer": "汇率免责声明",
+    "disclaimerContent": "显示的汇率仅供参考，可能与实际兑换汇率不同。请勿将这些汇率用于投资或交易决策。"
   }
 }

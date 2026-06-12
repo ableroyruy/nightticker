@@ -18,6 +18,7 @@
     "popular": "Popular",
     "topGainers": "Mayores Alzas",
     "topLosers": "Mayores Bajas",
+    "exchangeRates": "Tasas",
     "overnightPrices": "Precios Nocturnos",
     "weekendPrices": "Precios de Fin de Semana",
     "holidayPrices": "Precios de Festivos",
@@ -214,6 +215,7 @@
     "market": "Mercado",
     "price": "Precio",
     "change24h": "Cambio 24h",
+    "change": "Cambio",
     "volume": "Volumen",
     "noData": "Sin datos disponibles"
   },
@@ -230,6 +232,7 @@
   },
   "compliance": {
     "badge": "Hyperliquid Market Prices",
+    "forReferenceTitle": "SOLO PARA REFERENCIA",
     "forReference": "Solo para fines de referencia.",
     "notOfficial": "No son precios oficiales de bolsa de valores.",
     "mayDiffer": "Pueden diferir significativamente de los precios de los mercados tradicionales.",
@@ -364,5 +367,15 @@
     "rankChange": "Cambio de Ranking (vs hace 48h)",
     "noData": "Sin datos de ranking aun",
     "noDataDescription": "Los datos de ranking apareceran despues de que los usuarios comiencen a ver acciones"
+  },
+  "exchangeRate": {
+    "title": "Tasas de Cambio en Vivo",
+    "description": "Consulta las tasas de cambio en tiempo real para las principales monedas. Selecciona una moneda para mostrar todos los precios en esa moneda.",
+    "lastUpdated": "Ultima actualizacion",
+    "selectCurrencyHint": "Haz clic en una moneda para convertir todos los precios del sitio a esa moneda.",
+    "selected": "Seleccionado",
+    "vs24h": "vs hace 24h",
+    "disclaimer": "Aviso sobre Tasas de Cambio",
+    "disclaimerContent": "Las tasas de cambio mostradas son solo para referencia y pueden diferir de las tasas reales al cambiar moneda. No uses estas tasas para decisiones de inversion o trading."
   }
 }

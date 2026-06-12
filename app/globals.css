@@ -293,3 +293,27 @@
 .btn-premium:hover::before {
   @apply opacity-100;
 }
+
+/* Exchange Rate Ticker Animation */
+@keyframes ticker {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-33.333%);
+  }
+}
+
+.animate-ticker {
+  animation: ticker 30s linear infinite;
+}
+
+.animate-ticker:hover,
+.pause-animation {
+  animation-play-state: paused;
+}
+
+/* Ticker hover effect */
+.animate-ticker:hover {
+  cursor: pointer;
+}
