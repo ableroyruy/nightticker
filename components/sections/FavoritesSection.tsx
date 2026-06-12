@@ -24,8 +24,8 @@ export function FavoritesSection({ tickers }: FavoritesSectionProps) {
           <Star className="h-5 w-5 text-yellow-500" />
           {t('title')}
         </h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {[1, 2, 3, 4].map((i) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+          {[1, 2, 3, 4, 5].map((i) => (
             <div
               key={i}
               className="glass-card rounded-2xl p-4 h-32 skeleton-shimmer"
@@ -83,7 +83,7 @@ export function FavoritesSection({ tickers }: FavoritesSectionProps) {
           {favorites.length} {t('itemCount')}
         </span>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
         {favoriteAssets.map((asset) => (
           <div
             key={`fav-${asset.symbol}`}

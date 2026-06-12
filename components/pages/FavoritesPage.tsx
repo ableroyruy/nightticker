@@ -93,8 +93,8 @@ export function FavoritesPage() {
         <div className="container py-8">
           <div className="animate-pulse space-y-6">
             <div className="h-10 w-48 bg-muted rounded-lg" />
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {[...Array(8)].map((_, i) => (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+              {[...Array(10)].map((_, i) => (
                 <div key={i} className="h-32 bg-muted rounded-xl" />
               ))}
             </div>
@@ -182,7 +182,7 @@ export function FavoritesPage() {
             </p>
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
             {sortedAssets.map((asset) => (
               <AssetCard key={asset.symbol} asset={asset} />
             ))}
