@@ -61,7 +61,10 @@
     "usStocks": "미국 종목",
     "koreanStocks": "한국 종목",
     "indexMarkets": "지수 마켓",
-    "yourWatchlist": "내 관심 종목"
+    "yourWatchlist": "내 관심 종목",
+    "reorder": "순서 변경",
+    "editMode": "완료",
+    "reset": "초기화"
   },
   "categories": {
     "all": "전체",

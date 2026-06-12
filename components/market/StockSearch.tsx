@@ -3,12 +3,13 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations, useLocale } from 'next-intl';
-import { Search, TrendingUp, X } from 'lucide-react';
+import { Search, TrendingUp, X, Flame } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { stocks } from '@/lib/markets/stocks';
 import { cn } from '@/lib/utils';
 import { TrendingTicker } from './TrendingTicker';
 import { Stock } from '@/lib/providers/types';
+import { useSearchRanking } from '@/lib/context/SearchRankingContext';
 
 function getLocalizedName(stock: Stock, locale: string): string {
   switch (locale) {
@@ -37,11 +38,25 @@ export function StockSearch({ className, onSelect, showTrending = true }: StockS
   const tNav = useTranslations('nav');
   const locale = useLocale();
   const prefix = locale === 'en' ? '' : `/${locale}`;
+  const { getTopRankings } = useSearchRanking();
+
+  // Get popular stocks based on search ranking
+  const popularStocks = useMemo(() => {
+    const topRankings = getTopRankings(8);
+    if (topRankings.length === 0) {
+      // Fallback to default stocks if no rankings
+      return stocks.slice(0, 6);
+    }
+    // Map rankings to stock objects
+    return topRankings
+      .map((ranking) => stocks.find((s) => s.symbol === ranking.symbol))
+      .filter((s): s is Stock => s !== undefined);
+  }, [getTopRankings]);
 
   const filteredStocks = useMemo(() => {
     if (!query.trim()) {
-      // Show popular stocks when no query
-      return stocks.slice(0, 6);
+      // Show popular stocks based on ranking when no query
+      return popularStocks;
     }
 
     const lowerQuery = query.toLowerCase();
@@ -51,7 +66,7 @@ export function StockSearch({ className, onSelect, showTrending = true }: StockS
         stock.name.toLowerCase().includes(lowerQuery) ||
         stock.nameKo.includes(query)
     );
-  }, [query]);
+  }, [query, popularStocks]);
 
   // Reset selected index when filtered results change
   useEffect(() => {
@@ -140,7 +155,8 @@ export function StockSearch({ className, onSelect, showTrending = true }: StockS
       {isOpen && (
         <div className="absolute top-full mt-2 w-full glass-card border border-border/50 rounded-xl shadow-2xl z-50 max-h-80 overflow-auto">
           {!query.trim() && (
-            <div className="px-4 py-2 text-xs font-medium text-muted-foreground uppercase tracking-wide border-b border-border/50">
+            <div className="px-4 py-2 text-xs font-medium text-muted-foreground uppercase tracking-wide border-b border-border/50 flex items-center gap-1.5">
+              <Flame className="h-3.5 w-3.5 text-orange-500" />
               {tNav('popular')}
             </div>
           )}
@@ -160,7 +176,13 @@ export function StockSearch({ className, onSelect, showTrending = true }: StockS
                   onMouseEnter={() => setSelectedIndex(index)}
                 >
                   <div className="p-1.5 rounded-lg bg-primary/10">
-                    <TrendingUp className="h-4 w-4 text-primary" />
+                    {!query.trim() ? (
+                      <span className="flex items-center justify-center h-4 w-4 text-xs font-bold text-primary">
+                        {index + 1}
+                      </span>
+                    ) : (
+                      <TrendingUp className="h-4 w-4 text-primary" />
+                    )}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">

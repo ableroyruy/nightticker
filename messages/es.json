@@ -61,7 +61,10 @@
     "usStocks": "Acciones EEUU",
     "koreanStocks": "Acciones Coreanas",
     "indexMarkets": "Indices",
-    "yourWatchlist": "Tu Lista"
+    "yourWatchlist": "Tu Lista",
+    "reorder": "Reordenar",
+    "editMode": "Listo",
+    "reset": "Restablecer"
   },
   "categories": {
     "all": "Todos los Mercados",

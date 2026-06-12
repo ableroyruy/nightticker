@@ -61,7 +61,10 @@
     "usStocks": "US Stocks",
     "koreanStocks": "Korean Stocks",
     "indexMarkets": "Index Markets",
-    "yourWatchlist": "Your Watchlist"
+    "yourWatchlist": "Your Watchlist",
+    "reorder": "Reorder",
+    "editMode": "Done",
+    "reset": "Reset"
   },
   "categories": {
     "all": "All Markets",

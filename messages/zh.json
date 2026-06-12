@@ -61,7 +61,10 @@
     "usStocks": "美国股票",
     "koreanStocks": "韩国股票",
     "indexMarkets": "指数",
-    "yourWatchlist": "自选股"
+    "yourWatchlist": "自选股",
+    "reorder": "排序",
+    "editMode": "完成",
+    "reset": "重置"
   },
   "categories": {
     "all": "全部市场",

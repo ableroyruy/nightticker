@@ -61,7 +61,10 @@
     "usStocks": "米国株",
     "koreanStocks": "韓国株",
     "indexMarkets": "指数",
-    "yourWatchlist": "ウォッチリスト"
+    "yourWatchlist": "ウォッチリスト",
+    "reorder": "並べ替え",
+    "editMode": "完了",
+    "reset": "リセット"
   },
   "categories": {
     "all": "すべて",
