@@ -2,7 +2,6 @@
 
 import { ConnectionStatus } from '@/components/ui/connection-status';
 import { StockSearch } from '@/components/market/StockSearch';
-import { InstallButton } from '@/components/common/InstallButton';
 import { ConnectionStatus as ConnectionStatusType } from '@/lib/types/market';
 
 interface HeroSectionProps {
@@ -16,9 +15,8 @@ export function HeroSection({ connectionStatus, lastUpdate }: HeroSectionProps) 
       <div className="flex justify-center">
         <StockSearch />
       </div>
-      <div className="flex justify-center items-center gap-4 mt-3">
+      <div className="flex justify-center mt-3">
         <ConnectionStatus status={connectionStatus} lastUpdate={lastUpdate} />
-        <InstallButton />
       </div>
     </section>
   );
