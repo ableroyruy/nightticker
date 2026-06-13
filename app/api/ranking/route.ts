@@ -180,11 +180,10 @@ export async function POST(request: NextRequest) {
       data.snapshot24h = { ranks, timestamp: now };
     }
 
-    data.lastUpdated = now;
-
     // Save (debounced - only save every 10 seconds to reduce writes)
     const shouldSave = now - data.lastUpdated > 10000 || data.views.length % 10 === 0;
     if (shouldSave) {
+      data.lastUpdated = now;
       await saveData(data);
     }
 
