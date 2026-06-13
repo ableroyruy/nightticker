@@ -47,7 +47,7 @@ const getDefaultRankings = (): SearchRankingItem[] => {
 
 // Local storage cache key
 const CACHE_KEY = 'nightticker_ranking_cache';
-const CACHE_TTL = 60 * 1000; // 1 minute cache
+const CACHE_TTL = 5 * 60 * 1000; // 5 minute cache
 
 interface CachedData {
   rankings: SearchRankingItem[];

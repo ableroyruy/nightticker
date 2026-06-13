@@ -1,34 +1,20 @@
-import { put, list } from '@vercel/blob';
+import { Redis } from '@upstash/redis';
 import { NextRequest, NextResponse } from 'next/server';
 
-const BLOB_NAME = 'ranking-v2.json';
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL!,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+});
+
 const FIVE_MINUTES_MS = 5 * 60 * 1000;
 const TWENTY_FOUR_HOURS_MS = 24 * 60 * 60 * 1000;
-const TWENTY_FIVE_HOURS_MS = 25 * 60 * 60 * 1000;
+const BUCKET_TTL_SECONDS = 25 * 60 * 60; // 25 hours TTL
 
 // Default popular stocks for cold start
 const DEFAULT_POPULAR_STOCKS = [
   'NVDA', 'TSLA', 'AAPL', 'SMSN', 'SP500',
   'MSFT', 'GOOGL', 'AMZN', 'META', 'AMD',
 ];
-
-// 5-minute bucket: { timestamp: bucketStartTime, counts: { symbol: count } }
-interface Bucket {
-  timestamp: number;
-  counts: Record<string, number>;
-}
-
-// Previous ranking snapshot for rank change calculation
-interface RankSnapshot {
-  ranks: Record<string, number>;
-  timestamp: number;
-}
-
-interface RankingData {
-  buckets: Bucket[];
-  previousSnapshot: RankSnapshot | null;
-  lastUpdated: number;
-}
 
 interface RankingItem {
   symbol: string;
@@ -43,91 +29,89 @@ function getBucketTimestamp(timestamp: number): number {
   return Math.floor(timestamp / FIVE_MINUTES_MS) * FIVE_MINUTES_MS;
 }
 
-// Load data from Vercel Blob
-async function loadData(): Promise<RankingData> {
-  try {
-    const { blobs } = await list({ prefix: BLOB_NAME });
-    if (blobs.length === 0) {
-      return { buckets: [], previousSnapshot: null, lastUpdated: 0 };
-    }
-
-    const response = await fetch(blobs[0].url);
-    if (response.ok) {
-      return await response.json();
-    }
-  } catch (e) {
-    console.error('Failed to load ranking data:', e);
-  }
-  return { buckets: [], previousSnapshot: null, lastUpdated: 0 };
-}
-
-// Save data to Vercel Blob
-async function saveData(data: RankingData): Promise<void> {
-  await put(BLOB_NAME, JSON.stringify(data), {
-    access: 'public',
-    addRandomSuffix: false,
-    allowOverwrite: true,
-  });
-}
-
-// Calculate rankings from buckets (last 24 hours)
-function calculateRankings(data: RankingData): RankingItem[] {
-  const now = Date.now();
-  const cutoff24h = now - TWENTY_FOUR_HOURS_MS;
-
-  // Sum up views from all buckets within 24 hours
-  const viewCounts: Record<string, number> = {};
-
-  data.buckets
-    .filter((bucket) => bucket.timestamp > cutoff24h)
-    .forEach((bucket) => {
-      Object.entries(bucket.counts).forEach(([symbol, count]) => {
-        viewCounts[symbol] = (viewCounts[symbol] || 0) + count;
-      });
-    });
-
-  // If no data, return defaults
-  if (Object.keys(viewCounts).length === 0) {
-    return DEFAULT_POPULAR_STOCKS.map((symbol, index) => ({
-      symbol,
-      views: 0,
-      rank: index + 1,
-      previousRank: null,
-      rankChange: null,
-    }));
-  }
-
-  // Sort by view count (descending)
-  const sorted = Object.entries(viewCounts).sort((a, b) => b[1] - a[1]);
-
-  return sorted.map(([symbol, views], index) => {
-    const rank = index + 1;
-    const previousRank = data.previousSnapshot?.ranks[symbol] ?? null;
-    const rankChange = previousRank !== null ? previousRank - rank : null;
-
-    return {
-      symbol,
-      views,
-      rank,
-      previousRank,
-      rankChange,
-    };
-  });
+// Get bucket key for Redis
+function getBucketKey(timestamp: number): string {
+  return `ranking:bucket:${timestamp}`;
 }
 
 // GET - Fetch rankings
 export async function GET() {
   try {
-    const data = await loadData();
-    const rankings = calculateRankings(data);
+    const now = Date.now();
+    const cutoff24h = now - TWENTY_FOUR_HOURS_MS;
 
-    return NextResponse.json({
-      rankings,
-      lastUpdated: data.lastUpdated,
+    // Get all bucket keys from last 24 hours
+    const bucketKeys: string[] = [];
+    let bucketTime = getBucketTimestamp(now);
+    while (bucketTime > cutoff24h) {
+      bucketKeys.push(getBucketKey(bucketTime));
+      bucketTime -= FIVE_MINUTES_MS;
+    }
+
+    // Fetch all buckets in parallel (pipeline)
+    const pipeline = redis.pipeline();
+    bucketKeys.forEach((key) => pipeline.hgetall(key));
+    const results = await pipeline.exec();
+
+    // Aggregate view counts
+    const viewCounts: Record<string, number> = {};
+    results.forEach((result) => {
+      if (result && typeof result === 'object') {
+        Object.entries(result).forEach(([symbol, count]) => {
+          const numCount = typeof count === 'number' ? count : parseInt(count as string, 10);
+          if (!isNaN(numCount)) {
+            viewCounts[symbol] = (viewCounts[symbol] || 0) + numCount;
+          }
+        });
+      }
     });
+
+    // Get previous rankings
+    const previousRanks = (await redis.hgetall('ranking:previous')) as Record<string, number> | null;
+
+    // If no data, return defaults
+    if (Object.keys(viewCounts).length === 0) {
+      return NextResponse.json(
+        {
+          rankings: DEFAULT_POPULAR_STOCKS.map((symbol, index) => ({
+            symbol,
+            views: 0,
+            rank: index + 1,
+            previousRank: null,
+            rankChange: null,
+          })),
+          lastUpdated: now,
+        },
+        {
+          headers: {
+            'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
+          },
+        }
+      );
+    }
+
+    // Sort by view count (descending)
+    const sorted = Object.entries(viewCounts).sort((a, b) => b[1] - a[1]);
+
+    const rankings: RankingItem[] = sorted.map(([symbol, views], index) => {
+      const rank = index + 1;
+      const prevRank = previousRanks?.[symbol];
+      const previousRank = prevRank !== undefined ? Number(prevRank) : null;
+      const rankChange = previousRank !== null ? previousRank - rank : null;
+
+      return { symbol, views, rank, previousRank, rankChange };
+    });
+
+    return NextResponse.json(
+      { rankings, lastUpdated: now },
+      {
+        headers: {
+          'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
+        },
+      }
+    );
   } catch (error) {
     console.error('GET ranking error:', error);
-    // Return defaults on error
     return NextResponse.json({
       rankings: DEFAULT_POPULAR_STOCKS.map((symbol, index) => ({
         symbol,
@@ -136,7 +120,7 @@ export async function GET() {
         previousRank: null,
         rankChange: null,
       })),
-      lastUpdated: 0,
+      lastUpdated: Date.now(),
     });
   }
 }
@@ -152,44 +136,28 @@ export async function POST(request: NextRequest) {
 
     const now = Date.now();
     const currentBucketTime = getBucketTimestamp(now);
-    const cutoff25h = now - TWENTY_FIVE_HOURS_MS;
+    const bucketKey = getBucketKey(currentBucketTime);
 
-    // Load current data
-    const data = await loadData();
+    // Check if this is a new bucket (for updating previous rankings)
+    const bucketExists = await redis.exists(bucketKey);
 
-    // Clean old buckets (keep 25 hours)
-    data.buckets = data.buckets.filter((b) => b.timestamp > cutoff25h);
-
-    // Find or create current bucket
-    let currentBucket = data.buckets.find((b) => b.timestamp === currentBucketTime);
-    if (!currentBucket) {
-      currentBucket = { timestamp: currentBucketTime, counts: {} };
-      data.buckets.push(currentBucket);
+    if (!bucketExists) {
+      // New bucket - save current rankings as previous
+      const currentRankings = await getCurrentRankings();
+      if (currentRankings.length > 0) {
+        const previousData: Record<string, number> = {};
+        currentRankings.forEach((item) => {
+          previousData[item.symbol] = item.rank;
+        });
+        await redis.hset('ranking:previous', previousData);
+      }
     }
 
-    // Increment view count for symbol
-    currentBucket.counts[symbol] = (currentBucket.counts[symbol] || 0) + 1;
+    // Increment view count for symbol in current bucket
+    await redis.hincrby(bucketKey, symbol, 1);
 
-    // Update previous snapshot every 5 minutes (when a new bucket is created)
-    // This captures the ranking state before this bucket's data
-    const lastSnapshotTime = data.previousSnapshot?.timestamp || 0;
-    if (currentBucketTime > lastSnapshotTime) {
-      // Calculate rankings WITHOUT the current bucket to get previous state
-      const bucketsWithoutCurrent = data.buckets.filter(
-        (b) => b.timestamp < currentBucketTime && b.timestamp > now - TWENTY_FOUR_HOURS_MS
-      );
-      const tempData = { ...data, buckets: bucketsWithoutCurrent };
-      const previousRankings = calculateRankings(tempData);
-
-      const ranks: Record<string, number> = {};
-      previousRankings.forEach((item) => {
-        ranks[item.symbol] = item.rank;
-      });
-      data.previousSnapshot = { ranks, timestamp: currentBucketTime };
-    }
-
-    data.lastUpdated = now;
-    await saveData(data);
+    // Set TTL on bucket (25 hours)
+    await redis.expire(bucketKey, BUCKET_TTL_SECONDS);
 
     return NextResponse.json({ success: true });
   } catch (error) {
@@ -197,4 +165,46 @@ export async function POST(request: NextRequest) {
     const message = error instanceof Error ? error.message : 'Unknown error';
     return NextResponse.json({ error: 'Failed to record view', message }, { status: 500 });
   }
+}
+
+// Helper to get current rankings (for saving as previous)
+async function getCurrentRankings(): Promise<RankingItem[]> {
+  const now = Date.now();
+  const cutoff24h = now - TWENTY_FOUR_HOURS_MS;
+
+  const bucketKeys: string[] = [];
+  let bucketTime = getBucketTimestamp(now);
+  while (bucketTime > cutoff24h) {
+    bucketKeys.push(getBucketKey(bucketTime));
+    bucketTime -= FIVE_MINUTES_MS;
+  }
+
+  const pipeline = redis.pipeline();
+  bucketKeys.forEach((key) => pipeline.hgetall(key));
+  const results = await pipeline.exec();
+
+  const viewCounts: Record<string, number> = {};
+  results.forEach((result) => {
+    if (result && typeof result === 'object') {
+      Object.entries(result).forEach(([symbol, count]) => {
+        const numCount = typeof count === 'number' ? count : parseInt(count as string, 10);
+        if (!isNaN(numCount)) {
+          viewCounts[symbol] = (viewCounts[symbol] || 0) + numCount;
+        }
+      });
+    }
+  });
+
+  if (Object.keys(viewCounts).length === 0) {
+    return [];
+  }
+
+  const sorted = Object.entries(viewCounts).sort((a, b) => b[1] - a[1]);
+  return sorted.map(([symbol, views], index) => ({
+    symbol,
+    views,
+    rank: index + 1,
+    previousRank: null,
+    rankChange: null,
+  }));
 }
