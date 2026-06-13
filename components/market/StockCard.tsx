@@ -46,6 +46,10 @@ export function StockCard({ stock, price }: StockCardProps) {
             market={stock.category}
             name={stock.name}
             nameKo={stock.nameKo}
+            nameJa={stock.nameJa}
+            nameZh={stock.nameZh}
+            namePt={stock.namePt}
+            nameEs={stock.nameEs}
             slug={stock.slug}
           />
         </div>

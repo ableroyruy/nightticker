@@ -11,6 +11,10 @@ interface WatchlistButtonProps {
   market: MarketType;
   name: string;
   nameKo?: string;
+  nameJa?: string;
+  nameZh?: string;
+  namePt?: string;
+  nameEs?: string;
   slug: string;
   size?: 'sm' | 'default';
 }
@@ -20,6 +24,10 @@ export function WatchlistButton({
   market,
   name,
   nameKo,
+  nameJa,
+  nameZh,
+  namePt,
+  nameEs,
   slug,
   size = 'sm',
 }: WatchlistButtonProps) {
@@ -39,7 +47,7 @@ export function WatchlistButton({
     <Button
       variant="ghost"
       size="icon"
-      onClick={() => toggleFavorite({ symbol, market, name, nameKo, slug })}
+      onClick={() => toggleFavorite({ symbol, market, name, nameKo, nameJa, nameZh, namePt, nameEs, slug })}
       title={watched ? t('remove') : t('add')}
       className={`h-8 w-8 ${watched ? 'text-yellow-500' : 'text-muted-foreground'}`}
     >

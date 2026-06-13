@@ -22,6 +22,10 @@ export interface FavoriteAsset {
   symbol: string;
   name: string;
   nameKo?: string;
+  nameJa?: string;
+  nameZh?: string;
+  namePt?: string;
+  nameEs?: string;
   slug: string;
   addedAt: number;
 }

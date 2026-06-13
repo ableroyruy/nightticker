@@ -58,6 +58,10 @@ export function StockPageHeader({
           market={stock.category}
           name={stock.name}
           nameKo={stock.nameKo}
+          nameJa={stock.nameJa}
+          nameZh={stock.nameZh}
+          namePt={stock.namePt}
+          nameEs={stock.nameEs}
           slug={stock.slug}
         />
         <SearchRankBadge symbol={stock.symbol} />

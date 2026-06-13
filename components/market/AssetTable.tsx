@@ -163,6 +163,10 @@ export function AssetTable({
                           market: asset.market,
                           name: asset.name,
                           nameKo: asset.nameKo,
+                          nameJa: asset.nameJa,
+                          nameZh: asset.nameZh,
+                          namePt: asset.namePt,
+                          nameEs: asset.nameEs,
                           slug: asset.slug,
                         })
                       }
