@@ -32,7 +32,7 @@ export function PopularSearchesPage() {
   // Fallback to default stocks if no ranking data
   const displayRankings = rankings.length > 0 ? rankings : stocks.slice(0, 20).map((stock, index) => ({
     symbol: stock.symbol,
-    score: 20 - index,
+    views: 0,
     rank: index + 1,
     previousRank: null,
     rankChange: null,
@@ -102,7 +102,7 @@ export function PopularSearchesPage() {
                         {/* Price */}
                         <span className="font-semibold tabular-nums">
                           {ticker?.price ? (
-                            `$${ticker.price.toLocaleString('en-US', {
+                            `${stock.category !== 'INDEX' && stock.category !== 'FX' ? '$' : ''}${ticker.price.toLocaleString('en-US', {
                               minimumFractionDigits: 2,
                               maximumFractionDigits: ticker.price < 1 ? 4 : 2,
                             })}`
@@ -129,7 +129,7 @@ export function PopularSearchesPage() {
                                   {isNegative && '▼'}
                                   {!isPositive && !isNegative && '−'}
                                 </span>
-                                {isPositive ? '+' : '-'}${Math.abs(ticker.change24h).toFixed(2)}
+                                {isPositive ? '+' : '-'}{stock.category !== 'INDEX' && stock.category !== 'FX' ? '$' : ''}{Math.abs(ticker.change24h).toFixed(2)}
                               </span>
                             )}
 

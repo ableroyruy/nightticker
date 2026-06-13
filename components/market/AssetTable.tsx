@@ -132,7 +132,7 @@ export function AssetTable({
                   )}
                   <td className="text-right tabular-nums font-medium">
                     {asset.price !== null
-                      ? `$${asset.price.toLocaleString('en-US', {
+                      ? `${asset.market !== 'INDEX' && asset.market !== 'FX' ? '$' : ''}${asset.price.toLocaleString('en-US', {
                           minimumFractionDigits: 2,
                           maximumFractionDigits: asset.price < 1 ? 6 : 2,
                         })}`
@@ -151,6 +151,7 @@ export function AssetTable({
                       type="amount"
                       size="sm"
                       showIcon={false}
+                      hideCurrency={asset.market === 'INDEX' || asset.market === 'FX'}
                     />
                   </td>
                   <td>
