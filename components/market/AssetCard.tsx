@@ -224,6 +224,7 @@ function AssetCardInner({
                 changePercent={displayChangePercent24h}
                 size="md"
                 showChange={false}
+                hideCurrency={asset.market === 'INDEX' || asset.market === 'FX'}
               />
 
               <div className="flex items-center gap-2 flex-wrap">
@@ -233,6 +234,7 @@ function AssetCardInner({
                     type="amount"
                     size="sm"
                     showBackground
+                    hideCurrency={asset.market === 'INDEX' || asset.market === 'FX'}
                   />
                 )}
                 <PriceChange

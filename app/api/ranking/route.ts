@@ -1,9 +1,10 @@
-import { put, head, list } from '@vercel/blob';
+import { put, list } from '@vercel/blob';
 import { NextRequest, NextResponse } from 'next/server';
 
-const BLOB_NAME = 'ranking-data.json';
+const BLOB_NAME = 'ranking-v2.json';
+const FIVE_MINUTES_MS = 5 * 60 * 1000;
 const TWENTY_FOUR_HOURS_MS = 24 * 60 * 60 * 1000;
-const ONE_HOUR_MS = 60 * 60 * 1000;
+const TWENTY_FIVE_HOURS_MS = 25 * 60 * 60 * 1000;
 
 // Default popular stocks for cold start
 const DEFAULT_POPULAR_STOCKS = [
@@ -11,28 +12,35 @@ const DEFAULT_POPULAR_STOCKS = [
   'MSFT', 'GOOGL', 'AMZN', 'META', 'AMD',
 ];
 
-interface ViewRecord {
-  symbol: string;
+// 5-minute bucket: { timestamp: bucketStartTime, counts: { symbol: count } }
+interface Bucket {
   timestamp: number;
+  counts: Record<string, number>;
 }
 
+// Previous ranking snapshot for rank change calculation
 interface RankSnapshot {
   ranks: Record<string, number>;
   timestamp: number;
 }
 
 interface RankingData {
-  views: ViewRecord[];
-  snapshot24h: RankSnapshot | null;
+  buckets: Bucket[];
+  previousSnapshot: RankSnapshot | null;
   lastUpdated: number;
 }
 
 interface RankingItem {
   symbol: string;
-  score: number;
+  views: number;
   rank: number;
   previousRank: number | null;
   rankChange: number | null;
+}
+
+// Get the start of the current 5-minute bucket
+function getBucketTimestamp(timestamp: number): number {
+  return Math.floor(timestamp / FIVE_MINUTES_MS) * FIVE_MINUTES_MS;
 }
 
 // Load data from Vercel Blob
@@ -40,7 +48,7 @@ async function loadData(): Promise<RankingData> {
   try {
     const { blobs } = await list({ prefix: BLOB_NAME });
     if (blobs.length === 0) {
-      return { views: [], snapshot24h: null, lastUpdated: 0 };
+      return { buckets: [], previousSnapshot: null, lastUpdated: 0 };
     }
 
     const response = await fetch(blobs[0].url);
@@ -50,7 +58,7 @@ async function loadData(): Promise<RankingData> {
   } catch (e) {
     console.error('Failed to load ranking data:', e);
   }
-  return { views: [], snapshot24h: null, lastUpdated: 0 };
+  return { buckets: [], previousSnapshot: null, lastUpdated: 0 };
 }
 
 // Save data to Vercel Blob
@@ -62,57 +70,44 @@ async function saveData(data: RankingData): Promise<void> {
   });
 }
 
-// Calculate rankings from views
+// Calculate rankings from buckets (last 24 hours)
 function calculateRankings(data: RankingData): RankingItem[] {
   const now = Date.now();
   const cutoff24h = now - TWENTY_FOUR_HOURS_MS;
 
-  // Count views with time decay
-  const scores: Record<string, number> = {};
+  // Sum up views from all buckets within 24 hours
+  const viewCounts: Record<string, number> = {};
 
-  data.views
-    .filter((v) => v.timestamp > cutoff24h)
-    .forEach((v) => {
-      const hoursAgo = (now - v.timestamp) / ONE_HOUR_MS;
-      const weight = Math.pow(0.5, hoursAgo / 6); // Half-life = 6 hours
-      scores[v.symbol] = (scores[v.symbol] || 0) + weight;
+  data.buckets
+    .filter((bucket) => bucket.timestamp > cutoff24h)
+    .forEach((bucket) => {
+      Object.entries(bucket.counts).forEach(([symbol, count]) => {
+        viewCounts[symbol] = (viewCounts[symbol] || 0) + count;
+      });
     });
 
   // If no data, return defaults
-  if (Object.keys(scores).length === 0) {
-    // Use snapshot if available
-    if (data.snapshot24h && Object.keys(data.snapshot24h.ranks).length > 0) {
-      return Object.entries(data.snapshot24h.ranks)
-        .sort((a, b) => a[1] - b[1])
-        .map(([symbol, rank]) => ({
-          symbol,
-          score: 100 - rank,
-          rank,
-          previousRank: null,
-          rankChange: null,
-        }));
-    }
-    // Default stocks
+  if (Object.keys(viewCounts).length === 0) {
     return DEFAULT_POPULAR_STOCKS.map((symbol, index) => ({
       symbol,
-      score: DEFAULT_POPULAR_STOCKS.length - index,
+      views: 0,
       rank: index + 1,
       previousRank: null,
       rankChange: null,
     }));
   }
 
-  // Sort and build rankings
-  const sorted = Object.entries(scores).sort((a, b) => b[1] - a[1]);
+  // Sort by view count (descending)
+  const sorted = Object.entries(viewCounts).sort((a, b) => b[1] - a[1]);
 
-  return sorted.map(([symbol, score], index) => {
+  return sorted.map(([symbol, views], index) => {
     const rank = index + 1;
-    const previousRank = data.snapshot24h?.ranks[symbol] ?? null;
+    const previousRank = data.previousSnapshot?.ranks[symbol] ?? null;
     const rankChange = previousRank !== null ? previousRank - rank : null;
 
     return {
       symbol,
-      score: Math.round(score * 100) / 100,
+      views,
       rank,
       previousRank,
       rankChange,
@@ -136,7 +131,7 @@ export async function GET() {
     return NextResponse.json({
       rankings: DEFAULT_POPULAR_STOCKS.map((symbol, index) => ({
         symbol,
-        score: DEFAULT_POPULAR_STOCKS.length - index,
+        views: 0,
         rank: index + 1,
         previousRank: null,
         rankChange: null,
@@ -156,28 +151,43 @@ export async function POST(request: NextRequest) {
     }
 
     const now = Date.now();
-    const cutoff72h = now - (72 * ONE_HOUR_MS);
+    const currentBucketTime = getBucketTimestamp(now);
+    const cutoff25h = now - TWENTY_FIVE_HOURS_MS;
 
     // Load current data
     const data = await loadData();
 
-    // Add new view
-    data.views.push({ symbol, timestamp: now });
+    // Clean old buckets (keep 25 hours)
+    data.buckets = data.buckets.filter((b) => b.timestamp > cutoff25h);
 
-    // Clean old views (keep 72 hours)
-    data.views = data.views.filter((v) => v.timestamp > cutoff72h);
-
-    // Update 24h snapshot if needed
-    if (!data.snapshot24h || now - data.snapshot24h.timestamp > TWENTY_FOUR_HOURS_MS) {
-      const rankings = calculateRankings(data);
-      const ranks: Record<string, number> = {};
-      rankings.forEach((item) => {
-        ranks[item.symbol] = item.rank;
-      });
-      data.snapshot24h = { ranks, timestamp: now };
+    // Find or create current bucket
+    let currentBucket = data.buckets.find((b) => b.timestamp === currentBucketTime);
+    if (!currentBucket) {
+      currentBucket = { timestamp: currentBucketTime, counts: {} };
+      data.buckets.push(currentBucket);
     }
 
-    // Always save in serverless environment (no persistent memory)
+    // Increment view count for symbol
+    currentBucket.counts[symbol] = (currentBucket.counts[symbol] || 0) + 1;
+
+    // Update previous snapshot every 5 minutes (when a new bucket is created)
+    // This captures the ranking state before this bucket's data
+    const lastSnapshotTime = data.previousSnapshot?.timestamp || 0;
+    if (currentBucketTime > lastSnapshotTime) {
+      // Calculate rankings WITHOUT the current bucket to get previous state
+      const bucketsWithoutCurrent = data.buckets.filter(
+        (b) => b.timestamp < currentBucketTime && b.timestamp > now - TWENTY_FOUR_HOURS_MS
+      );
+      const tempData = { ...data, buckets: bucketsWithoutCurrent };
+      const previousRankings = calculateRankings(tempData);
+
+      const ranks: Record<string, number> = {};
+      previousRankings.forEach((item) => {
+        ranks[item.symbol] = item.rank;
+      });
+      data.previousSnapshot = { ranks, timestamp: currentBucketTime };
+    }
+
     data.lastUpdated = now;
     await saveData(data);
 

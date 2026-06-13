@@ -395,7 +395,7 @@ export default async function StockPage({ params }: Props) {
         <Separator />
 
         {/* Real-time Price Card */}
-        <MarketPriceCard hyperliquidSymbol={stock.hyperliquidSymbol} locale={locale} />
+        <MarketPriceCard hyperliquidSymbol={stock.hyperliquidSymbol} locale={locale} category={stock.category} />
 
         {/* H2: Weekend Price Section */}
         <section>

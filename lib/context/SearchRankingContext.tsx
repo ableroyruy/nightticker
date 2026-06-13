@@ -19,7 +19,7 @@ const DEFAULT_POPULAR_STOCKS = [
 
 export interface SearchRankingItem {
   symbol: string;
-  score: number;
+  views: number;
   rank: number;
   previousRank: number | null;
   rankChange: number | null;
@@ -38,7 +38,7 @@ const SearchRankingContext = createContext<SearchRankingContextValue | null>(nul
 const getDefaultRankings = (): SearchRankingItem[] => {
   return DEFAULT_POPULAR_STOCKS.map((symbol, index) => ({
     symbol,
-    score: DEFAULT_POPULAR_STOCKS.length - index,
+    views: 0,
     rank: index + 1,
     previousRank: null,
     rankChange: null,

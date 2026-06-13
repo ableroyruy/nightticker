@@ -20,9 +20,10 @@ const MiniChart = dynamic(() => import('./MiniChart').then((mod) => mod.MiniChar
 interface MarketPriceCardProps {
   hyperliquidSymbol: string;
   locale: string;
+  category?: string;
 }
 
-export function MarketPriceCard({ hyperliquidSymbol, locale }: MarketPriceCardProps) {
+export function MarketPriceCard({ hyperliquidSymbol, locale, category }: MarketPriceCardProps) {
   const t = useTranslations('market');
   const { tickers, status, lastUpdate } = useHyperliquidTicker();
 
@@ -53,6 +54,7 @@ export function MarketPriceCard({ hyperliquidSymbol, locale }: MarketPriceCardPr
             change24h={ticker?.change24h ?? null}
             changePercent24h={ticker?.changePercent24h ?? null}
             size="lg"
+            hideCurrency={category === 'INDEX' || category === 'FX'}
           />
         )}
 

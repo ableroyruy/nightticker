@@ -29,12 +29,16 @@ export function StockPageHeader({
     recordPageView(stock.symbol);
   }, [stock.symbol, recordPageView]);
 
-  const titleSuffix =
-    locale === 'ko'
-      ? `야간 ${term}`
-      : locale === 'ja'
-        ? `夜間${term}`
-        : `Overnight ${term}`;
+  const titleSuffix = (() => {
+    switch (locale) {
+      case 'ko': return `야간 ${term}`;
+      case 'ja': return `夜間${term}`;
+      case 'zh': return `夜间${term}`;
+      case 'pt': return `${term} Noturno`;
+      case 'es': return `${term} Nocturno`;
+      default: return `Overnight ${term}`;
+    }
+  })();
 
   // Generate share URL
   const shareUrl = locale === 'en'

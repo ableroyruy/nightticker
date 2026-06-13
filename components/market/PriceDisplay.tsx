@@ -11,6 +11,7 @@ interface PriceDisplayProps {
   isLoading?: boolean;
   size?: 'sm' | 'md' | 'lg';
   showChange?: boolean;
+  hideCurrency?: boolean;
 }
 
 export function PriceDisplay({
@@ -20,6 +21,7 @@ export function PriceDisplay({
   isLoading = false,
   size = 'md',
   showChange = true,
+  hideCurrency = false,
 }: PriceDisplayProps) {
   const t = useTranslations('market');
 
@@ -54,19 +56,26 @@ export function PriceDisplay({
   }
 
   // Format price with appropriate decimals
-  const formattedPrice = new Intl.NumberFormat('en-US', {
-    style: 'currency',
-    currency: 'USD',
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(price);
+  const formattedPrice = hideCurrency
+    ? new Intl.NumberFormat('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }).format(price)
+    : new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD',
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2,
+      }).format(price);
 
   const isPositive = changePercent24h != null && changePercent24h > 0;
   const isNegative = changePercent24h != null && changePercent24h < 0;
 
-  // Format change amount with dollar sign
+  // Format change amount (with or without currency symbol)
   const formattedChange = change24h != null
-    ? `${isPositive ? '+' : '-'}$${Math.abs(change24h).toFixed(2)}`
+    ? hideCurrency
+      ? `${isPositive ? '+' : '-'}${Math.abs(change24h).toFixed(2)}`
+      : `${isPositive ? '+' : '-'}$${Math.abs(change24h).toFixed(2)}`
     : null;
 
   // Format change percent

@@ -2,11 +2,12 @@
 
 import { cn } from '@/lib/utils';
 
-function formatPriceUSD(value: number): string {
-  return '$' + value.toLocaleString('en-US', {
+function formatPrice(value: number, showCurrency: boolean = true): string {
+  const formatted = value.toLocaleString('en-US', {
     minimumFractionDigits: 2,
     maximumFractionDigits: 2,
   });
+  return showCurrency ? '$' + formatted : formatted;
 }
 
 interface PriceChangeProps {
@@ -16,6 +17,7 @@ interface PriceChangeProps {
   showBackground?: boolean;
   size?: 'sm' | 'md' | 'lg';
   className?: string;
+  hideCurrency?: boolean;
 }
 
 export function PriceChange({
@@ -25,6 +27,7 @@ export function PriceChange({
   showBackground = false,
   size = 'md',
   className,
+  hideCurrency = false,
 }: PriceChangeProps) {
 
   if (value === null || value === undefined) {
@@ -47,11 +50,11 @@ export function PriceChange({
     lg: 'text-xs',
   };
 
-  // For amount type, show in USD
+  // For amount type, optionally show currency
   const formattedValue =
     type === 'percent'
       ? `${isPositive ? '+' : ''}${value.toFixed(2)}%`
-      : `${isPositive ? '+' : ''}${formatPriceUSD(value)}`;
+      : `${isPositive ? '+' : ''}${formatPrice(value, !hideCurrency)}`;
 
   return (
     <span
@@ -91,6 +94,7 @@ interface PriceDisplayProps {
   size?: 'sm' | 'md' | 'lg' | 'xl';
   showChange?: boolean;
   className?: string;
+  hideCurrency?: boolean;
 }
 
 export function PriceDisplay({
@@ -101,6 +105,7 @@ export function PriceDisplay({
   size = 'md',
   showChange = true,
   className,
+  hideCurrency = false,
 }: PriceDisplayProps) {
 
   const sizeClasses = {
@@ -118,8 +123,8 @@ export function PriceDisplay({
     );
   }
 
-  // Format price in USD
-  const formattedPrice = formatPriceUSD(price);
+  // Format price (with or without currency symbol)
+  const formattedPrice = formatPrice(price, !hideCurrency);
 
   // Calculate change from previous price if not provided
   const calculatedChange =
@@ -151,7 +156,7 @@ export function PriceDisplay({
       </span>
       {showChange && calculatedChange !== null && (
         <div className="flex items-center gap-2">
-          <PriceChange value={calculatedChange} type="amount" size="sm" />
+          <PriceChange value={calculatedChange} type="amount" size="sm" hideCurrency={hideCurrency} />
           {calculatedChangePercent !== null && (
             <PriceChange
               value={calculatedChangePercent}
