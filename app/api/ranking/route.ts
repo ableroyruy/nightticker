@@ -7,8 +7,10 @@ const redis = new Redis({
 });
 
 const FIVE_MINUTES_MS = 5 * 60 * 1000;
+const ONE_HOUR_MS = 60 * 60 * 1000;
 const TWENTY_FOUR_HOURS_MS = 24 * 60 * 60 * 1000;
 const BUCKET_TTL_SECONDS = 25 * 60 * 60; // 25 hours TTL
+const SNAPSHOT_TTL_SECONDS = 25 * 60 * 60; // 25 hours TTL for snapshots
 
 // Default popular stocks for cold start
 const DEFAULT_POPULAR_STOCKS = [
@@ -29,9 +31,19 @@ function getBucketTimestamp(timestamp: number): number {
   return Math.floor(timestamp / FIVE_MINUTES_MS) * FIVE_MINUTES_MS;
 }
 
+// Get the start of the current hour
+function getHourTimestamp(timestamp: number): number {
+  return Math.floor(timestamp / ONE_HOUR_MS) * ONE_HOUR_MS;
+}
+
 // Get bucket key for Redis
 function getBucketKey(timestamp: number): string {
   return `ranking:bucket:${timestamp}`;
+}
+
+// Get hourly snapshot key for Redis
+function getSnapshotKey(timestamp: number): string {
+  return `ranking:snapshot:${timestamp}`;
 }
 
 // GET - Fetch rankings
@@ -66,8 +78,10 @@ export async function GET() {
       }
     });
 
-    // Get previous rankings
-    const previousRanks = (await redis.hgetall('ranking:previous')) as Record<string, number> | null;
+    // Get previous rankings from 1 hour ago snapshot
+    const previousHourTimestamp = getHourTimestamp(now) - ONE_HOUR_MS;
+    const previousSnapshotKey = getSnapshotKey(previousHourTimestamp);
+    const previousRanks = (await redis.hgetall(previousSnapshotKey)) as Record<string, number> | null;
 
     // If no data, return defaults
     if (Object.keys(viewCounts).length === 0) {
@@ -138,18 +152,21 @@ export async function POST(request: NextRequest) {
     const currentBucketTime = getBucketTimestamp(now);
     const bucketKey = getBucketKey(currentBucketTime);
 
-    // Check if this is a new bucket (for updating previous rankings)
-    const bucketExists = await redis.exists(bucketKey);
+    // Check if we need to save hourly snapshot
+    const currentHourTimestamp = getHourTimestamp(now);
+    const snapshotKey = getSnapshotKey(currentHourTimestamp);
+    const snapshotExists = await redis.exists(snapshotKey);
 
-    if (!bucketExists) {
-      // New bucket - save current rankings as previous
+    if (!snapshotExists) {
+      // New hour - save current rankings as hourly snapshot
       const currentRankings = await getCurrentRankings();
       if (currentRankings.length > 0) {
-        const previousData: Record<string, number> = {};
+        const snapshotData: Record<string, number> = {};
         currentRankings.forEach((item) => {
-          previousData[item.symbol] = item.rank;
+          snapshotData[item.symbol] = item.rank;
         });
-        await redis.hset('ranking:previous', previousData);
+        await redis.hset(snapshotKey, snapshotData);
+        await redis.expire(snapshotKey, SNAPSHOT_TTL_SECONDS);
       }
     }
 

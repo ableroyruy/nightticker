@@ -5,7 +5,6 @@ import Link from 'next/link';
 import { useHyperliquidTicker } from '@/lib/hooks/useHyperliquidTicker';
 import { stocks } from '@/lib/markets/stocks';
 import { cn } from '@/lib/utils';
-import { TrendingUp, TrendingDown } from 'lucide-react';
 
 function getLocalizedName(stock: (typeof stocks)[0], locale: string): string {
   switch (locale) {
@@ -73,15 +72,13 @@ export function StockTicker() {
                 {stock.changePercent !== null && (
                   <span
                     className={cn(
-                      'flex items-center gap-0.5 text-xs font-medium',
-                      isPositive ? 'text-emerald-500' : 'text-red-500'
+                      'flex items-center gap-0.5 text-xs font-medium tabular-nums',
+                      isPositive ? 'text-gain' : 'text-loss'
                     )}
                   >
-                    {isPositive ? (
-                      <TrendingUp className="h-3 w-3" />
-                    ) : (
-                      <TrendingDown className="h-3 w-3" />
-                    )}
+                    <span className="text-[8px] arrow-bounce">
+                      {isPositive ? '▲' : '▼'}
+                    </span>
                     {isPositive ? '+' : ''}
                     {stock.changePercent.toFixed(2)}%
                   </span>

@@ -45,8 +45,8 @@ const getDefaultRankings = (): SearchRankingItem[] => {
   }));
 };
 
-// Local storage cache key
-const CACHE_KEY = 'nightticker_ranking_cache';
+// Local storage cache key - v2 to invalidate old cache
+const CACHE_KEY = 'nightticker_ranking_cache_v2';
 const CACHE_TTL = 5 * 60 * 1000; // 5 minute cache
 
 interface CachedData {
@@ -89,10 +89,16 @@ export function SearchRankingProvider({ children }: { children: ReactNode }) {
   const pendingViewsRef = useRef<string[]>([]);
   const flushTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Fetch rankings from API
-  const fetchRankings = useCallback(async () => {
+  // Fetch rankings from API with retry
+  const fetchRankings = useCallback(async (retryCount = 0): Promise<SearchRankingItem[] | null> => {
+    const maxRetries = 2;
     try {
-      const response = await fetch('/api/ranking');
+      const response = await fetch('/api/ranking', {
+        cache: 'no-store',
+        headers: {
+          'Cache-Control': 'no-cache',
+        },
+      });
       if (response.ok) {
         const data = await response.json();
         if (data.rankings && data.rankings.length > 0) {
@@ -100,9 +106,16 @@ export function SearchRankingProvider({ children }: { children: ReactNode }) {
           saveCache(data.rankings);
           return data.rankings;
         }
+      } else {
+        console.error('Fetch rankings failed:', response.status, response.statusText);
       }
     } catch (e) {
       console.error('Fetch rankings error:', e);
+      // Retry on network error
+      if (retryCount < maxRetries) {
+        await new Promise((resolve) => setTimeout(resolve, 1000 * (retryCount + 1)));
+        return fetchRankings(retryCount + 1);
+      }
     }
     return null;
   }, []);

@@ -47,6 +47,7 @@ export const stocks: Stock[] = [
   { symbol: 'HIMS', name: 'Hims & Hers', nameKo: '힘스앤허스', nameJa: 'ヒムズ&ハーズ', nameZh: 'Hims & Hers', slug: 'hims', category: 'US', sector: 'Healthcare', hyperliquidSymbol: 'xyz:HIMS' },
   // Space & Defense
   { symbol: 'RKLB', name: 'Rocket Lab', nameKo: '로켓랩', nameJa: 'ロケットラボ', nameZh: '火箭实验室', slug: 'rocket-lab', category: 'US', sector: 'Space', hyperliquidSymbol: 'xyz:RKLB' },
+  { symbol: 'SPCX', name: 'SpaceX', nameKo: '스페이스X', nameJa: 'スペースX', nameZh: 'SpaceX', namePt: 'SpaceX', nameEs: 'SpaceX', slug: 'spacex', category: 'US', sector: 'Space', hyperliquidSymbol: 'xyz:SPCX' },
   // Entertainment & Gaming
   { symbol: 'DKNG', name: 'DraftKings', nameKo: '드래프트킹스', nameJa: 'ドラフトキングス', nameZh: 'DraftKings', slug: 'draftkings', category: 'US', sector: 'Entertainment', hyperliquidSymbol: 'xyz:DKNG' },
 
