@@ -10,10 +10,9 @@ export const metadata: Metadata = {
   description: 'Monitor stock-related market activity when traditional exchanges are closed. Overnight, weekend, and holiday reference prices powered by Hyperliquid Market Prices.',
   keywords: ['night stock price', 'overnight stock price', 'weekend stock price', 'market closed price', 'hyperliquid'],
   authors: [{ name: 'NightTicker' }],
-  manifest: '/manifest.json',
+  manifest: '/site.webmanifest',
   icons: {
     icon: [
-      { url: '/icon.svg', type: 'image/svg+xml' },
       { url: '/favicon.ico', sizes: 'any' },
       { url: '/favicon-16x16.png', sizes: '16x16', type: 'image/png' },
       { url: '/favicon-32x32.png', sizes: '32x32', type: 'image/png' },
@@ -32,7 +31,7 @@ export const metadata: Metadata = {
     description: 'Monitor stock-related market activity when traditional exchanges are closed.',
     images: [
       {
-        url: '/android-chrome-512.png',
+        url: '/android-chrome-512x512.png',
         width: 512,
         height: 512,
         alt: 'NightTicker',
@@ -43,15 +42,16 @@ export const metadata: Metadata = {
     card: 'summary',
     title: 'NightTicker - The Market Never Sleeps',
     description: 'Monitor stock-related market activity when traditional exchanges are closed.',
-    images: ['/android-chrome-512.png'],
+    images: ['/android-chrome-512x512.png'],
   },
   robots: {
     index: true,
     follow: true,
   },
   other: {
-    'msapplication-TileImage': '/android-chrome-192.png',
-    'msapplication-TileColor': '#7c3aed',
+    'msapplication-TileImage': '/android-chrome-192x192.png',
+    'msapplication-TileColor': '#0D0E14',
+    'theme-color': '#0D0E14',
   },
 };
 

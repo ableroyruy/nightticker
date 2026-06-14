@@ -1,10 +1,11 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
 import { useTranslations, useLocale } from 'next-intl';
 import { LanguageSwitcher } from './LanguageSwitcher';
-import { Moon, Menu, X, Home, Star, TrendingUp, TrendingDown, ChevronDown, BarChart3, Coins, Globe, Cpu, Building2, DollarSign, Flame } from 'lucide-react';
+import { Menu, X, Home, Star, TrendingUp, TrendingDown, ChevronDown, BarChart3, Coins, Globe, Cpu, Building2, DollarSign, Flame } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import {
   DropdownMenu,
@@ -62,10 +63,14 @@ export function Header() {
     <header className="sticky top-0 z-50 w-full border-b border-border/50 bg-background/80 backdrop-blur-xl">
       <div className="container flex h-16 items-center justify-between">
         <div className="flex items-center gap-6">
-          <Link href={prefix || '/'} className="flex items-center gap-2.5">
-            <div className="p-1.5 glass-card rounded-lg">
-              <Moon className="h-5 w-5 text-primary" />
-            </div>
+          <Link href={prefix || '/'} className="flex items-center gap-2">
+            <Image
+              src="/nightticker-logo-transparent-512.png"
+              alt="NightTicker"
+              width={28}
+              height={28}
+              className="rounded-md"
+            />
             <span className="font-bold text-xl tracking-tight">NightTicker</span>
           </Link>
 
