@@ -101,7 +101,11 @@ export function PopularSearchesPage() {
                       {/* Price Row */}
                       <div className="flex items-center justify-between gap-3 flex-wrap">
                         {/* Price */}
-                        <span className="font-semibold tabular-nums">
+                        <span className={cn(
+                          'font-semibold tabular-nums',
+                          isPositive && 'text-gain',
+                          isNegative && 'text-loss'
+                        )}>
                           {ticker?.price ? (
                             `${stock.category !== 'INDEX' && stock.category !== 'FX' ? '$' : ''}${ticker.price.toLocaleString('en-US', {
                               minimumFractionDigits: 2,
