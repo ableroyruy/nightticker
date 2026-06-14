@@ -6,6 +6,7 @@ import { ConnectionStatus } from '@/lib/types/market';
 const WS_URL = 'wss://api.hyperliquid.xyz/ws';
 const CACHED_TICKER_URL = '/api/market/ticker'; // 통합 API (prices + meta)
 const RECONNECT_DELAY = 3000;
+const CACHE_TTL = 30000; // 30초
 
 interface WsMessage {
   channel: string;
@@ -28,9 +29,31 @@ interface UseHyperliquidTickerReturn {
   error: string | null;
 }
 
+// ========== 전역 캐시 ==========
+interface GlobalCache {
+  tickers: Record<string, TickerData>;
+  prevDayPrices: Record<string, number>;
+  timestamp: number;
+}
+
+let globalCache: GlobalCache | null = null;
+
+function getGlobalCache(): GlobalCache | null {
+  if (globalCache && Date.now() - globalCache.timestamp < CACHE_TTL) {
+    return globalCache;
+  }
+  return null;
+}
+
+function setGlobalCache(tickers: Record<string, TickerData>, prevDayPrices: Record<string, number>) {
+  globalCache = { tickers, prevDayPrices, timestamp: Date.now() };
+}
+
 export function useHyperliquidTicker(): UseHyperliquidTickerReturn {
-  const [tickers, setTickers] = useState<Record<string, TickerData>>({});
-  const [status, setStatus] = useState<ConnectionStatus>('connecting');
+  // 전역 캐시가 있으면 초기값으로 사용
+  const cached = getGlobalCache();
+  const [tickers, setTickers] = useState<Record<string, TickerData>>(cached?.tickers ?? {});
+  const [status, setStatus] = useState<ConnectionStatus>(cached ? 'connected' : 'connecting');
   const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -78,6 +101,14 @@ export function useHyperliquidTicker(): UseHyperliquidTickerReturn {
   const fetchCachedTicker = useCallback(async () => {
     if (!mountedRef.current) return;
 
+    // 전역 캐시가 있으면 먼저 적용
+    const cached = getGlobalCache();
+    if (cached) {
+      prevDayPricesRef.current = cached.prevDayPrices;
+      tickersRef.current = cached.tickers;
+      // 이미 useState 초기값으로 설정됨
+    }
+
     try {
       const response = await fetch(CACHED_TICKER_URL);
       if (!response.ok) return;
@@ -92,10 +123,11 @@ export function useHyperliquidTicker(): UseHyperliquidTickerReturn {
       }
       prevDayPricesRef.current = prevDayPrices;
 
-      // Set tickers immediately
+      // Set tickers and update global cache
       tickersRef.current = data;
       setTickers(data);
       setLastUpdate(new Date());
+      setGlobalCache(data, prevDayPrices);
     } catch (e) {
       console.error('Failed to fetch cached ticker:', e);
     }
