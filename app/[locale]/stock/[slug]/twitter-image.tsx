@@ -81,22 +81,17 @@ export default async function Image({
             marginBottom: '40px',
           }}
         >
-          <div
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={`${process.env.NEXT_PUBLIC_SITE_URL || 'https://nightticker.com'}/nightticker-logo-transparent-512.png`}
+            alt="NightTicker Logo"
+            width={60}
+            height={60}
             style={{
-              width: '60px',
-              height: '60px',
-              borderRadius: '16px',
-              background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
               marginRight: '16px',
-              fontSize: '32px',
-              color: 'white',
+              borderRadius: '12px',
             }}
-          >
-            N
-          </div>
+          />
           <span style={{ fontSize: '32px', fontWeight: 600, color: 'white' }}>NightTicker</span>
         </div>
 

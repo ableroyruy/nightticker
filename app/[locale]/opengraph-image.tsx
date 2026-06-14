@@ -19,6 +19,8 @@ export default async function Image({ params }: { params: Promise<{ locale: stri
       ? '야간 시세 | 주말 시세 | 휴일 시세'
       : 'Overnight Prices | Weekend Prices | Holiday Prices';
 
+  const logoUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://nightticker.com'}/nightticker-logo-transparent-512.png`;
+
   return new ImageResponse(
     (
       <div
@@ -41,21 +43,17 @@ export default async function Image({ params }: { params: Promise<{ locale: stri
             marginBottom: '24px',
           }}
         >
-          <div
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={logoUrl}
+            alt="NightTicker Logo"
+            width={80}
+            height={80}
             style={{
-              width: '80px',
-              height: '80px',
-              borderRadius: '20px',
-              background: 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
               marginRight: '24px',
-              fontSize: '48px',
+              borderRadius: '16px',
             }}
-          >
-            N
-          </div>
+          />
           <div
             style={{
               fontSize: '72px',
