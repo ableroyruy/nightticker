@@ -130,7 +130,7 @@ function AssetCardInner({
     <Link href={`${prefix}${href}`} className="block group">
       <div
         className={cn(
-          'glass-card glass-card-hover rounded-2xl p-3 h-full cursor-pointer overflow-hidden',
+          'glass-card glass-card-hover rounded-xl p-2.5 h-full cursor-pointer overflow-hidden',
           'transition-all duration-300 active:scale-[0.98]',
           'group-hover:shadow-lg',
           marketAccentBorders[asset.market],
@@ -203,7 +203,7 @@ function AssetCardInner({
         {/* Price and Chart Row - Category colored background */}
         <div
           className={cn(
-            'relative -mx-3 -mb-3 px-3 py-2 overflow-hidden',
+            'relative -mx-2.5 -mb-2.5 px-2.5 py-1.5 overflow-hidden',
             'bg-gradient-to-r',
             marketGradients[asset.market],
             'rounded-b-2xl',

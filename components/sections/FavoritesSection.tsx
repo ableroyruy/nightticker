@@ -19,8 +19,8 @@ export function FavoritesSection({ tickers }: FavoritesSectionProps) {
   if (!isLoaded) {
     return (
       <section className="space-y-3">
-        <h2 className="text-lg font-semibold flex items-center gap-2">
-          <span className="w-1 h-5 bg-yellow-500 rounded-full" />
+        <h2 className="text-lg font-semibold flex items-center gap-2 pl-1">
+          <span className="w-1 h-4 bg-yellow-500 rounded-full" />
           {t('title')}
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
@@ -38,8 +38,8 @@ export function FavoritesSection({ tickers }: FavoritesSectionProps) {
   if (favorites.length === 0) {
     return (
       <section className="space-y-3">
-        <h2 className="text-lg font-semibold flex items-center gap-2">
-          <span className="w-1 h-5 bg-yellow-500 rounded-full" />
+        <h2 className="text-lg font-semibold flex items-center gap-2 pl-1">
+          <span className="w-1 h-4 bg-yellow-500 rounded-full" />
           {t('title')}
         </h2>
         <div className="glass-card rounded-2xl p-8 text-center">
@@ -77,9 +77,9 @@ export function FavoritesSection({ tickers }: FavoritesSectionProps) {
 
   return (
     <section className="space-y-3">
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between pl-1 pr-2">
         <h2 className="text-lg font-semibold flex items-center gap-2">
-          <span className="w-1 h-5 bg-yellow-500 rounded-full" />
+          <span className="w-1 h-4 bg-yellow-500 rounded-full" />
           {t('title')}
         </h2>
         <span className="text-sm text-muted-foreground">

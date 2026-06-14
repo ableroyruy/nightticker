@@ -36,13 +36,13 @@ export function CategorySection({ market, assets, limit = 10 }: CategorySectionP
   const losersCount = assets.filter(a => a.changePercent24h != null && a.changePercent24h < 0).length;
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       {/* Market Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex items-center justify-between pl-1 pr-2">
         <div className="flex items-center gap-2">
           <div
             className={cn(
-              'h-5 w-1 rounded-full',
+              'h-4 w-1 rounded-full',
               market === 'INDEX' && 'bg-emerald-500',
               market === 'ETF' && 'bg-teal-500',
               market === 'COMMODITY' && 'bg-amber-500',
