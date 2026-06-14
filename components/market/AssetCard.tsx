@@ -174,7 +174,6 @@ function AssetCardInner({
                       marketBadgeColors[asset.market]
                     )}
                   >
-                    <span className="mr-0.5">{marketFlags[asset.market]}</span>
                     {getMarketLabel(asset.market)}
                   </Badge>
                 )}
