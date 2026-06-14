@@ -31,7 +31,7 @@ interface TrendingTickerProps {
 
 export function TrendingTicker({
   className,
-  limit = 10,
+  limit,
   onSelect,
 }: TrendingTickerProps) {
   const locale = useLocale();
@@ -42,19 +42,20 @@ export function TrendingTicker({
   const [currentIndex, setCurrentIndex] = useState(0);
   const prefix = locale === 'en' ? '' : `/${locale}`;
 
-  // Use all stocks as fallback when no rankings available
+  // Use all stocks - no limit by default
   const topRankings = useMemo(() => {
-    const rankings = getTopRankings(stocks.length); // Get all possible rankings
-    if (rankings.length >= limit) {
-      return rankings.slice(0, limit);
+    const rankings = getTopRankings(stocks.length);
+    if (rankings.length > 0) {
+      return limit ? rankings.slice(0, limit) : rankings;
     }
     // Fallback: create rankings from all stocks
-    return stocks.map((stock, index) => ({
+    const allStocks = stocks.map((stock, index) => ({
       symbol: stock.symbol,
       rank: index + 1,
       count: 0,
       rankChange: 0,
     }));
+    return limit ? allStocks.slice(0, limit) : allStocks;
   }, [getTopRankings, limit]);
 
   // Cycle through items every 3 seconds
@@ -128,8 +129,8 @@ export function TrendingTicker({
                   ${ticker.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </span>
               )}
-              {/* Change */}
-              {ticker?.changePercent24h != null && (
+              {/* Change Amount */}
+              {ticker?.change24h != null && (
                 <span className={cn(
                   'text-xs tabular-nums flex items-center gap-0.5',
                   isPositive && 'text-gain',
@@ -141,6 +142,17 @@ export function TrendingTicker({
                     {isNegative && '▼'}
                     {isZero && '−'}
                   </span>
+                  {isPositive ? '+$' : '-$'}{Math.abs(ticker.change24h).toFixed(2)}
+                </span>
+              )}
+              {/* Change Percent */}
+              {ticker?.changePercent24h != null && (
+                <span className={cn(
+                  'text-xs tabular-nums',
+                  isPositive && 'text-gain',
+                  isNegative && 'text-loss',
+                  isZero && 'text-muted-foreground'
+                )}>
                   {isPositive ? '+' : ''}{ticker.changePercent24h.toFixed(2)}%
                 </span>
               )}
@@ -202,7 +214,7 @@ function RankChangeIndicator({ change }: { change: number }) {
 // Marquee-style continuous scroll component
 export function TrendingMarquee({
   className,
-  limit = 10,
+  limit,
   onSelect,
 }: TrendingTickerProps) {
   const locale = useLocale();
@@ -212,18 +224,19 @@ export function TrendingMarquee({
   const { tickers } = useHyperliquidTicker();
   const prefix = locale === 'en' ? '' : `/${locale}`;
 
-  // Use all stocks as fallback when no rankings available
+  // Use all stocks - no limit by default
   const topRankings = useMemo(() => {
     const rankings = getTopRankings(stocks.length);
-    if (rankings.length >= limit) {
-      return rankings.slice(0, limit);
+    if (rankings.length > 0) {
+      return limit ? rankings.slice(0, limit) : rankings;
     }
-    return stocks.slice(0, limit).map((stock, index) => ({
+    const allStocks = stocks.map((stock, index) => ({
       symbol: stock.symbol,
       rank: index + 1,
       count: 0,
       rankChange: 0,
     }));
+    return limit ? allStocks.slice(0, limit) : allStocks;
   }, [getTopRankings, limit]);
 
   const items = topRankings.map((item) => {
@@ -278,13 +291,20 @@ export function TrendingMarquee({
                 className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-muted/30 hover:bg-muted/50 transition-colors shrink-0"
               >
                 <span className="text-primary font-medium">#{item.rank}</span>
-                <span className={cn(
-                  'font-medium',
-                  isPositive && 'text-gain',
-                  isNegative && 'text-loss',
-                  isZero && 'text-muted-foreground'
-                )}>{displayName}</span>
-                {ticker?.changePercent24h != null && (
+                <span className="font-medium">{displayName}</span>
+                {/* Price */}
+                {ticker?.price && (
+                  <span className={cn(
+                    'text-xs tabular-nums',
+                    isPositive && 'text-gain',
+                    isNegative && 'text-loss',
+                    isZero && 'text-muted-foreground'
+                  )}>
+                    ${ticker.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                  </span>
+                )}
+                {/* Change Amount */}
+                {ticker?.change24h != null && (
                   <span className={cn(
                     'text-xs tabular-nums flex items-center gap-0.5',
                     isPositive && 'text-gain',
@@ -296,6 +316,17 @@ export function TrendingMarquee({
                       {isNegative && '▼'}
                       {isZero && '−'}
                     </span>
+                    {isPositive ? '+$' : '-$'}{Math.abs(ticker.change24h).toFixed(2)}
+                  </span>
+                )}
+                {/* Change Percent */}
+                {ticker?.changePercent24h != null && (
+                  <span className={cn(
+                    'text-xs tabular-nums',
+                    isPositive && 'text-gain',
+                    isNegative && 'text-loss',
+                    isZero && 'text-muted-foreground'
+                  )}>
                     {isPositive ? '+' : ''}{ticker.changePercent24h.toFixed(1)}%
                   </span>
                 )}
