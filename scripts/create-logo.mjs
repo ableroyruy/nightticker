@@ -1,10 +1,32 @@
 import sharp from 'sharp';
 import path from 'path';
+import fs from 'fs';
 
-const SOURCE = '/Users/user/Downloads/9b0968ed-c379-4f52-89f7-21e56be0e10f.png';
 const WEB_PUBLIC = '/Users/user/nightticker/public';
 const APP_RES = '/Users/user/nightticker-app/android/app/src/main/res';
 const APP_ASSETS = '/Users/user/nightticker-app/assets';
+
+// Create SVG of the original OG logo (purple gradient + white N)
+function createLogoSVG(size) {
+  const borderRadius = Math.round(size * 0.22); // ~20% border radius
+  const fontSize = Math.round(size * 0.55);
+
+  return `
+<svg width="${size}" height="${size}" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3b82f6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="${size}" height="${size}" rx="${borderRadius}" ry="${borderRadius}" fill="url(#grad)"/>
+  <text x="50%" y="55%" dominant-baseline="middle" text-anchor="middle"
+        font-family="system-ui, -apple-system, sans-serif"
+        font-size="${fontSize}"
+        font-weight="700"
+        fill="white">N</text>
+</svg>`;
+}
 
 // Web icon sizes
 const WEB_ICONS = [
@@ -33,65 +55,62 @@ const APP_ICONS = [
 ];
 
 async function main() {
-  // Load source with original color profile preserved
-  const sourceImage = sharp(SOURCE, {
-    failOn: 'none',
-  }).withMetadata(); // Preserve color profile
+  console.log('Creating logo from original OG design (purple gradient + white N)...\n');
 
-  console.log('Generating web icons (preserving original colors)...');
+  // Generate web icons
+  console.log('Generating web icons...');
   for (const icon of WEB_ICONS) {
-    await sharp(SOURCE)
-      .resize(icon.size, icon.size, {
-        kernel: sharp.kernel.lanczos3,
-        fit: 'contain',
-      })
-      .png({ quality: 100, compressionLevel: 6 })
+    const svg = createLogoSVG(icon.size);
+    await sharp(Buffer.from(svg))
+      .png()
       .toFile(path.join(WEB_PUBLIC, icon.name));
     console.log(`  Created ${icon.name}`);
   }
 
   // favicon.ico
-  await sharp(SOURCE)
-    .resize(32, 32, { kernel: sharp.kernel.lanczos3 })
-    .png({ quality: 100 })
+  const svg32 = createLogoSVG(32);
+  await sharp(Buffer.from(svg32))
+    .png()
     .toFile(path.join(WEB_PUBLIC, 'favicon.ico'));
   console.log('  Created favicon.ico');
+
+  // Save master SVG
+  fs.writeFileSync(
+    path.join(WEB_PUBLIC, 'nightticker-logo.svg'),
+    createLogoSVG(512)
+  );
+  console.log('  Created nightticker-logo.svg');
 
   console.log('\nGenerating app icons...');
 
   // App header logo
-  await sharp(SOURCE)
-    .resize(512, 512, { kernel: sharp.kernel.lanczos3 })
-    .png({ quality: 100 })
+  const logoSvg = createLogoSVG(512);
+  await sharp(Buffer.from(logoSvg))
+    .png()
     .toFile(path.join(APP_ASSETS, 'logo.png'));
   console.log('  Created assets/logo.png');
 
   // App launcher icons
   for (const icon of APP_ICONS) {
+    const svg = createLogoSVG(icon.size);
     const launcherPath = path.join(APP_RES, icon.folder, 'ic_launcher.png');
     const roundPath = path.join(APP_RES, icon.folder, 'ic_launcher_round.png');
 
-    await sharp(SOURCE)
-      .resize(icon.size, icon.size, { kernel: sharp.kernel.lanczos3 })
-      .png({ quality: 100 })
-      .toFile(launcherPath);
+    await sharp(Buffer.from(svg)).png().toFile(launcherPath);
     console.log(`  Created ${icon.folder}/ic_launcher.png`);
 
-    await sharp(SOURCE)
-      .resize(icon.size, icon.size, { kernel: sharp.kernel.lanczos3 })
-      .png({ quality: 100 })
-      .toFile(roundPath);
+    await sharp(Buffer.from(svg)).png().toFile(roundPath);
     console.log(`  Created ${icon.folder}/ic_launcher_round.png`);
   }
 
   // Adaptive icon foreground
-  await sharp(SOURCE)
-    .resize(432, 432, { kernel: sharp.kernel.lanczos3 })
-    .png({ quality: 100 })
+  const foregroundSvg = createLogoSVG(432);
+  await sharp(Buffer.from(foregroundSvg))
+    .png()
     .toFile(path.join(APP_RES, 'drawable', 'ic_launcher_foreground.png'));
   console.log('  Created drawable/ic_launcher_foreground.png');
 
-  console.log('\nAll icons generated with original colors!');
+  console.log('\nAll icons created with original OG logo design!');
 }
 
 main().catch(console.error);

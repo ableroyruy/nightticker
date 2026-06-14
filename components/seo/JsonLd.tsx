@@ -44,7 +44,7 @@ interface JsonLdProps {
   stockSymbol?: string;
 }
 
-export function JsonLd({ type, locale, baseUrl = 'https://nightticker.com', stockName, stockSymbol }: JsonLdProps) {
+export function JsonLd({ type, locale, baseUrl = 'https://www.nightticker.com', stockName, stockSymbol }: JsonLdProps) {
   let data: WebsiteJsonLd | OrganizationJsonLd | FinancialProductJsonLd;
 
   if (type === 'website') {

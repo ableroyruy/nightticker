@@ -9,7 +9,7 @@ type Props = {
   params: Promise<{ locale: string; category: string }>;
 };
 
-const BASE_URL = 'https://nightticker.com';
+const BASE_URL = 'https://www.nightticker.com';
 
 const validCategories: StockCategory[] = ['US', 'KR', 'JP', 'INDEX', 'ETF', 'COMMODITY', 'FX', 'SPECIAL', 'SEMICONDUCTOR'];
 

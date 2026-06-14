@@ -83,7 +83,7 @@ export default async function Image({
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={`${process.env.NEXT_PUBLIC_SITE_URL || 'https://nightticker.com'}/nightticker-logo-transparent-512.png`}
+            src={`${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.nightticker.com'}/nightticker-logo-transparent-512.png`}
             alt="NightTicker Logo"
             width={60}
             height={60}

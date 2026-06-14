@@ -19,7 +19,7 @@ export default async function Image({ params }: { params: Promise<{ locale: stri
       ? '야간 시세 | 주말 시세 | 휴일 시세'
       : 'Overnight Prices | Weekend Prices | Holiday Prices';
 
-  const logoUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://nightticker.com'}/nightticker-logo-transparent-512.png`;
+  const logoUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.nightticker.com'}/nightticker-logo-transparent-512.png`;
 
   return new ImageResponse(
     (

@@ -7,7 +7,7 @@ import { ShareButton } from '@/components/common/ShareButton';
 import { Stock } from '@/lib/providers/types';
 import { useSearchRanking } from '@/lib/context/SearchRankingContext';
 
-const BASE_URL = 'https://nightticker.com';
+const BASE_URL = 'https://www.nightticker.com';
 
 interface StockPageHeaderProps {
   stock: Stock;

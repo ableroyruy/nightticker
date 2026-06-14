@@ -5,7 +5,7 @@ export const size = { width: 180, height: 180 };
 export const contentType = 'image/png';
 
 export default function AppleIcon() {
-  const logoUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://nightticker.com'}/nightticker-logo-transparent-512.png`;
+  const logoUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.nightticker.com'}/nightticker-logo-transparent-512.png`;
 
   return new ImageResponse(
     (

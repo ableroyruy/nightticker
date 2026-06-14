@@ -10,7 +10,7 @@ type Props = {
   params: Promise<{ locale: string }>;
 };
 
-const BASE_URL = 'https://nightticker.com';
+const BASE_URL = 'https://www.nightticker.com';
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { locale } = await params;

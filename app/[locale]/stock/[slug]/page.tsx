@@ -25,7 +25,7 @@ export async function generateStaticParams() {
   );
 }
 
-const BASE_URL = 'https://nightticker.com';
+const BASE_URL = 'https://www.nightticker.com';
 
 function getAssetType(stock: Stock, locale: string): { term: string; typeName: string } {
   const isStock = ['US', 'KR', 'JP'].includes(stock.category);

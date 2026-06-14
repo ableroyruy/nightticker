@@ -1,6 +1,6 @@
 import { MetadataRoute } from 'next';
 
-const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://nightticker.com';
+const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.nightticker.com';
 
 export default function robots(): MetadataRoute.Robots {
   return {

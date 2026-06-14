@@ -1,7 +1,7 @@
 import { MetadataRoute } from 'next';
 import { getAllSlugs } from '@/lib/markets/stocks';
 
-const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://nightticker.com';
+const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.nightticker.com';
 
 // Category slugs that have stocks
 const categories = ['us', 'kr', 'jp', 'index', 'etf', 'commodity', 'fx', 'special', 'semiconductor'];
