@@ -35,7 +35,7 @@ export function GainersLosersSection({
   return (
     <div className="space-y-3">
       {/* Market Header */}
-      <div className="flex items-center justify-between pl-1 pr-2">
+      <div className="flex items-center justify-between pl-3 pr-1">
         <div className="flex items-center gap-2">
           <div
             className={cn(
@@ -78,7 +78,7 @@ export function GainersLosersSection({
 
       {/* Gainers */}
       <div className="space-y-3">
-        <h3 className="text-base font-medium flex items-center gap-2 pl-3">
+        <h3 className="text-base font-medium flex items-center gap-2 pl-5">
           <span className="text-sm text-gain arrow-bounce">▲</span>
           {t('topGainers')}
         </h3>
@@ -99,7 +99,7 @@ export function GainersLosersSection({
 
       {/* Losers */}
       <div className="space-y-3">
-        <h3 className="text-base font-medium flex items-center gap-2 pl-3">
+        <h3 className="text-base font-medium flex items-center gap-2 pl-5">
           <span className="text-sm text-loss arrow-bounce">▼</span>
           {t('topLosers')}
         </h3>

@@ -38,7 +38,7 @@ export function CategorySection({ market, assets, limit = 10 }: CategorySectionP
   return (
     <div className="space-y-3">
       {/* Market Header */}
-      <div className="flex items-center justify-between pl-1 pr-2">
+      <div className="flex items-center justify-between pl-3 pr-1">
         <div className="flex items-center gap-2">
           <div
             className={cn(
