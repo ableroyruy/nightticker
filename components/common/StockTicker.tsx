@@ -36,6 +36,7 @@ export function StockTicker() {
       return {
         ...stock,
         price: ticker?.price ?? null,
+        change24h: ticker?.change24h ?? null,
         changePercent: ticker?.changePercent24h ?? null,
       };
     })
@@ -53,7 +54,10 @@ export function StockTicker() {
       <div className="relative">
         <div className="animate-ticker flex whitespace-nowrap py-2">
           {tickerItems.map((stock, index) => {
-            const isPositive = (stock.changePercent ?? 0) >= 0;
+            const isPositive = stock.changePercent != null && stock.changePercent > 0;
+            const isNegative = stock.changePercent != null && stock.changePercent < 0;
+            const isZero = stock.changePercent != null && stock.changePercent === 0;
+
             return (
               <Link
                 key={`${stock.symbol}-${index}`}
@@ -63,24 +67,47 @@ export function StockTicker() {
                 <span className="font-medium text-sm">
                   {getLocalizedName(stock, locale)}
                 </span>
-                <span className="text-sm text-muted-foreground">
+                {/* Price with color */}
+                <span className={cn(
+                  'text-sm tabular-nums',
+                  isPositive && 'text-gain',
+                  isNegative && 'text-loss',
+                  isZero && 'text-muted-foreground'
+                )}>
                   ${stock.price?.toLocaleString('en-US', {
                     minimumFractionDigits: 2,
                     maximumFractionDigits: 2,
                   })}
                 </span>
-                {stock.changePercent !== null && (
+                {/* Change Amount */}
+                {stock.change24h != null && (
                   <span
                     className={cn(
                       'flex items-center gap-0.5 text-xs font-medium tabular-nums',
-                      isPositive ? 'text-gain' : 'text-loss'
+                      isPositive && 'text-gain',
+                      isNegative && 'text-loss',
+                      isZero && 'text-muted-foreground'
                     )}
                   >
                     <span className="text-[8px] arrow-bounce">
-                      {isPositive ? '▲' : '▼'}
+                      {isPositive && '▲'}
+                      {isNegative && '▼'}
+                      {isZero && '−'}
                     </span>
-                    {isPositive ? '+' : ''}
-                    {stock.changePercent.toFixed(2)}%
+                    {isPositive ? '+$' : isNegative ? '-$' : '$'}{Math.abs(stock.change24h).toFixed(2)}
+                  </span>
+                )}
+                {/* Change Percent */}
+                {stock.changePercent != null && (
+                  <span
+                    className={cn(
+                      'text-xs font-medium tabular-nums',
+                      isPositive && 'text-gain',
+                      isNegative && 'text-loss',
+                      isZero && 'text-muted-foreground'
+                    )}
+                  >
+                    {isPositive ? '+' : ''}{stock.changePercent.toFixed(2)}%
                   </span>
                 )}
                 <span className="text-border/50 mx-2">|</span>
