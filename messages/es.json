@@ -209,7 +209,7 @@
     "closed": "Cerrado",
     "viewSourceMarket": "Ver Mercado de Origen",
     "exploreDetails": "Explorar Detalles",
-    "priceUnavailable": "Precio no disponible",
+    "priceUnavailable": "Actualizando precio...",
     "loading": "Cargando..."
   },
   "table": {

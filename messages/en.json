@@ -209,7 +209,7 @@
     "closed": "Closed",
     "viewSourceMarket": "View Source Market",
     "exploreDetails": "Explore Market Details",
-    "priceUnavailable": "Price unavailable",
+    "priceUnavailable": "Updating price...",
     "loading": "Loading..."
   },
   "table": {

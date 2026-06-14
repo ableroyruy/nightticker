@@ -70,6 +70,7 @@ export function PriceDisplay({
 
   const isPositive = changePercent24h != null && changePercent24h > 0;
   const isNegative = changePercent24h != null && changePercent24h < 0;
+  const isZero = changePercent24h != null && changePercent24h === 0;
 
   // Format change amount (with or without currency symbol)
   const formattedChange = change24h != null
@@ -85,7 +86,12 @@ export function PriceDisplay({
 
   return (
     <div className="space-y-2">
-      <span className={sizeClasses[size]}>{formattedPrice}</span>
+      <span className={cn(
+        sizeClasses[size],
+        isPositive && 'text-gain',
+        isNegative && 'text-loss',
+        isZero && 'text-muted-foreground'
+      )}>{formattedPrice}</span>
       {showChange && (changePercent24h != null || change24h != null) && (
         <div className="flex items-center gap-3 flex-wrap">
           {/* Change Amount with background */}
@@ -96,13 +102,13 @@ export function PriceDisplay({
                 changeSizeClasses[size],
                 isPositive && 'text-gain bg-gain',
                 isNegative && 'text-loss bg-loss',
-                !isPositive && !isNegative && 'text-muted-foreground bg-muted'
+                isZero && 'text-muted-foreground bg-muted'
               )}
             >
               <span className={cn(triangleSizes[size], 'arrow-bounce')}>
                 {isPositive && '▲'}
                 {isNegative && '▼'}
-                {!isPositive && !isNegative && '−'}
+                {isZero && '−'}
               </span>
               {formattedChange}
             </span>
@@ -116,7 +122,7 @@ export function PriceDisplay({
                 changeSizeClasses[size],
                 isPositive && 'text-gain',
                 isNegative && 'text-loss',
-                !isPositive && !isNegative && 'text-muted-foreground'
+                isZero && 'text-muted-foreground'
               )}
             >
               {formattedPercent}

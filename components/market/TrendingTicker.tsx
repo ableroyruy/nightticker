@@ -2,12 +2,12 @@
 
 import { useEffect, useState, useMemo } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useLocale, useTranslations } from 'next-intl';
 import { motion, AnimatePresence } from 'framer-motion';
-import { TrendingUp } from 'lucide-react';
 import { useSearchRanking, SearchRankingItem } from '@/lib/context/SearchRankingContext';
 import { useHyperliquidTicker } from '@/lib/hooks/useHyperliquidTicker';
-import { getStockBySymbol } from '@/lib/markets/stocks';
+import { stocks, getStockBySymbol } from '@/lib/markets/stocks';
 import { Stock } from '@/lib/providers/types';
 import { cn } from '@/lib/utils';
 
@@ -35,13 +35,27 @@ export function TrendingTicker({
   onSelect,
 }: TrendingTickerProps) {
   const locale = useLocale();
+  const router = useRouter();
   const t = useTranslations('nav');
   const { getTopRankings } = useSearchRanking();
   const { tickers } = useHyperliquidTicker();
   const [currentIndex, setCurrentIndex] = useState(0);
   const prefix = locale === 'en' ? '' : `/${locale}`;
 
-  const topRankings = useMemo(() => getTopRankings(limit), [getTopRankings, limit]);
+  // Use all stocks as fallback when no rankings available
+  const topRankings = useMemo(() => {
+    const rankings = getTopRankings(stocks.length); // Get all possible rankings
+    if (rankings.length >= limit) {
+      return rankings.slice(0, limit);
+    }
+    // Fallback: create rankings from all stocks
+    return stocks.map((stock, index) => ({
+      symbol: stock.symbol,
+      rank: index + 1,
+      count: 0,
+      rankChange: 0,
+    }));
+  }, [getTopRankings, limit]);
 
   // Cycle through items every 3 seconds
   useEffect(() => {
@@ -65,17 +79,24 @@ export function TrendingTicker({
   const ticker = tickers[tickerKey];
   const isPositive = ticker?.changePercent24h != null && ticker.changePercent24h > 0;
   const isNegative = ticker?.changePercent24h != null && ticker.changePercent24h < 0;
+  const isZero = ticker?.changePercent24h != null && ticker.changePercent24h === 0;
 
   const handleClick = () => {
     onSelect?.(stock.slug);
   };
 
+  const handlePopularClick = () => {
+    router.push(`${prefix}/popular`);
+  };
+
   return (
     <div className={cn('flex items-center gap-2 text-sm', className)}>
-      <div className="flex items-center gap-1 text-muted-foreground">
-        <TrendingUp className="h-3.5 w-3.5" />
+      <button
+        onClick={handlePopularClick}
+        className="flex items-center gap-1 text-muted-foreground hover:text-primary transition-colors cursor-pointer"
+      >
         <span className="text-xs">{t('popular')}</span>
-      </div>
+      </button>
 
       <div className="relative h-5 overflow-hidden flex-1">
         <AnimatePresence mode="wait">
@@ -98,7 +119,12 @@ export function TrendingTicker({
               <span className="truncate font-medium">{displayName}</span>
               {/* Price */}
               {ticker?.price && (
-                <span className="text-xs tabular-nums">
+                <span className={cn(
+                  'text-xs tabular-nums',
+                  isPositive && 'text-gain',
+                  isNegative && 'text-loss',
+                  isZero && 'text-muted-foreground'
+                )}>
                   ${ticker.price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </span>
               )}
@@ -108,11 +134,12 @@ export function TrendingTicker({
                   'text-xs tabular-nums flex items-center gap-0.5',
                   isPositive && 'text-gain',
                   isNegative && 'text-loss',
-                  !isPositive && !isNegative && 'text-muted-foreground'
+                  isZero && 'text-muted-foreground'
                 )}>
                   <span className="text-[8px] arrow-bounce">
                     {isPositive && '▲'}
                     {isNegative && '▼'}
+                    {isZero && '−'}
                   </span>
                   {isPositive ? '+' : ''}{ticker.changePercent24h.toFixed(2)}%
                 </span>
@@ -122,12 +149,14 @@ export function TrendingTicker({
         </AnimatePresence>
       </div>
 
-      {/* Progress dots */}
-      <div className="flex gap-1">
+      {/* Progress dots - clickable to go to popular page */}
+      <button
+        onClick={handlePopularClick}
+        className="flex gap-1 cursor-pointer hover:opacity-80 transition-opacity"
+      >
         {topRankings.slice(0, 5).map((_, index) => (
-          <button
+          <span
             key={index}
-            onClick={() => setCurrentIndex(index)}
             className={cn(
               'w-1.5 h-1.5 rounded-full transition-colors',
               index === currentIndex % 5
@@ -136,7 +165,7 @@ export function TrendingTicker({
             )}
           />
         ))}
-      </div>
+      </button>
     </div>
   );
 }
@@ -177,14 +206,25 @@ export function TrendingMarquee({
   onSelect,
 }: TrendingTickerProps) {
   const locale = useLocale();
+  const router = useRouter();
   const t = useTranslations('nav');
   const { getTopRankings } = useSearchRanking();
   const { tickers } = useHyperliquidTicker();
   const prefix = locale === 'en' ? '' : `/${locale}`;
 
-  const topRankings = useMemo(() => getTopRankings(limit), [getTopRankings, limit]);
-
-  if (topRankings.length === 0) return null;
+  // Use all stocks as fallback when no rankings available
+  const topRankings = useMemo(() => {
+    const rankings = getTopRankings(stocks.length);
+    if (rankings.length >= limit) {
+      return rankings.slice(0, limit);
+    }
+    return stocks.slice(0, limit).map((stock, index) => ({
+      symbol: stock.symbol,
+      rank: index + 1,
+      count: 0,
+      rankChange: 0,
+    }));
+  }, [getTopRankings, limit]);
 
   const items = topRankings.map((item) => {
     const stock = getStockBySymbol(item.symbol);
@@ -193,12 +233,18 @@ export function TrendingMarquee({
 
   if (items.length === 0) return null;
 
+  const handlePopularClick = () => {
+    router.push(`${prefix}/popular`);
+  };
+
   return (
     <div className={cn('overflow-hidden', className)}>
-      <div className="flex items-center gap-1 text-xs text-muted-foreground mb-1">
-        <TrendingUp className="h-3 w-3" />
+      <button
+        onClick={handlePopularClick}
+        className="flex items-center gap-1 text-xs text-muted-foreground mb-1 hover:text-primary transition-colors cursor-pointer"
+      >
         <span>{t('popular')}</span>
-      </div>
+      </button>
 
       <div className="relative overflow-hidden">
         <motion.div
@@ -222,6 +268,7 @@ export function TrendingMarquee({
             const ticker = tickers[tickerKey];
             const isPositive = ticker?.changePercent24h != null && ticker.changePercent24h > 0;
             const isNegative = ticker?.changePercent24h != null && ticker.changePercent24h < 0;
+            const isZero = ticker?.changePercent24h != null && ticker.changePercent24h === 0;
 
             return (
               <Link
@@ -231,16 +278,23 @@ export function TrendingMarquee({
                 className="flex items-center gap-1.5 px-2 py-1 rounded-full bg-muted/30 hover:bg-muted/50 transition-colors shrink-0"
               >
                 <span className="text-primary font-medium">#{item.rank}</span>
-                <span className="font-medium">{displayName}</span>
+                <span className={cn(
+                  'font-medium',
+                  isPositive && 'text-gain',
+                  isNegative && 'text-loss',
+                  isZero && 'text-muted-foreground'
+                )}>{displayName}</span>
                 {ticker?.changePercent24h != null && (
                   <span className={cn(
                     'text-xs tabular-nums flex items-center gap-0.5',
                     isPositive && 'text-gain',
-                    isNegative && 'text-loss'
+                    isNegative && 'text-loss',
+                    isZero && 'text-muted-foreground'
                   )}>
                     <span className="text-[8px] arrow-bounce">
                       {isPositive && '▲'}
                       {isNegative && '▼'}
+                      {isZero && '−'}
                     </span>
                     {isPositive ? '+' : ''}{ticker.changePercent24h.toFixed(1)}%
                   </span>

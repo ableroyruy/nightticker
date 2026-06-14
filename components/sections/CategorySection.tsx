@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { useTranslations } from 'next-intl';
-import { ArrowRight, BarChart3, Coins, DollarSign, Cpu } from 'lucide-react';
+import { ArrowRight } from 'lucide-react';
 import { MarketAsset, MarketType } from '@/lib/types/market';
 import { AnimatedAssetGrid } from '@/components/market/AnimatedAssetGrid';
 import { Button } from '@/components/ui/button';
@@ -13,15 +13,6 @@ interface CategorySectionProps {
   assets: MarketAsset[];
   limit?: number;
 }
-
-const marketIcons: Record<string, React.ElementType> = {
-  INDEX: BarChart3,
-  ETF: BarChart3,
-  COMMODITY: Coins,
-  FX: DollarSign,
-  SPECIAL: Cpu,
-  SEMICONDUCTOR: Cpu,
-};
 
 export function CategorySection({ market, assets, limit = 10 }: CategorySectionProps) {
   const t = useTranslations('categories');
@@ -39,8 +30,6 @@ export function CategorySection({ market, assets, limit = 10 }: CategorySectionP
   });
 
   const displayAssets = sortedAssets.slice(0, limit);
-
-  const Icon = marketIcons[market] || BarChart3;
 
   // Get count of gainers and losers for display
   const gainersCount = assets.filter(a => a.changePercent24h != null && a.changePercent24h > 0).length;
@@ -62,10 +51,7 @@ export function CategorySection({ market, assets, limit = 10 }: CategorySectionP
               market === 'SEMICONDUCTOR' && 'bg-violet-500'
             )}
           />
-          <div className="flex items-center gap-2">
-            <Icon className="h-5 w-5 text-muted-foreground" />
-            <h2 className="text-2xl font-bold">{marketLabel}</h2>
-          </div>
+          <h2 className="text-2xl font-bold">{marketLabel}</h2>
           {/* Small indicator showing gainers/losers count */}
           <div className="flex items-center gap-2 text-sm font-medium">
             {gainersCount > 0 && (

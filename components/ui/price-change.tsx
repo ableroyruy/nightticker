@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
 
 function formatPrice(value: number, showCurrency: boolean = true): string {
@@ -66,6 +67,7 @@ export function PriceChange({
         isZero && 'text-muted-foreground',
         showBackground && isPositive && 'bg-gain px-1.5 py-0.5 rounded',
         showBackground && isNegative && 'bg-loss px-1.5 py-0.5 rounded',
+        showBackground && isZero && 'bg-muted px-1.5 py-0.5 rounded',
         className
       )}
     >
@@ -107,6 +109,7 @@ export function PriceDisplay({
   className,
   hideCurrency = false,
 }: PriceDisplayProps) {
+  const t = useTranslations('market');
 
   const sizeClasses = {
     sm: 'text-sm',
@@ -118,7 +121,7 @@ export function PriceDisplay({
   if (price === null || price === undefined) {
     return (
       <div className={cn('tabular-nums', className)}>
-        <span className="text-muted-foreground">Price unavailable</span>
+        <span className="text-muted-foreground">{t('priceUnavailable')}</span>
       </div>
     );
   }
@@ -142,6 +145,20 @@ export function PriceDisplay({
         ? price > previousPrice
         : null;
 
+  const isDown =
+    calculatedChange !== null
+      ? calculatedChange < 0
+      : previousPrice !== null && previousPrice !== undefined
+        ? price < previousPrice
+        : null;
+
+  const isFlat =
+    calculatedChange !== null
+      ? calculatedChange === 0
+      : previousPrice !== null && previousPrice !== undefined
+        ? price === previousPrice
+        : null;
+
   return (
     <div className={cn('flex flex-col gap-1', className)}>
       <span
@@ -149,7 +166,8 @@ export function PriceDisplay({
           'tabular-nums font-semibold',
           sizeClasses[size],
           isUp === true && 'text-gain',
-          isUp === false && 'text-loss'
+          isDown === true && 'text-loss',
+          isFlat === true && 'text-muted-foreground'
         )}
       >
         {formattedPrice}

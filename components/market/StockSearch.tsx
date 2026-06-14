@@ -3,7 +3,7 @@
 import { useState, useMemo, useRef, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations, useLocale } from 'next-intl';
-import { Search, TrendingUp, X, Flame } from 'lucide-react';
+import { Search, TrendingUp, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import { stocks } from '@/lib/markets/stocks';
 import { cn } from '@/lib/utils';
@@ -155,8 +155,7 @@ export function StockSearch({ className, onSelect, showTrending = true }: StockS
       {isOpen && (
         <div className="absolute top-full mt-2 w-full glass-card border border-border/50 rounded-xl shadow-2xl z-50 max-h-80 overflow-auto">
           {!query.trim() && (
-            <div className="px-4 py-2 text-xs font-medium text-muted-foreground uppercase tracking-wide border-b border-border/50 flex items-center gap-1.5">
-              <Flame className="h-3.5 w-3.5 text-orange-500" />
+            <div className="px-4 py-2 text-xs font-medium text-muted-foreground uppercase tracking-wide border-b border-border/50">
               {tNav('popular')}
             </div>
           )}
