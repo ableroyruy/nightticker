@@ -25,6 +25,7 @@ function getLocalizedName(stock: Stock, locale: string): string {
 export function PopularSearchesPage() {
   const locale = useLocale();
   const t = useTranslations('popularRanking');
+  const tMarket = useTranslations('market');
   const { rankings } = useSearchRanking();
   const { tickers } = useHyperliquidTicker();
   const prefix = locale === 'en' ? '' : `/${locale}`;
@@ -107,7 +108,7 @@ export function PopularSearchesPage() {
                               maximumFractionDigits: ticker.price < 1 ? 4 : 2,
                             })}`
                           ) : (
-                            <span className="text-muted-foreground">-</span>
+                            <span className="text-muted-foreground text-sm">{tMarket('priceUnavailable')}</span>
                           )}
                         </span>
 

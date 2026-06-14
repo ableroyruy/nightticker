@@ -28,21 +28,20 @@ export function StockTicker() {
   const { tickers } = useHyperliquidTicker();
   const prefix = locale === 'en' ? '' : `/${locale}`;
 
-  // Get all stocks with their prices
-  const stocksWithPrices = stocks
-    .map((stock) => {
-      const tickerKey = stock.hyperliquidSymbol.replace('xyz:', '');
-      const ticker = tickers[tickerKey];
-      return {
-        ...stock,
-        price: ticker?.price ?? null,
-        change24h: ticker?.change24h ?? null,
-        changePercent: ticker?.changePercent24h ?? null,
-      };
-    })
-    .filter((s) => s.price !== null);
+  // Get all stocks with their prices (show all stocks regardless of price data)
+  const stocksWithPrices = stocks.map((stock) => {
+    const tickerKey = stock.hyperliquidSymbol.replace('xyz:', '');
+    const ticker = tickers[tickerKey];
+    return {
+      ...stock,
+      price: ticker?.price ?? null,
+      change24h: ticker?.change24h ?? null,
+      changePercent: ticker?.changePercent24h ?? null,
+    };
+  });
 
-  if (stocksWithPrices.length === 0) {
+  // Always show the ticker with all stocks
+  if (stocks.length === 0) {
     return null;
   }
 
@@ -68,17 +67,21 @@ export function StockTicker() {
                   {getLocalizedName(stock, locale)}
                 </span>
                 {/* Price with color */}
-                <span className={cn(
-                  'text-sm tabular-nums',
-                  isPositive && 'text-gain',
-                  isNegative && 'text-loss',
-                  isZero && 'text-muted-foreground'
-                )}>
-                  ${stock.price?.toLocaleString('en-US', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
-                </span>
+                {stock.price !== null ? (
+                  <span className={cn(
+                    'text-sm tabular-nums',
+                    isPositive && 'text-gain',
+                    isNegative && 'text-loss',
+                    isZero && 'text-muted-foreground'
+                  )}>
+                    ${stock.price.toLocaleString('en-US', {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </span>
+                ) : (
+                  <span className="text-sm text-muted-foreground">-</span>
+                )}
                 {/* Change Amount */}
                 {stock.change24h != null && (
                   <span

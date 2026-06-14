@@ -1,7 +1,6 @@
 'use client';
 
 import { useTranslations, useLocale } from 'next-intl';
-import { Star } from 'lucide-react';
 import { useFavorites } from '@/lib/context/FavoritesContext';
 import { AssetCard } from '@/components/market/AssetCard';
 import { MarketAsset } from '@/lib/types/market';
@@ -21,7 +20,7 @@ export function FavoritesSection({ tickers }: FavoritesSectionProps) {
     return (
       <section className="space-y-4">
         <h2 className="text-xl font-semibold flex items-center gap-2">
-          <Star className="h-5 w-5 text-yellow-500" />
+          <span className="w-1 h-5 bg-yellow-500 rounded-full" />
           {t('title')}
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
@@ -40,11 +39,11 @@ export function FavoritesSection({ tickers }: FavoritesSectionProps) {
     return (
       <section className="space-y-4">
         <h2 className="text-xl font-semibold flex items-center gap-2">
-          <Star className="h-5 w-5 text-yellow-500" />
+          <span className="w-1 h-5 bg-yellow-500 rounded-full" />
           {t('title')}
         </h2>
         <div className="glass-card rounded-2xl p-8 text-center">
-          <Star className="h-12 w-12 text-muted-foreground/30 mx-auto mb-3" />
+          <span className="w-2 h-12 bg-muted-foreground/30 rounded-full mx-auto mb-3 block" />
           <p className="text-muted-foreground">{t('empty')}</p>
           <p className="text-xs text-muted-foreground mt-1">{t('emptyHint')}</p>
         </div>
@@ -80,7 +79,7 @@ export function FavoritesSection({ tickers }: FavoritesSectionProps) {
     <section className="space-y-4">
       <div className="flex items-center justify-between">
         <h2 className="text-xl font-semibold flex items-center gap-2">
-          <Star className="h-5 w-5 text-yellow-500 fill-yellow-500" />
+          <span className="w-1 h-5 bg-yellow-500 rounded-full" />
           {t('title')}
         </h2>
         <span className="text-sm text-muted-foreground">
