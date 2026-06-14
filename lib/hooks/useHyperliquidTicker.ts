@@ -6,6 +6,7 @@ import { ConnectionStatus } from '@/lib/types/market';
 const WS_URL = 'wss://api.hyperliquid.xyz/ws';
 const API_URL = 'https://api.hyperliquid.xyz/info';
 const CACHED_PRICES_URL = '/api/market/prices'; // Our cached API
+const CACHED_META_URL = '/api/market/meta'; // Our cached meta API
 const META_REFRESH_INTERVAL = 60000; // 1 minute for 24h base prices
 const RECONNECT_DELAY = 3000;
 
@@ -88,6 +89,41 @@ export function useHyperliquidTicker(): UseHyperliquidTickerReturn {
     setLastUpdate(new Date());
   }, []);
 
+  // Fetch cached meta (prevDayPx) from our API (fast)
+  const fetchCachedMeta = useCallback(async () => {
+    if (!mountedRef.current) return;
+
+    try {
+      const response = await fetch(CACHED_META_URL);
+      if (!response.ok) return;
+
+      const data: Record<string, number> = await response.json();
+      if (!mountedRef.current) return;
+
+      prevDayPricesRef.current = data;
+
+      // Update tickers if we already have price data
+      if (Object.keys(tickersRef.current).length > 0) {
+        const updated: Record<string, TickerData> = {};
+        for (const [symbol, ticker] of Object.entries(tickersRef.current)) {
+          const prevDayPx = data[symbol] || ticker.prevDayPx;
+          const change24h = prevDayPx > 0 ? ticker.price - prevDayPx : 0;
+          const changePercent24h = prevDayPx > 0 ? (change24h / prevDayPx) * 100 : 0;
+          updated[symbol] = {
+            ...ticker,
+            prevDayPx,
+            change24h,
+            changePercent24h,
+          };
+        }
+        tickersRef.current = updated;
+        setTickers(updated);
+      }
+    } catch (e) {
+      console.error('Failed to fetch cached meta:', e);
+    }
+  }, []);
+
   // Fetch initial prices from our cached API (fast)
   const fetchCachedPrices = useCallback(async () => {
     if (!mountedRef.current) return;
@@ -99,37 +135,34 @@ export function useHyperliquidTicker(): UseHyperliquidTickerReturn {
       const mids: Record<string, string> = await response.json();
       if (!mountedRef.current) return;
 
-      // Process prices if we already have prevDayPx data
-      if (Object.keys(prevDayPricesRef.current).length > 0) {
-        processPriceUpdate(mids);
-      } else {
-        // Store raw prices temporarily
-        const prevDayPrices = prevDayPricesRef.current;
-        const newTickers: Record<string, TickerData> = {};
+      // Process prices with prevDayPx data
+      const prevDayPrices = prevDayPricesRef.current;
+      const newTickers: Record<string, TickerData> = {};
 
-        for (const [rawSymbol, priceStr] of Object.entries(mids)) {
-          const price = parseFloat(priceStr);
-          if (isNaN(price)) continue;
+      for (const [rawSymbol, priceStr] of Object.entries(mids)) {
+        const price = parseFloat(priceStr);
+        if (isNaN(price)) continue;
 
-          const symbol = rawSymbol.replace('xyz:', '');
-          const prevDayPx = prevDayPrices[symbol] || 0;
+        const symbol = rawSymbol.replace('xyz:', '');
+        const prevDayPx = prevDayPrices[symbol] || 0;
+        const change24h = prevDayPx > 0 ? price - prevDayPx : 0;
+        const changePercent24h = prevDayPx > 0 ? (change24h / prevDayPx) * 100 : 0;
 
-          newTickers[symbol] = {
-            price,
-            prevDayPx,
-            change24h: 0,
-            changePercent24h: 0,
-          };
-        }
-
-        tickersRef.current = newTickers;
-        setTickers(newTickers);
-        setLastUpdate(new Date());
+        newTickers[symbol] = {
+          price,
+          prevDayPx,
+          change24h,
+          changePercent24h,
+        };
       }
+
+      tickersRef.current = newTickers;
+      setTickers(newTickers);
+      setLastUpdate(new Date());
     } catch (e) {
       console.error('Failed to fetch cached prices:', e);
     }
-  }, [processPriceUpdate]);
+  }, []);
 
   // Fetch metaAndAssetCtxs for 24h base prices (REST)
   const fetchMeta = useCallback(async () => {
@@ -274,14 +307,14 @@ export function useHyperliquidTicker(): UseHyperliquidTickerReturn {
   useEffect(() => {
     mountedRef.current = true;
 
-    // Fast init: cached prices -> meta -> WebSocket
+    // Fast init: cached meta + prices in parallel -> WebSocket
     const init = async () => {
-      // 1. Get cached prices immediately (fast)
-      await fetchCachedPrices();
-      // 2. Fetch meta for 24h base prices
-      await fetchMeta();
-      // 3. Connect WebSocket for real-time updates
+      // 1. Get cached meta and prices in parallel (both fast)
+      await Promise.all([fetchCachedMeta(), fetchCachedPrices()]);
+      // 2. Connect WebSocket for real-time updates
       connectWebSocket();
+      // 3. Refresh meta from source in background (for freshness)
+      fetchMeta();
     };
     init();
 
@@ -306,7 +339,7 @@ export function useHyperliquidTicker(): UseHyperliquidTickerReturn {
         reconnectTimeoutRef.current = null;
       }
     };
-  }, [fetchCachedPrices, fetchMeta, connectWebSocket]);
+  }, [fetchCachedMeta, fetchCachedPrices, fetchMeta, connectWebSocket]);
 
   return {
     tickers,
