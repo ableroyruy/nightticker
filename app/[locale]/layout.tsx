@@ -8,7 +8,6 @@ import { Footer } from '@/components/layout/Footer';
 import { JsonLd } from '@/components/seo/JsonLd';
 import { FavoritesProvider } from '@/lib/context/FavoritesContext';
 import { SearchRankingProvider } from '@/lib/context/SearchRankingContext';
-import { StockTicker } from '@/components/common/StockTicker';
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -62,7 +61,6 @@ export default async function LocaleLayout({ children, params }: Props) {
           <FavoritesProvider>
             <SearchRankingProvider>
               <Header />
-              <StockTicker />
               <main className="flex-1">{children}</main>
               <Footer />
             </SearchRankingProvider>
