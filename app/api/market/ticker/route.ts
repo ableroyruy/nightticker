@@ -36,7 +36,7 @@ async function fetchPrices(): Promise<Record<string, string>> {
   const response = await fetch(API_URL, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ type: 'allMids' }),
+    body: JSON.stringify({ type: 'allMids', dex: 'xyz' }),
   });
 
   if (!response.ok) {
