@@ -17,7 +17,7 @@ import { useSearchRanking } from '@/lib/context/SearchRankingContext';
 
 const MiniChart = dynamic(() => import('./MiniChart').then((mod) => mod.MiniChart), {
   ssr: false,
-  loading: () => <Skeleton className="w-[180px] h-[72px] rounded" />,
+  loading: () => <Skeleton className="w-[140px] h-[56px] rounded" />,
 });
 
 interface AssetCardProps {
@@ -130,14 +130,14 @@ function AssetCardInner({
     <Link href={`${prefix}${href}`} className="block group">
       <div
         className={cn(
-          'glass-card glass-card-hover rounded-2xl p-4 h-full cursor-pointer overflow-hidden',
+          'glass-card glass-card-hover rounded-2xl p-3 h-full cursor-pointer overflow-hidden',
           'transition-all duration-300 active:scale-[0.98]',
           'group-hover:shadow-lg',
           marketAccentBorders[asset.market],
           className
         )}
       >
-        <div className="flex items-start justify-between gap-2 mb-3">
+        <div className="flex items-start justify-between gap-2 mb-2">
           <div className="flex items-center gap-2 min-w-0">
             {rank && (
               <span className="text-xs font-medium text-muted-foreground w-5">
@@ -147,6 +147,7 @@ function AssetCardInner({
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
                 <span className="font-semibold truncate">{displayName}</span>
+                <span className="text-xs text-muted-foreground">{asset.symbol}</span>
                 {searchRank && searchRank.rank <= 10 && (
                   <button
                     type="button"
@@ -162,7 +163,6 @@ function AssetCardInner({
                         : 'bg-primary/20 text-primary hover:bg-primary/30'
                     )}
                   >
-                    <span className="animate-pulse">🔥</span>
                     #{searchRank.rank}
                   </button>
                 )}
@@ -179,7 +179,6 @@ function AssetCardInner({
                   </Badge>
                 )}
               </div>
-              <p className="text-xs text-muted-foreground truncate">{asset.symbol}</p>
             </div>
           </div>
           <FavoriteButton
@@ -204,7 +203,7 @@ function AssetCardInner({
         {/* Price and Chart Row - Category colored background */}
         <div
           className={cn(
-            'relative -mx-4 -mb-4 px-4 py-3 overflow-hidden',
+            'relative -mx-3 -mb-3 px-3 py-2 overflow-hidden',
             'bg-gradient-to-r',
             marketGradients[asset.market],
             'rounded-b-2xl',
@@ -253,7 +252,7 @@ function AssetCardInner({
             {/* Mini Chart with glow container */}
             <div
               className={cn(
-                'flex-shrink-0 max-w-[180px] overflow-hidden rounded-lg',
+                'flex-shrink-0 max-w-[140px] overflow-hidden rounded-lg',
                 'shadow-inner',
                 marketGlowColors[asset.market]
               )}
@@ -262,8 +261,8 @@ function AssetCardInner({
                 candles={candles}
                 loading={chartLoading}
                 error={chartError}
-                width={180}
-                height={72}
+                width={140}
+                height={56}
               />
             </div>
           </div>

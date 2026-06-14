@@ -33,13 +33,13 @@ export function GainersLosersSection({
   const losersCount = losers.length;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-4">
       {/* Market Header */}
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2">
           <div
             className={cn(
-              'h-8 w-1 rounded-full',
+              'h-5 w-1 rounded-full',
               market === 'KR' && 'bg-blue-500',
               market === 'US' && 'bg-purple-500',
               market === 'JP' && 'bg-red-500',
@@ -51,7 +51,7 @@ export function GainersLosersSection({
               market === 'SEMICONDUCTOR' && 'bg-violet-500'
             )}
           />
-          <h2 className="text-2xl font-bold">{marketLabel}</h2>
+          <h2 className="text-lg font-semibold">{marketLabel}</h2>
           {/* Gainer/Loser count indicators */}
           <div className="flex items-center gap-2 text-sm font-medium">
             {gainersCount > 0 && (
@@ -77,8 +77,8 @@ export function GainersLosersSection({
       </div>
 
       {/* Gainers */}
-      <div className="space-y-4">
-        <h3 className="text-lg font-semibold flex items-center gap-2">
+      <div className="space-y-3">
+        <h3 className="text-base font-medium flex items-center gap-2">
           <span className="text-sm text-gain arrow-bounce">▲</span>
           {t('topGainers')}
         </h3>
@@ -98,8 +98,8 @@ export function GainersLosersSection({
       </div>
 
       {/* Losers */}
-      <div className="space-y-4">
-        <h3 className="text-lg font-semibold flex items-center gap-2">
+      <div className="space-y-3">
+        <h3 className="text-base font-medium flex items-center gap-2">
           <span className="text-sm text-loss arrow-bounce">▼</span>
           {t('topLosers')}
         </h3>

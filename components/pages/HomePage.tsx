@@ -153,7 +153,7 @@ export function HomePage() {
           <div
             key={sectionId}
             className={cn(
-              'py-8 rounded-3xl transition-all duration-300',
+              'py-4 rounded-3xl transition-all duration-300',
               sectionBgColors[sectionId]
             )}
           >

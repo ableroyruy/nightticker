@@ -18,8 +18,8 @@ export function FavoritesSection({ tickers }: FavoritesSectionProps) {
 
   if (!isLoaded) {
     return (
-      <section className="space-y-4">
-        <h2 className="text-xl font-semibold flex items-center gap-2">
+      <section className="space-y-3">
+        <h2 className="text-lg font-semibold flex items-center gap-2">
           <span className="w-1 h-5 bg-yellow-500 rounded-full" />
           {t('title')}
         </h2>
@@ -37,8 +37,8 @@ export function FavoritesSection({ tickers }: FavoritesSectionProps) {
 
   if (favorites.length === 0) {
     return (
-      <section className="space-y-4">
-        <h2 className="text-xl font-semibold flex items-center gap-2">
+      <section className="space-y-3">
+        <h2 className="text-lg font-semibold flex items-center gap-2">
           <span className="w-1 h-5 bg-yellow-500 rounded-full" />
           {t('title')}
         </h2>
@@ -76,9 +76,9 @@ export function FavoritesSection({ tickers }: FavoritesSectionProps) {
   });
 
   return (
-    <section className="space-y-4">
+    <section className="space-y-3">
       <div className="flex items-center justify-between">
-        <h2 className="text-xl font-semibold flex items-center gap-2">
+        <h2 className="text-lg font-semibold flex items-center gap-2">
           <span className="w-1 h-5 bg-yellow-500 rounded-full" />
           {t('title')}
         </h2>
