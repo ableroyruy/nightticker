@@ -4,21 +4,8 @@ import { useState, useEffect, useRef, useCallback } from 'react';
 import { ConnectionStatus } from '@/lib/types/market';
 
 const WS_URL = 'wss://api.hyperliquid.xyz/ws';
-const API_URL = 'https://api.hyperliquid.xyz/info';
-const CACHED_PRICES_URL = '/api/market/prices'; // Our cached API
-const CACHED_META_URL = '/api/market/meta'; // Our cached meta API
-const META_REFRESH_INTERVAL = 60000; // 1 minute for 24h base prices
+const CACHED_TICKER_URL = '/api/market/ticker'; // 통합 API (prices + meta)
 const RECONNECT_DELAY = 3000;
-
-interface AssetContext {
-  prevDayPx: string;
-  midPx: string;
-  markPx: string;
-}
-
-interface AssetMeta {
-  name: string;
-}
 
 interface WsMessage {
   channel: string;
@@ -49,7 +36,6 @@ export function useHyperliquidTicker(): UseHyperliquidTickerReturn {
 
   const mountedRef = useRef(true);
   const wsRef = useRef<WebSocket | null>(null);
-  const metaIntervalRef = useRef<NodeJS.Timeout | null>(null);
   const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const prevDayPricesRef = useRef<Record<string, number>>({});
   const tickersRef = useRef<Record<string, TickerData>>({});
@@ -65,7 +51,6 @@ export function useHyperliquidTicker(): UseHyperliquidTickerReturn {
       const price = parseFloat(priceStr);
       if (isNaN(price)) continue;
 
-      // Remove 'xyz:' prefix to match component lookups
       const symbol = rawSymbol.replace('xyz:', '');
       const prevDayPx = prevDayPrices[symbol] || 0;
       let change24h = 0;
@@ -89,140 +74,30 @@ export function useHyperliquidTicker(): UseHyperliquidTickerReturn {
     setLastUpdate(new Date());
   }, []);
 
-  // Fetch cached meta (prevDayPx) from our API (fast)
-  const fetchCachedMeta = useCallback(async () => {
+  // Fetch initial data from cached ticker API (fast, single request)
+  const fetchCachedTicker = useCallback(async () => {
     if (!mountedRef.current) return;
 
     try {
-      const response = await fetch(CACHED_META_URL);
+      const response = await fetch(CACHED_TICKER_URL);
       if (!response.ok) return;
 
-      const data: Record<string, number> = await response.json();
+      const data: Record<string, TickerData> = await response.json();
       if (!mountedRef.current) return;
 
-      prevDayPricesRef.current = data;
-
-      // Update tickers if we already have price data
-      if (Object.keys(tickersRef.current).length > 0) {
-        const updated: Record<string, TickerData> = {};
-        for (const [symbol, ticker] of Object.entries(tickersRef.current)) {
-          const prevDayPx = data[symbol] || ticker.prevDayPx;
-          const change24h = prevDayPx > 0 ? ticker.price - prevDayPx : 0;
-          const changePercent24h = prevDayPx > 0 ? (change24h / prevDayPx) * 100 : 0;
-          updated[symbol] = {
-            ...ticker,
-            prevDayPx,
-            change24h,
-            changePercent24h,
-          };
-        }
-        tickersRef.current = updated;
-        setTickers(updated);
+      // Store prevDayPx for WebSocket updates
+      const prevDayPrices: Record<string, number> = {};
+      for (const [symbol, ticker] of Object.entries(data)) {
+        prevDayPrices[symbol] = ticker.prevDayPx;
       }
-    } catch (e) {
-      console.error('Failed to fetch cached meta:', e);
-    }
-  }, []);
+      prevDayPricesRef.current = prevDayPrices;
 
-  // Fetch initial prices from our cached API (fast)
-  const fetchCachedPrices = useCallback(async () => {
-    if (!mountedRef.current) return;
-
-    try {
-      const response = await fetch(CACHED_PRICES_URL);
-      if (!response.ok) return;
-
-      const mids: Record<string, string> = await response.json();
-      if (!mountedRef.current) return;
-
-      // Process prices with prevDayPx data
-      const prevDayPrices = prevDayPricesRef.current;
-      const newTickers: Record<string, TickerData> = {};
-
-      for (const [rawSymbol, priceStr] of Object.entries(mids)) {
-        const price = parseFloat(priceStr);
-        if (isNaN(price)) continue;
-
-        const symbol = rawSymbol.replace('xyz:', '');
-        const prevDayPx = prevDayPrices[symbol] || 0;
-        const change24h = prevDayPx > 0 ? price - prevDayPx : 0;
-        const changePercent24h = prevDayPx > 0 ? (change24h / prevDayPx) * 100 : 0;
-
-        newTickers[symbol] = {
-          price,
-          prevDayPx,
-          change24h,
-          changePercent24h,
-        };
-      }
-
-      tickersRef.current = newTickers;
-      setTickers(newTickers);
+      // Set tickers immediately
+      tickersRef.current = data;
+      setTickers(data);
       setLastUpdate(new Date());
     } catch (e) {
-      console.error('Failed to fetch cached prices:', e);
-    }
-  }, []);
-
-  // Fetch metaAndAssetCtxs for 24h base prices (REST)
-  const fetchMeta = useCallback(async () => {
-    if (!mountedRef.current) return;
-
-    try {
-      const response = await fetch(API_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'metaAndAssetCtxs', dex: 'xyz' }),
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP error: ${response.status}`);
-      }
-
-      const data = await response.json();
-
-      if (!mountedRef.current) return;
-
-      if (Array.isArray(data) && data.length >= 2) {
-        const universe: AssetMeta[] = data[0].universe || [];
-        const contexts: AssetContext[] = data[1] || [];
-
-        const newPrevDayPrices: Record<string, number> = {};
-
-        universe.forEach((meta, index) => {
-          const ctx = contexts[index];
-          if (meta.name && ctx?.prevDayPx) {
-            const prevDayPx = parseFloat(ctx.prevDayPx);
-            if (!isNaN(prevDayPx) && prevDayPx > 0) {
-              // Remove 'xyz:' prefix to match component lookups
-              const symbol = meta.name.replace('xyz:', '');
-              newPrevDayPrices[symbol] = prevDayPx;
-            }
-          }
-        });
-
-        prevDayPricesRef.current = newPrevDayPrices;
-
-        // Update tickers with new prevDayPx data
-        if (Object.keys(tickersRef.current).length > 0) {
-          const updated: Record<string, TickerData> = {};
-          for (const [symbol, ticker] of Object.entries(tickersRef.current)) {
-            const prevDayPx = newPrevDayPrices[symbol] || ticker.prevDayPx;
-            const change24h = prevDayPx > 0 ? ticker.price - prevDayPx : 0;
-            const changePercent24h = prevDayPx > 0 ? (change24h / prevDayPx) * 100 : 0;
-            updated[symbol] = {
-              ...ticker,
-              prevDayPx,
-              change24h,
-              changePercent24h,
-            };
-          }
-          tickersRef.current = updated;
-          setTickers(updated);
-        }
-      }
-    } catch (e) {
-      console.error('Failed to fetch meta:', e);
+      console.error('Failed to fetch cached ticker:', e);
     }
   }, []);
 
@@ -307,19 +182,14 @@ export function useHyperliquidTicker(): UseHyperliquidTickerReturn {
   useEffect(() => {
     mountedRef.current = true;
 
-    // Fast init: cached meta + prices in parallel -> WebSocket
+    // Fast init: single API call -> WebSocket
     const init = async () => {
-      // 1. Get cached meta and prices in parallel (both fast)
-      await Promise.all([fetchCachedMeta(), fetchCachedPrices()]);
+      // 1. Get cached ticker (prices + meta in one request)
+      await fetchCachedTicker();
       // 2. Connect WebSocket for real-time updates
       connectWebSocket();
-      // 3. Refresh meta from source in background (for freshness)
-      fetchMeta();
     };
     init();
-
-    // Set up meta refresh interval
-    metaIntervalRef.current = setInterval(fetchMeta, META_REFRESH_INTERVAL);
 
     return () => {
       mountedRef.current = false;
@@ -329,17 +199,12 @@ export function useHyperliquidTicker(): UseHyperliquidTickerReturn {
         wsRef.current = null;
       }
 
-      if (metaIntervalRef.current) {
-        clearInterval(metaIntervalRef.current);
-        metaIntervalRef.current = null;
-      }
-
       if (reconnectTimeoutRef.current) {
         clearTimeout(reconnectTimeoutRef.current);
         reconnectTimeoutRef.current = null;
       }
     };
-  }, [fetchCachedMeta, fetchCachedPrices, fetchMeta, connectWebSocket]);
+  }, [fetchCachedTicker, connectWebSocket]);
 
   return {
     tickers,
