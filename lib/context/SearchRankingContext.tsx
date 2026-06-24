@@ -93,12 +93,7 @@ export function SearchRankingProvider({ children }: { children: ReactNode }) {
   const fetchRankings = useCallback(async (retryCount = 0): Promise<SearchRankingItem[] | null> => {
     const maxRetries = 2;
     try {
-      const response = await fetch('/api/ranking', {
-        cache: 'no-store',
-        headers: {
-          'Cache-Control': 'no-cache',
-        },
-      });
+      const response = await fetch('/api/ranking');
       if (response.ok) {
         const data = await response.json();
         if (data.rankings && data.rankings.length > 0) {
