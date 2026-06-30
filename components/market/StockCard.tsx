@@ -3,7 +3,7 @@
 import Link from 'next/link';
 import { useLocale } from 'next-intl';
 import { Card, CardContent } from '@/components/ui/card';
-import { PriceDisplay } from './PriceDisplay';
+import { PriceDisplay, PriceChange } from '@/components/ui/price-change';
 import { WatchlistButton } from './WatchlistButton';
 import { Stock } from '@/lib/providers/types';
 import { MarketPrice } from '@/lib/providers/types';
@@ -54,8 +54,32 @@ export function StockCard({ stock, price }: StockCardProps) {
           />
         </div>
 
-        <div className="mt-4">
-          <PriceDisplay price={price?.price ?? null} size="sm" />
+        <div className="mt-4 space-y-1">
+          <PriceDisplay
+            price={price?.price ?? null}
+            change={price?.change24h ?? null}
+            changePercent={price?.changePercent24h ?? null}
+            size="md"
+            showChange={false}
+            hideCurrency={stock.category === 'INDEX' || stock.category === 'FX'}
+          />
+          <div className="flex items-center gap-2 flex-wrap">
+            {price?.change24h != null && (
+              <PriceChange
+                value={price.change24h}
+                type="amount"
+                size="sm"
+                showBackground
+                hideCurrency={stock.category === 'INDEX' || stock.category === 'FX'}
+              />
+            )}
+            <PriceChange
+              value={price?.changePercent24h ?? null}
+              type="percent"
+              size="sm"
+              showIcon={false}
+            />
+          </div>
         </div>
 
         {price?.lastUpdated && (
