@@ -1,10 +1,9 @@
 import { Metadata } from 'next';
 import { getTranslations, setRequestLocale } from 'next-intl/server';
 import { Separator } from '@/components/ui/separator';
-import { StockGrid } from '@/components/market/StockGrid';
+import { LiveStockGrid } from '@/components/market/LiveStockGrid';
 import { HyperliquidBadge } from '@/components/common/HyperliquidBadge';
 import { ComplianceNotice } from '@/components/common/ComplianceNotice';
-import { getAllMarketData } from '@/lib/providers/market-data-provider';
 
 type Props = {
   params: Promise<{ locale: string }>;
@@ -66,7 +65,6 @@ export default async function WeekendPricesPage({ params }: Props) {
   setRequestLocale(locale);
 
   const t = await getTranslations('pages.weekend');
-  const stocks = await getAllMarketData();
 
   return (
     <div className="container py-8 space-y-8">
@@ -90,7 +88,7 @@ export default async function WeekendPricesPage({ params }: Props) {
         <h2 className="text-2xl font-bold mb-6">
           {locale === 'ko' ? '주말 참고 가격' : 'Weekend Reference Prices'}
         </h2>
-        <StockGrid stocks={stocks} />
+        <LiveStockGrid />
       </section>
 
       <Separator />
