@@ -1,13 +1,21 @@
 'use client';
 
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
 import { useLocale } from 'next-intl';
 import { Card, CardContent } from '@/components/ui/card';
 import { PriceDisplay, PriceChange } from '@/components/ui/price-change';
 import { WatchlistButton } from './WatchlistButton';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useHyperliquidTicker } from '@/lib/hooks/useHyperliquidTicker';
+import { useCandleData } from '@/lib/hooks/useCandleData';
 import { stocks } from '@/lib/markets/stocks';
 import { Stock } from '@/lib/providers/types';
+
+const MiniChart = dynamic(() => import('./MiniChart').then((mod) => mod.MiniChart), {
+  ssr: false,
+  loading: () => <Skeleton className="w-full h-[56px] rounded" />,
+});
 
 function getLocalizedName(stock: Stock, locale: string): string {
   switch (locale) {
@@ -27,6 +35,7 @@ function LiveStockCard({ stock }: { stock: Stock }) {
 
   const tickerKey = stock.hyperliquidSymbol.replace('xyz:', '');
   const ticker = tickers[tickerKey];
+  const { candles, loading: chartLoading, error: chartError } = useCandleData(tickerKey);
 
   return (
     <Card className="hover:shadow-md transition-shadow">
@@ -54,30 +63,42 @@ function LiveStockCard({ stock }: { stock: Stock }) {
           />
         </div>
 
-        <div className="mt-4 space-y-1">
-          <PriceDisplay
-            price={ticker?.price ?? null}
-            change={ticker?.change24h ?? null}
-            changePercent={ticker?.changePercent24h ?? null}
-            size="md"
-            showChange={false}
-            hideCurrency={stock.category === 'INDEX' || stock.category === 'FX'}
-          />
-          <div className="flex items-center gap-2 flex-wrap">
-            {ticker?.change24h != null && (
+        <div className="mt-4 flex items-center justify-between gap-3">
+          <div className="space-y-1 min-w-0 flex-shrink">
+            <PriceDisplay
+              price={ticker?.price ?? null}
+              change={ticker?.change24h ?? null}
+              changePercent={ticker?.changePercent24h ?? null}
+              size="md"
+              showChange={false}
+              hideCurrency={stock.category === 'INDEX' || stock.category === 'FX'}
+            />
+            <div className="flex items-center gap-2 flex-wrap">
+              {ticker?.change24h != null && (
+                <PriceChange
+                  value={ticker.change24h}
+                  type="amount"
+                  size="sm"
+                  showBackground
+                  hideCurrency={stock.category === 'INDEX' || stock.category === 'FX'}
+                />
+              )}
               <PriceChange
-                value={ticker.change24h}
-                type="amount"
+                value={ticker?.changePercent24h ?? null}
+                type="percent"
                 size="sm"
-                showBackground
-                hideCurrency={stock.category === 'INDEX' || stock.category === 'FX'}
+                showIcon={false}
               />
-            )}
-            <PriceChange
-              value={ticker?.changePercent24h ?? null}
-              type="percent"
-              size="sm"
-              showIcon={false}
+            </div>
+          </div>
+
+          <div className="flex-shrink-0 max-w-[120px] overflow-hidden rounded-lg">
+            <MiniChart
+              candles={candles}
+              loading={chartLoading}
+              error={chartError}
+              width={120}
+              height={56}
             />
           </div>
         </div>
