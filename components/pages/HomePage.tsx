@@ -166,7 +166,7 @@ export function HomePage() {
           </Fragment>
         ))}
 
-        {locale === 'ko' && <StudyAILabBanner variant="projects" />}
+        {locale === 'ko' && <StudyAILabBanner variant="investingGuide" />}
 
         {/* Compliance Notice */}
         <div className="container py-8">

@@ -7,16 +7,10 @@ const banners = {
     caption: 'AI로 ETF부터 주식까지 · 자세히 보기 →',
     width: 720,
   },
-  noCode: {
-    src: '/banners/studyailab-no-code.png',
-    alt: 'AI로 코딩 없이 개발하기 — 아파트 찾기, 주식 챗봇, 쇼츠 제작',
-    caption: 'AI로 코딩 없이 개발하기 · 자세히 보기 →',
-    width: 640,
-  },
-  projects: {
-    src: '/banners/studyailab-projects.png',
-    alt: '비전공자도 완성하는 6가지 실전 프로젝트 — 프로처럼 AI로 코딩 없이 개발하기',
-    caption: 'AI로 만드는 6가지 실전 프로젝트 · 자세히 보기 →',
+  investingGuide: {
+    src: '/banners/studyailab-stock-etf.png',
+    alt: 'AI로 끝내는 주식 & ETF 실전 투자 — 실전투자대회 수상자의 AI 분석 비법 공개',
+    caption: 'AI로 끝내는 주식 & ETF 실전 투자 · 자세히 보기 →',
     width: 640,
   },
 } as const;
