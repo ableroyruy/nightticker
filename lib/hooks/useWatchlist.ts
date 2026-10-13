@@ -10,17 +10,23 @@ export function useWatchlist() {
 
   // Load watchlist from localStorage on mount
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      try {
-        const stored = localStorage.getItem(WATCHLIST_KEY);
-        if (stored) {
-          setWatchlist(JSON.parse(stored));
+    let cancelled = false;
+    Promise.resolve().then(() => {
+      if (cancelled) return;
+      if (typeof window !== 'undefined') {
+        try {
+          const stored = localStorage.getItem(WATCHLIST_KEY);
+          if (stored) {
+            setWatchlist(JSON.parse(stored));
+          }
+        } catch (error) {
+          console.error('Failed to load watchlist:', error);
         }
-      } catch (error) {
-        console.error('Failed to load watchlist:', error);
+        setIsLoaded(true);
       }
-      setIsLoaded(true);
-    }
+
+    });
+    return () => { cancelled = true; };
   }, []);
 
   // Save watchlist to localStorage whenever it changes

@@ -16,6 +16,10 @@ const languages = [
   { code: 'es', label: 'Espanol', flag: 'ES' },
 ] as const;
 
+function setLocaleCookie(locale: string) {
+  document.cookie = `NEXT_LOCALE=${locale};path=/;max-age=31536000`;
+}
+
 export function LanguageSwitcher() {
   const locale = useLocale();
   const pathname = usePathname();
@@ -39,7 +43,7 @@ export function LanguageSwitcher() {
     }
 
     // Set cookie to override locale detection
-    document.cookie = `NEXT_LOCALE=${newLocale};path=/;max-age=31536000`;
+    setLocaleCookie(newLocale);
 
     // Build new path
     let newPath = pathname;
@@ -59,7 +63,7 @@ export function LanguageSwitcher() {
     }
 
     setIsOpen(false);
-    window.location.href = newPath;
+    window.location.assign(newPath);
   };
 
   const currentLang = languages.find((l) => l.code === locale) || languages[0];

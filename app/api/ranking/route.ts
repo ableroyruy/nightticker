@@ -11,7 +11,7 @@ const ONE_HOUR_MS = 60 * 60 * 1000;
 const TWENTY_FOUR_HOURS_MS = 24 * 60 * 60 * 1000;
 const BUCKET_TTL_SECONDS = 25 * 60 * 60; // 25 hours TTL
 const SNAPSHOT_TTL_SECONDS = 25 * 60 * 60; // 25 hours TTL
-const CACHE_TTL_SECONDS = 5 * 60; // 5 minutes cache
+const CACHE_TTL_SECONDS = 30 * 60; // 30 minutes cache
 const CACHE_KEY = 'ranking:cache';
 
 // Default popular stocks for cold start
@@ -33,12 +33,12 @@ let memoryCache: { data: { rankings: RankingItem[]; lastUpdated: number } | null
   data: null,
   expires: 0,
 };
-const MEMORY_CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes memory cache
+const MEMORY_CACHE_TTL_MS = 30 * 60 * 1000; // 30 minutes memory cache
 
 // ===== In-memory write buffer (reduces Redis writes) =====
 const writeBuffer: Map<string, number> = new Map();
 let lastFlushTime = Date.now();
-const FLUSH_INTERVAL_MS = 5 * 60 * 1000; // Flush every 5 minutes
+const FLUSH_INTERVAL_MS = 30 * 60 * 1000; // Flush on the next POST after 30 minutes
 const FLUSH_THRESHOLD = 100; // Or when buffer has 100+ items
 
 // Get the start of the current 5-minute bucket
@@ -70,19 +70,19 @@ export async function GET() {
     if (memoryCache.data && now < memoryCache.expires) {
       return NextResponse.json(memoryCache.data, {
         headers: {
-          'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+          'Cache-Control': 'public, max-age=0, s-maxage=1800, stale-while-revalidate=60',
         },
       });
     }
 
     // 2. Check Redis cache (1 Redis call)
     const cached = await redis.get(CACHE_KEY) as { rankings: RankingItem[]; lastUpdated: number } | null;
-    if (cached) {
+    if (cached && now - cached.lastUpdated < MEMORY_CACHE_TTL_MS) {
       // Update memory cache
-      memoryCache = { data: cached, expires: now + MEMORY_CACHE_TTL_MS };
+      memoryCache = { data: cached, expires: cached.lastUpdated + MEMORY_CACHE_TTL_MS };
       return NextResponse.json(cached, {
         headers: {
-          'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+          'Cache-Control': 'public, max-age=0, s-maxage=1800, stale-while-revalidate=60',
         },
       });
     }
@@ -136,7 +136,7 @@ export async function GET() {
         },
         {
           headers: {
-            'Cache-Control': 'public, s-maxage=300, stale-while-revalidate=600',
+            'Cache-Control': 'public, max-age=0, s-maxage=1800, stale-while-revalidate=60',
           },
         }
       );
@@ -156,7 +156,7 @@ export async function GET() {
 
     const response = { rankings, lastUpdated: now };
 
-    // Cache the result for 5 minutes in Redis
+    // Cache the result for 30 minutes in Redis
     await redis.set(CACHE_KEY, JSON.stringify(response), { ex: CACHE_TTL_SECONDS });
 
     // Also update memory cache
@@ -164,7 +164,7 @@ export async function GET() {
 
     return NextResponse.json(response, {
       headers: {
-        'Cache-Control': 'public, s-maxage=60, stale-while-revalidate=300',
+        'Cache-Control': 'public, max-age=0, s-maxage=1800, stale-while-revalidate=60',
       },
     });
   } catch (error) {

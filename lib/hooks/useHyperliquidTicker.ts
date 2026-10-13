@@ -134,7 +134,7 @@ export function useHyperliquidTicker(): UseHyperliquidTickerReturn {
   }, []);
 
   // Connect to WebSocket
-  const connectWebSocket = useCallback(() => {
+  const connectWebSocket = useCallback(function connect() {
     if (!mountedRef.current) return;
     if (wsRef.current?.readyState === WebSocket.OPEN) return;
 
@@ -192,7 +192,7 @@ export function useHyperliquidTicker(): UseHyperliquidTickerReturn {
         reconnectTimeoutRef.current = setTimeout(() => {
           if (mountedRef.current) {
             setStatus('connecting');
-            connectWebSocket();
+            connect();
           }
         }, RECONNECT_DELAY);
       };
@@ -204,7 +204,7 @@ export function useHyperliquidTicker(): UseHyperliquidTickerReturn {
 
         reconnectTimeoutRef.current = setTimeout(() => {
           if (mountedRef.current) {
-            connectWebSocket();
+            connect();
           }
         }, RECONNECT_DELAY);
       }

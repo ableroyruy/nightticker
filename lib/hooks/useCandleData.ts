@@ -206,7 +206,7 @@ export function useCandleData(symbol: string): CandleState & { status: Connectio
     mountedRef.current = true;
 
     // 즉시 로드 (배치로 묶임)
-    loadData();
+    Promise.resolve().then(loadData);
 
     // 폴링 설정
     const intervalId = setInterval(() => {

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useRef, useEffect } from 'react';
+import { useState, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations, useLocale } from 'next-intl';
 import { Search, TrendingUp, X } from 'lucide-react';
@@ -69,9 +69,11 @@ export function StockSearch({ className, onSelect, showTrending = true }: StockS
   }, [query, popularStocks]);
 
   // Reset selected index when filtered results change
-  useEffect(() => {
+  const [previousResults, setPreviousResults] = useState(filteredStocks);
+  if (previousResults !== filteredStocks) {
+    setPreviousResults(filteredStocks);
     setSelectedIndex(0);
-  }, [filteredStocks]);
+  }
 
   const handleSelect = (slug: string) => {
     // Page view is tracked on the stock detail page

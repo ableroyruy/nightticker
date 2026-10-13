@@ -4,6 +4,7 @@ import { setRequestLocale } from 'next-intl/server';
 import { Separator } from '@/components/ui/separator';
 import { MarketPriceCard } from '@/components/market/MarketPriceCard';
 import { ComplianceNotice } from '@/components/common/ComplianceNotice';
+import { StudyAILabBanner } from '@/components/common/StudyAILabBanner';
 import { InternalLinks } from '@/components/stock/InternalLinks';
 import { StockPageHeader } from '@/components/stock/StockPageHeader';
 import { getStockBySlug, getAllSlugs, categoryNames } from '@/lib/markets/stocks';
@@ -396,6 +397,8 @@ export default async function StockPage({ params }: Props) {
 
         {/* Real-time Price Card */}
         <MarketPriceCard hyperliquidSymbol={stock.hyperliquidSymbol} locale={locale} category={stock.category} />
+
+        {locale === 'ko' && <StudyAILabBanner variant="noCode" />}
 
         {/* H2: Weekend Price Section */}
         <section>

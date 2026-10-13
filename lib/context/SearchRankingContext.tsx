@@ -47,7 +47,7 @@ const getDefaultRankings = (): SearchRankingItem[] => {
 
 // Local storage cache key - v2 to invalidate old cache
 const CACHE_KEY = 'nightticker_ranking_cache_v2';
-const CACHE_TTL = 5 * 60 * 1000; // 5 minute cache
+const CACHE_TTL = 30 * 60 * 1000; // 30 minute cache
 
 interface CachedData {
   rankings: SearchRankingItem[];
@@ -61,7 +61,7 @@ const loadCache = (): SearchRankingItem[] | null => {
     const cached = localStorage.getItem(CACHE_KEY);
     if (cached) {
       const data: CachedData = JSON.parse(cached);
-      // Use cache if less than 1 minute old
+      // Use cache if less than 30 minutes old
       if (Date.now() - data.timestamp < CACHE_TTL) {
         return data.rankings;
       }
@@ -73,10 +73,10 @@ const loadCache = (): SearchRankingItem[] | null => {
 };
 
 // Save to cache
-const saveCache = (rankings: SearchRankingItem[]): void => {
+const saveCache = (rankings: SearchRankingItem[], timestamp: number): void => {
   if (typeof window === 'undefined') return;
   try {
-    const data: CachedData = { rankings, timestamp: Date.now() };
+    const data: CachedData = { rankings, timestamp };
     localStorage.setItem(CACHE_KEY, JSON.stringify(data));
   } catch (e) {
     console.error('Cache save error:', e);
@@ -90,7 +90,7 @@ export function SearchRankingProvider({ children }: { children: ReactNode }) {
   const flushTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   // Fetch rankings from API with retry
-  const fetchRankings = useCallback(async (retryCount = 0): Promise<SearchRankingItem[] | null> => {
+  const fetchRankings = useCallback(async function fetchWithRetry(retryCount = 0): Promise<SearchRankingItem[] | null> {
     const maxRetries = 2;
     try {
       const response = await fetch('/api/ranking');
@@ -98,7 +98,7 @@ export function SearchRankingProvider({ children }: { children: ReactNode }) {
         const data = await response.json();
         if (data.rankings && data.rankings.length > 0) {
           setRankings(data.rankings);
-          saveCache(data.rankings);
+          saveCache(data.rankings, data.lastUpdated);
           return data.rankings;
         }
       } else {
@@ -109,7 +109,7 @@ export function SearchRankingProvider({ children }: { children: ReactNode }) {
       // Retry on network error
       if (retryCount < maxRetries) {
         await new Promise((resolve) => setTimeout(resolve, 1000 * (retryCount + 1)));
-        return fetchRankings(retryCount + 1);
+        return fetchWithRetry(retryCount + 1);
       }
     }
     return null;
@@ -135,9 +135,8 @@ export function SearchRankingProvider({ children }: { children: ReactNode }) {
       }
     }
 
-    // Refresh rankings after recording
-    await fetchRankings();
-  }, [fetchRankings]);
+    // Rankings refresh on their own 30-minute schedule.
+  }, []);
 
   // Record a page view (debounced)
   const recordPageView = useCallback(
@@ -158,27 +157,26 @@ export function SearchRankingProvider({ children }: { children: ReactNode }) {
   // Initialize
   useEffect(() => {
     // Try cache first for instant display
-    const cached = loadCache();
-    if (cached && cached.length > 0) {
-      setRankings(cached);
-      setIsLoading(false);
-    }
-
-    // Then fetch fresh data
-    fetchRankings().then((fresh) => {
-      if (fresh) {
-        setRankings(fresh);
+    let cancelled = false;
+    Promise.resolve().then(async () => {
+      if (cancelled) return;
+      const cached = loadCache();
+      if (cached && cached.length > 0) {
+        setRankings(cached);
+      } else {
+        await fetchRankings();
       }
-      setIsLoading(false);
+      if (!cancelled) setIsLoading(false);
     });
 
-    // Refresh every 5 minutes
+    // Refresh every 30 minutes
     const interval = setInterval(() => {
       fetchRankings();
-    }, 5 * 60 * 1000);
+    }, CACHE_TTL);
 
     // Cleanup
     return () => {
+      cancelled = true;
       clearInterval(interval);
       if (flushTimeoutRef.current) {
         clearTimeout(flushTimeoutRef.current);

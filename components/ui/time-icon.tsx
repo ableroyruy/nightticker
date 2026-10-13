@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useSyncExternalStore } from 'react';
 import { Sun, Sunrise, Sunset, Moon } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -62,19 +62,20 @@ interface TimeIconProps {
   size?: 'sm' | 'md' | 'lg';
 }
 
+const subscribeToMount = () => () => {};
+const clientMounted = () => true;
+const serverMounted = () => false;
+
 export function TimeIcon({
   className,
   showLabel = false,
   locale = 'en',
   size = 'md',
 }: TimeIconProps) {
-  const [timeOfDay, setTimeOfDay] = useState<TimeOfDay>('night');
-  const [mounted, setMounted] = useState(false);
+  const [timeOfDay, setTimeOfDay] = useState<TimeOfDay>(getTimeOfDay);
+  const mounted = useSyncExternalStore(subscribeToMount, clientMounted, serverMounted);
 
   useEffect(() => {
-    setMounted(true);
-    setTimeOfDay(getTimeOfDay());
-
     // Update every minute
     const interval = setInterval(() => {
       setTimeOfDay(getTimeOfDay());

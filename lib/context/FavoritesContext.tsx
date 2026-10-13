@@ -22,15 +22,21 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
 
   // Load from localStorage on mount
   useEffect(() => {
-    try {
-      const stored = localStorage.getItem(STORAGE_KEY);
-      if (stored) {
-        setFavorites(JSON.parse(stored));
+    let cancelled = false;
+    Promise.resolve().then(() => {
+      if (cancelled) return;
+      try {
+        const stored = localStorage.getItem(STORAGE_KEY);
+        if (stored) {
+          setFavorites(JSON.parse(stored));
+        }
+      } catch (error) {
+        console.error('Failed to load favorites:', error);
       }
-    } catch (error) {
-      console.error('Failed to load favorites:', error);
-    }
-    setIsLoaded(true);
+      setIsLoaded(true);
+
+    });
+    return () => { cancelled = true; };
   }, []);
 
   // Save to localStorage whenever favorites change

@@ -1,13 +1,14 @@
 'use client';
 
 import { useLocale } from 'next-intl';
-import { useMemo } from 'react';
+import { Fragment, useMemo } from 'react';
 import { useHyperliquidTicker } from '@/lib/hooks/useHyperliquidTicker';
 import { HeroSection } from '@/components/sections/HeroSection';
 import { FavoritesSection } from '@/components/sections/FavoritesSection';
 import { GainersLosersSection } from '@/components/sections/GainersLosersSection';
 import { CategorySection } from '@/components/sections/CategorySection';
 import { ComplianceNotice } from '@/components/common/ComplianceNotice';
+import { StudyAILabBanner } from '@/components/common/StudyAILabBanner';
 import { stocks, getStocksBySectorForCategory } from '@/lib/markets/stocks';
 import { MarketAsset, MarketType } from '@/lib/types/market';
 import { cn } from '@/lib/utils';
@@ -150,8 +151,8 @@ export function HomePage() {
       <div className="py-4 space-y-2">
         {/* Sections */}
         {sectionOrder.map((sectionId) => (
+          <Fragment key={sectionId}>
           <div
-            key={sectionId}
             className={cn(
               'py-4 rounded-3xl transition-all duration-300',
               sectionBgColors[sectionId]
@@ -159,7 +160,13 @@ export function HomePage() {
           >
             <div className="container">{renderSectionContent(sectionId)}</div>
           </div>
+          {locale === 'ko' && sectionId === 'US' && (
+            <StudyAILabBanner variant="investing" />
+          )}
+          </Fragment>
         ))}
+
+        {locale === 'ko' && <StudyAILabBanner variant="projects" />}
 
         {/* Compliance Notice */}
         <div className="container py-8">
