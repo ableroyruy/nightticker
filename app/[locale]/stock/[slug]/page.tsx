@@ -401,11 +401,11 @@ export default async function StockPage({ params }: Props) {
             <span className="rounded-full bg-muted px-3 py-1">{categoryNames[stock.category][locale as keyof typeof categoryNames.US] ?? categoryNames[stock.category].en}</span>
             <span>{locale === 'ko' ? 'Hyperliquid 참고가격' : locale === 'ja' ? 'Hyperliquid 参考価格' : locale === 'zh' ? 'Hyperliquid 参考价格' : locale === 'pt' ? 'Preco de referencia Hyperliquid' : locale === 'es' ? 'Precio de referencia Hyperliquid' : 'Hyperliquid reference price'}</span>
           </div>
-          {stock.description && <details className="rounded-xl border px-4 py-3">
-            <summary className="cursor-pointer font-medium">{locale === 'ko' ? '상품 정보' : locale === 'ja' ? '商品情報' : locale === 'zh' ? '产品信息' : locale === 'pt' ? 'Sobre o ativo' : locale === 'es' ? 'Sobre el activo' : 'About this asset'}</summary>
+          {stock.description && <div className="rounded-xl border px-4 py-3">
+            <h2 className="font-medium">{locale === 'ko' ? '상품 정보' : locale === 'ja' ? '商品情報' : locale === 'zh' ? '产品信息' : locale === 'pt' ? 'Sobre o ativo' : locale === 'es' ? 'Sobre el activo' : 'About this asset'}</h2>
             <p className="mt-3 leading-relaxed text-muted-foreground">{stock.description}</p>
             <p className="mt-2 text-xs text-muted-foreground">{locale === 'ko' ? '파생상품 시장의 참고가격으로, 기초자산의 공식 가격과 다를 수 있습니다.' : locale === 'ja' ? 'デリバティブ市場の参考価格であり、原資産の公式価格と異なる場合があります。' : locale === 'zh' ? '衍生品市场参考价格，可能与标的资产官方价格不同。' : locale === 'pt' ? 'Preco de referencia de derivativos; pode diferir da cotacao oficial.' : locale === 'es' ? 'Precio de referencia de derivados; puede diferir de la cotizacion oficial.' : 'Reference price from a derivatives market; may differ from the official underlying price.'}</p>
-          </details>}
+          </div>}
         </section>
 
         {locale === 'ko' && <StudyAILabBanner variant="investingGuide" />}
