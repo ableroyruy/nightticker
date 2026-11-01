@@ -1,0 +1,458 @@
+{
+  "consumer": {
+    "en": "consumer devices, software and digital services",
+    "ko": "소비자 기기·소프트웨어·디지털 서비스",
+    "ja": "消費者向け機器・ソフトウェア・デジタルサービス",
+    "zh": "消费设备、软件与数字服务",
+    "pt": "dispositivos de consumo, software e serviços digitais",
+    "es": "dispositivos de consumo, software y servicios digitales"
+  },
+  "cloud": {
+    "en": "cloud computing and enterprise software",
+    "ko": "클라우드 컴퓨팅·기업용 소프트웨어",
+    "ja": "クラウドコンピューティング・企業向けソフトウェア",
+    "zh": "云计算与企业软件",
+    "pt": "computação em nuvem e software empresarial",
+    "es": "computación en la nube y software empresarial"
+  },
+  "ads": {
+    "en": "online advertising, social platforms and digital services",
+    "ko": "온라인 광고·플랫폼·디지털 서비스",
+    "ja": "オンライン広告・プラットフォーム・デジタルサービス",
+    "zh": "在线广告、平台与数字服务",
+    "pt": "publicidade online, plataformas e serviços digitais",
+    "es": "publicidad en línea, plataformas y servicios digitales"
+  },
+  "commerce": {
+    "en": "e-commerce, logistics and digital services",
+    "ko": "전자상거래·물류·디지털 서비스",
+    "ja": "電子商取引・物流・デジタルサービス",
+    "zh": "电子商务、物流与数字服务",
+    "pt": "comércio eletrónico, logística e serviços digitais",
+    "es": "comercio electrónico, logística y servicios digitales"
+  },
+  "video": {
+    "en": "video entertainment and streaming",
+    "ko": "영상 콘텐츠·스트리밍",
+    "ja": "映像コンテンツ・ストリーミング",
+    "zh": "视频娱乐与流媒体",
+    "pt": "entretenimento em vídeo e streaming",
+    "es": "entretenimiento en vídeo y streaming"
+  },
+  "hardware": {
+    "en": "computing hardware and infrastructure",
+    "ko": "컴퓨팅 하드웨어·인프라",
+    "ja": "コンピューティング機器・インフラ",
+    "zh": "计算硬件与基础设施",
+    "pt": "hardware e infraestrutura de computação",
+    "es": "hardware e infraestructura de computación"
+  },
+  "semiconductor": {
+    "en": "semiconductors and computing technology",
+    "ko": "반도체·컴퓨팅 기술",
+    "ja": "半導体・コンピューティング技術",
+    "zh": "半导体与计算技术",
+    "pt": "semicondutores e tecnologia de computação",
+    "es": "semiconductores y tecnología informática"
+  },
+  "memory": {
+    "en": "memory semiconductors and data storage",
+    "ko": "메모리 반도체·데이터 저장장치",
+    "ja": "メモリー半導体・データストレージ",
+    "zh": "存储芯片与数据存储",
+    "pt": "semicondutores de memória e armazenamento de dados",
+    "es": "semiconductores de memoria y almacenamiento de datos"
+  },
+  "equipment": {
+    "en": "semiconductor manufacturing equipment",
+    "ko": "반도체 제조 장비",
+    "ja": "半導体製造装置",
+    "zh": "半导体制造设备",
+    "pt": "equipamentos de fabricação de semicondutores",
+    "es": "equipos de fabricación de semiconductores"
+  },
+  "vehicles": {
+    "en": "vehicles and mobility products",
+    "ko": "자동차·모빌리티 제품",
+    "ja": "自動車・モビリティ製品",
+    "zh": "汽车与出行产品",
+    "pt": "veículos e produtos de mobilidade",
+    "es": "vehículos y productos de movilidad"
+  },
+  "digitalassets": {
+    "en": "digital-asset trading, treasury or infrastructure",
+    "ko": "디지털 자산 거래·재무·인프라",
+    "ja": "デジタル資産の取引・財務・インフラ",
+    "zh": "数字资产交易、储备或基础设施",
+    "pt": "negociação, tesouraria ou infraestrutura de ativos digitais",
+    "es": "negociación, tesorería o infraestructura de activos digitales"
+  },
+  "finance": {
+    "en": "financial services and investment management",
+    "ko": "금융 서비스·투자 운용",
+    "ja": "金融サービス・投資運用",
+    "zh": "金融服务与投资管理",
+    "pt": "serviços financeiros e gestão de investimentos",
+    "es": "servicios financieros y gestión de inversiones"
+  },
+  "ai": {
+    "en": "AI software, computing and infrastructure",
+    "ko": "AI 소프트웨어·컴퓨팅·인프라",
+    "ja": "AIソフトウェア・コンピューティング・インフラ",
+    "zh": "人工智能软件、计算与基础设施",
+    "pt": "software, computação e infraestrutura de IA",
+    "es": "software, computación e infraestructura de IA"
+  },
+  "retail": {
+    "en": "retail and consumer products",
+    "ko": "소매 유통·소비재",
+    "ja": "小売・消費者向け製品",
+    "zh": "零售与消费产品",
+    "pt": "retalho e produtos de consumo",
+    "es": "comercio minorista y productos de consumo"
+  },
+  "health": {
+    "en": "medicines, biotechnology and healthcare",
+    "ko": "의약품·바이오·헬스케어",
+    "ja": "医薬品・バイオテクノロジー・ヘルスケア",
+    "zh": "医药、生物技术与医疗健康",
+    "pt": "medicamentos, biotecnologia e saúde",
+    "es": "medicamentos, biotecnología y salud"
+  },
+  "space": {
+    "en": "space launch systems and satellite technology",
+    "ko": "우주 발사체·위성 기술",
+    "ja": "宇宙打上げシステム・衛星技術",
+    "zh": "航天发射系统与卫星技术",
+    "pt": "sistemas de lançamento espacial e tecnologia de satélites",
+    "es": "sistemas de lanzamiento espacial y tecnología de satélites"
+  },
+  "gaming": {
+    "en": "online gaming and sports entertainment",
+    "ko": "온라인 게임·스포츠 엔터테인먼트",
+    "ja": "オンラインゲーム・スポーツ娯楽",
+    "zh": "在线游戏与体育娱乐",
+    "pt": "jogos online e entretenimento desportivo",
+    "es": "juegos en línea y entretenimiento deportivo"
+  },
+  "networks": {
+    "en": "communications networks and optical components",
+    "ko": "통신 네트워크·광학 부품",
+    "ja": "通信ネットワーク・光学部品",
+    "zh": "通信网络与光学元件",
+    "pt": "redes de comunicação e componentes óticos",
+    "es": "redes de comunicación y componentes ópticos"
+  },
+  "power": {
+    "en": "energy equipment and power generation",
+    "ko": "에너지 장비·발전",
+    "ja": "エネルギー設備・発電",
+    "zh": "能源设备与发电",
+    "pt": "equipamentos de energia e geração elétrica",
+    "es": "equipos de energía y generación eléctrica"
+  },
+  "quantum": {
+    "en": "quantum computers and related software",
+    "ko": "양자컴퓨터·관련 소프트웨어",
+    "ja": "量子コンピューター・関連ソフトウェア",
+    "zh": "量子计算机与相关软件",
+    "pt": "computadores quânticos e software relacionado",
+    "es": "ordenadores cuánticos y software relacionado"
+  },
+  "robotics": {
+    "en": "robotics and embodied AI",
+    "ko": "로보틱스·물리 AI",
+    "ja": "ロボティクス・身体性AI",
+    "zh": "机器人与具身智能",
+    "pt": "robótica e IA incorporada",
+    "es": "robótica e IA incorporada"
+  },
+  "rareearth": {
+    "en": "rare-earth mining, processing and magnets",
+    "ko": "희토류 채굴·가공·자석",
+    "ja": "レアアースの採掘・加工・磁石",
+    "zh": "稀土开采、加工与磁体",
+    "pt": "mineração, processamento e ímanes de terras raras",
+    "es": "minería, procesamiento e imanes de tierras raras"
+  },
+  "oilcompany": {
+    "en": "oil, natural gas and transportation fuels",
+    "ko": "석유·천연가스·운송용 연료",
+    "ja": "石油・天然ガス・輸送用燃料",
+    "zh": "石油、天然气与交通燃料",
+    "pt": "petróleo, gás natural e combustíveis de transporte",
+    "es": "petróleo, gas natural y combustibles de transporte"
+  },
+  "glass": {
+    "en": "specialty glass, ceramics and optical communications",
+    "ko": "특수 유리·세라믹·광통신",
+    "ja": "特殊ガラス・セラミックス・光通信",
+    "zh": "特种玻璃、陶瓷与光通信",
+    "pt": "vidro especial, cerâmica e comunicações óticas",
+    "es": "vidrio especial, cerámica y comunicaciones ópticas"
+  },
+  "exchange": {
+    "en": "exchanges, clearing and market data",
+    "ko": "거래소·청산·시장 데이터",
+    "ja": "取引所・清算・市場データ",
+    "zh": "交易所、清算与市场数据",
+    "pt": "bolsas, compensação e dados de mercado",
+    "es": "bolsas, compensación y datos de mercado"
+  },
+  "wearable": {
+    "en": "wearable devices and health insights",
+    "ko": "웨어러블 기기·건강 분석",
+    "ja": "ウェアラブル機器・健康分析",
+    "zh": "可穿戴设备与健康分析",
+    "pt": "dispositivos vestíveis e análise de saúde",
+    "es": "dispositivos ponibles y análisis de salud"
+  },
+  "community": {
+    "en": "online communities and user-created content",
+    "ko": "온라인 커뮤니티·사용자 제작 콘텐츠",
+    "ja": "オンラインコミュニティ・利用者作成コンテンツ",
+    "zh": "在线社区与用户生成内容",
+    "pt": "comunidades online e conteúdo criado por utilizadores",
+    "es": "comunidades en línea y contenido generado por usuarios"
+  },
+  "index": {
+    "en": "a benchmark basket of listed equities",
+    "ko": "상장 주식으로 구성된 대표 지수",
+    "ja": "上場株式で構成される代表指数",
+    "zh": "由上市股票组成的基准指数",
+    "pt": "um índice de referência composto por ações cotadas",
+    "es": "un índice de referencia compuesto por acciones cotizadas"
+  },
+  "fund": {
+    "en": "a fund portfolio of the securities described in its mandate",
+    "ko": "투자 목적에 따라 구성된 증권 포트폴리오",
+    "ja": "投資目的に沿って構成された証券ポートフォリオ",
+    "zh": "依照投资目标构建的证券组合",
+    "pt": "uma carteira de títulos conforme o mandato do fundo",
+    "es": "una cartera de valores según el mandato del fondo"
+  },
+  "gold": {
+    "en": "gold spot prices",
+    "ko": "금 현물 가격",
+    "ja": "金の現物価格",
+    "zh": "黄金现货价格",
+    "pt": "preços à vista do ouro",
+    "es": "precios al contado del oro"
+  },
+  "silver": {
+    "en": "silver spot prices",
+    "ko": "은 현물 가격",
+    "ja": "銀の現物価格",
+    "zh": "白银现货价格",
+    "pt": "preços à vista da prata",
+    "es": "precios al contado de la plata"
+  },
+  "platinum": {
+    "en": "platinum spot prices",
+    "ko": "백금 현물 가격",
+    "ja": "プラチナの現物価格",
+    "zh": "铂金现货价格",
+    "pt": "preços à vista da platina",
+    "es": "precios al contado del platino"
+  },
+  "palladium": {
+    "en": "palladium spot prices",
+    "ko": "팔라듐 현물 가격",
+    "ja": "パラジウムの現物価格",
+    "zh": "钯金现货价格",
+    "pt": "preços à vista do paládio",
+    "es": "precios al contado del paladio"
+  },
+  "copper": {
+    "en": "high-grade copper prices",
+    "ko": "고품위 구리 가격",
+    "ja": "高品位銅の価格",
+    "zh": "高品位铜价格",
+    "pt": "preços do cobre de alta qualidade",
+    "es": "precios del cobre de alta calidad"
+  },
+  "crude": {
+    "en": "WTI or Brent crude-oil benchmark prices",
+    "ko": "WTI·브렌트 원유 기준가격",
+    "ja": "WTI・ブレント原油の指標価格",
+    "zh": "WTI或布伦特原油基准价格",
+    "pt": "preços de referência do petróleo WTI ou Brent",
+    "es": "precios de referencia del petróleo WTI o Brent"
+  },
+  "gas": {
+    "en": "Henry Hub natural-gas benchmark prices",
+    "ko": "헨리허브 천연가스 기준가격",
+    "ja": "ヘンリーハブ天然ガスの指標価格",
+    "zh": "亨利港天然气基准价格",
+    "pt": "preços de referência do gás natural Henry Hub",
+    "es": "precios de referencia del gas natural Henry Hub"
+  },
+  "diesel": {
+    "en": "New York Harbor ultra-low sulfur diesel prices",
+    "ko": "뉴욕항 초저유황 경유 가격",
+    "ja": "ニューヨーク港の超低硫黄ディーゼル価格",
+    "zh": "纽约港超低硫柴油价格",
+    "pt": "preços do diesel de ultrabaixo teor de enxofre no porto de Nova Iorque",
+    "es": "precios del diésel ultrabajo en azufre en el puerto de Nueva York"
+  },
+  "fx": {
+    "en": "spot foreign-exchange rates",
+    "ko": "현물 외환 환율",
+    "ja": "外国為替のスポットレート",
+    "zh": "即期外汇汇率",
+    "pt": "taxas de câmbio à vista",
+    "es": "tipos de cambio al contado"
+  },
+  "fund-EWY": {
+    "en": "South Korean large- and mid-cap equities",
+    "ko": "한국 대형·중형주",
+    "ja": "韓国の大型・中型株",
+    "zh": "韩国大中盘股票",
+    "pt": "ações sul-coreanas de grande e média capitalização",
+    "es": "acciones surcoreanas de gran y mediana capitalización"
+  },
+  "fund-EWJ": {
+    "en": "Japanese large- and mid-cap equities",
+    "ko": "일본 대형·중형주",
+    "ja": "日本の大型・中型株",
+    "zh": "日本大中盘股票",
+    "pt": "ações japonesas de grande e média capitalização",
+    "es": "acciones japonesas de gran y mediana capitalización"
+  },
+  "fund-EWT": {
+    "en": "Taiwanese large- and mid-cap equities",
+    "ko": "대만 대형·중형주",
+    "ja": "台湾の大型・中型株",
+    "zh": "台湾大中盘股票",
+    "pt": "ações taiwanesas de grande e média capitalização",
+    "es": "acciones taiwanesas de gran y mediana capitalización"
+  },
+  "fund-EWZ": {
+    "en": "Brazilian equities",
+    "ko": "브라질 주식",
+    "ja": "ブラジル株",
+    "zh": "巴西股票",
+    "pt": "ações brasileiras",
+    "es": "acciones brasileñas"
+  },
+  "fund-XLE": {
+    "en": "large US energy companies in the Energy Select Sector Index",
+    "ko": "에너지 셀렉트 섹터 지수의 미국 대형 에너지 기업",
+    "ja": "Energy Select Sector Indexの米国大手エネルギー企業",
+    "zh": "能源精选行业指数中的美国大型能源公司",
+    "pt": "grandes empresas de energia dos EUA do Energy Select Sector Index",
+    "es": "grandes empresas energéticas de EE. UU. del Energy Select Sector Index"
+  },
+  "fund-URNM": {
+    "en": "uranium-mining equities and physical uranium exposure",
+    "ko": "우라늄 광산 주식·실물 우라늄 익스포저",
+    "ja": "ウラン採掘株・現物ウランへのエクスポージャー",
+    "zh": "铀矿股票与实物铀敞口",
+    "pt": "ações de mineração de urânio e exposição a urânio físico",
+    "es": "acciones mineras de uranio y exposición a uranio físico"
+  },
+  "fund-DRAM": {
+    "en": "semiconductor memory and storage companies",
+    "ko": "반도체 메모리·저장장치 기업",
+    "ja": "半導体メモリー・ストレージ企業",
+    "zh": "半导体存储与数据存储公司",
+    "pt": "empresas de memória de semicondutores e armazenamento",
+    "es": "empresas de memoria de semiconductores y almacenamiento"
+  },
+  "fund-SMH": {
+    "en": "US-listed semiconductor production and equipment companies",
+    "ko": "미국 상장 반도체 제조·장비 기업",
+    "ja": "米国上場の半導体製造・装置企業",
+    "zh": "美国上市半导体制造与设备公司",
+    "pt": "empresas de produção e equipamentos de semicondutores cotadas nos EUA",
+    "es": "empresas de fabricación y equipos de semiconductores cotizadas en EE. UU."
+  },
+  "fund-KORU": {
+    "en": "daily 300% exposure to the MSCI Korea 25/50 Index",
+    "ko": "MSCI Korea 25/50 지수의 일일 수익률 300% 목표",
+    "ja": "MSCI Korea 25/50指数の日次リターン300%を目標とする運用",
+    "zh": "MSCI韩国25/50指数每日收益300%的目标敞口",
+    "pt": "exposição diária alvo de 300% ao MSCI Korea 25/50 Index",
+    "es": "exposición diaria objetivo del 300% al MSCI Korea 25/50 Index"
+  },
+  "fund-SOXL": {
+    "en": "daily 300% exposure to the ICE Semiconductor Index",
+    "ko": "ICE 반도체 지수의 일일 수익률 300% 목표",
+    "ja": "ICE Semiconductor Indexの日次リターン300%を目標とする運用",
+    "zh": "ICE半导体指数每日收益300%的目标敞口",
+    "pt": "exposição diária alvo de 300% ao ICE Semiconductor Index",
+    "es": "exposición diaria objetivo del 300% al ICE Semiconductor Index"
+  },
+  "fund-MAGS": {
+    "en": "approximately equal-weighted exposure to Alphabet, Amazon, Apple, Meta, Microsoft, NVIDIA and Tesla",
+    "ko": "알파벳·아마존·애플·메타·마이크로소프트·엔비디아·테슬라의 대략적 동일가중 투자",
+    "ja": "Alphabet・Amazon・Apple・Meta・Microsoft・NVIDIA・Teslaへの概ね均等加重投資",
+    "zh": "对Alphabet、亚马逊、苹果、Meta、微软、英伟达和特斯拉的大致等权重投资",
+    "pt": "exposição aproximadamente equiponderada a Alphabet, Amazon, Apple, Meta, Microsoft, NVIDIA e Tesla",
+    "es": "exposición aproximadamente equiponderada a Alphabet, Amazon, Apple, Meta, Microsoft, NVIDIA y Tesla"
+  },
+  "fund-XBI": {
+    "en": "approximately equal-weighted US biotechnology equities",
+    "ko": "미국 바이오테크 주식의 대략적 동일가중 투자",
+    "ja": "米国バイオテクノロジー株への概ね均等加重投資",
+    "zh": "对美国生物技术股票的大致等权重投资",
+    "pt": "ações de biotecnologia dos EUA aproximadamente equiponderadas",
+    "es": "acciones biotecnológicas de EE. UU. aproximadamente equiponderadas"
+  },
+  "fund-TLT": {
+    "en": "US Treasury bonds with remaining maturities greater than 20 years",
+    "ko": "잔존만기 20년 초과 미국 국채",
+    "ja": "残存期間20年超の米国債",
+    "zh": "剩余期限超过20年的美国国债",
+    "pt": "títulos do Tesouro dos EUA com prazo remanescente superior a 20 anos",
+    "es": "bonos del Tesoro de EE. UU. con vencimiento residual superior a 20 años"
+  },
+  "fund-KSTR": {
+    "en": "the 50 largest Shanghai STAR Market companies in the STAR 50 Index",
+    "ko": "상하이 STAR 시장의 대형 50개 기업으로 구성된 STAR 50 지수",
+    "ja": "上海STAR市場の主要50社で構成されるSTAR 50指数",
+    "zh": "由上海科创板50家大型公司构成的科创50指数",
+    "pt": "as 50 maiores empresas do STAR Market de Xangai no STAR 50 Index",
+    "es": "las 50 mayores empresas del STAR Market de Shanghái en el STAR 50 Index"
+  },
+  "fund-LYTE": {
+    "en": "photonics and optics businesses, including optical interconnects, lasers and photonic chips",
+    "ko": "광학 연결·레이저·광자 칩 등 포토닉스·광학 기업",
+    "ja": "光インターコネクト・レーザー・フォトニックチップなどの光学関連企業",
+    "zh": "光互连、激光器与光子芯片等光子和光学公司",
+    "pt": "empresas de fotónica e ótica, incluindo interligações óticas, lasers e chips fotónicos",
+    "es": "empresas de fotónica y óptica, incluidas interconexiones ópticas, láseres y chips fotónicos"
+  },
+  "fund-NCLD": {
+    "en": "neocloud companies, GPU-as-a-Service platforms and AI data centers",
+    "ko": "네오클라우드 기업·GPU 서비스 플랫폼·AI 데이터센터",
+    "ja": "ネオクラウド企業・GPUサービス基盤・AIデータセンター",
+    "zh": "新型云服务公司、GPU即服务平台与AI数据中心",
+    "pt": "empresas neocloud, plataformas GPU como serviço e centros de dados de IA",
+    "es": "empresas neocloud, plataformas GPU como servicio y centros de datos de IA"
+  },
+  "fund-SNXX": {
+    "en": "daily 200% exposure to Sandisk common stock",
+    "ko": "샌디스크 보통주의 일일 수익률 200% 목표",
+    "ja": "Sandisk普通株の日次リターン200%を目標とする運用",
+    "zh": "闪迪普通股每日收益200%的目标敞口",
+    "pt": "exposição diária alvo de 200% às ações ordinárias da Sandisk",
+    "es": "exposición diaria objetivo del 200% a las acciones ordinarias de Sandisk"
+  },
+  "cybersecurity": {
+    "en": "cybersecurity, secure networks and software services",
+    "ko": "사이버보안·보안 네트워크·소프트웨어 서비스",
+    "ja": "サイバーセキュリティ・安全なネットワーク・ソフトウェアサービス",
+    "zh": "网络安全、安全网络与软件服务",
+    "pt": "cibersegurança, redes seguras e serviços de software",
+    "es": "ciberseguridad, redes seguras y servicios de software"
+  },
+  "collaboration": {
+    "en": "video communications and workplace collaboration software",
+    "ko": "영상 통신·업무 협업 소프트웨어",
+    "ja": "映像通信・業務コラボレーションソフトウェア",
+    "zh": "视频通信与工作协作软件",
+    "pt": "comunicações por vídeo e software de colaboração no trabalho",
+    "es": "comunicaciones por vídeo y software de colaboración laboral"
+  }
+}

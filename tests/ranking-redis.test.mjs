@@ -55,12 +55,19 @@ test('Redis scripts: atomic recording, retry dedup, quotas, lease ownership and 
     assert.equal(cli('EXISTS', 'cache'), '0');
     assert.equal(cli('--eval', releasePath, 'lease', ',', 'old-owner'), '0');
     assert.equal(cli('GET', 'lease'), 'new-owner');
-    assert.equal(cli('--eval', publishPath, 'lease', 'cache', 'snapshot', ',', 'new-owner', '{"expiresAt":123}', '{"NVDA":1}'), '1');
+    assert.equal(cli('--eval', publishPath, 'lease', 'cache', 'snapshot', ',', 'new-owner', '{"expiresAt":123}', '{"NVDA":1,"US:NVDA":1,"SEMICONDUCTOR:NVDA":1}'), '1');
     assert.equal(cli('HGET', 'snapshot', 'NVDA'), '1');
+    assert.equal(cli('HGET', 'snapshot', 'US:NVDA'), '1');
+    assert.equal(cli('HGET', 'snapshot', 'SEMICONDUCTOR:NVDA'), '1');
     assert.equal(cli('EXISTS', 'lease'), '0');
     cli('SET', 'lease', 'next-owner');
     cli('--eval', publishPath, 'lease', 'cache', 'snapshot', ',', 'next-owner', '{}', '{"NVDA":2}');
     assert.equal(cli('HGET', 'snapshot', 'NVDA'), '1', 'hourly snapshot is immutable');
+    cli('HSET', 'legacy-snapshot', 'NVDA', '2');
+    cli('SET', 'lease', 'rollout-owner');
+    cli('--eval', publishPath, 'lease', 'cache', 'legacy-snapshot', ',', 'rollout-owner', '{}', '{"NVDA":1,"US:NVDA":1}');
+    assert.equal(cli('HGET', 'legacy-snapshot', 'NVDA'), '2', 'legacy snapshots survive rollout and rollback');
+    assert.equal(cli('HEXISTS', 'legacy-snapshot', 'US:NVDA'), '0', 'missing category history stays unavailable until next hour');
   } finally {
     try { cli('SHUTDOWN', 'NOSAVE'); } catch { server.kill(); }
     rmSync(dir, { recursive: true, force: true });

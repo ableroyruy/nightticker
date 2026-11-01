@@ -1,14 +1,14 @@
 import { MetadataRoute } from 'next';
+import { SITE_URL } from '@/lib/seo/site';
 
-const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.nightticker.com';
 
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: {
       userAgent: '*',
       allow: '/',
-      disallow: ['/api/', '/_next/'],
+      disallow: ['/api/'],
     },
-    sitemap: `${baseUrl}/sitemap.xml`,
+    sitemap: `${SITE_URL}/sitemap.xml`,
   };
 }

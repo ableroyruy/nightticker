@@ -1,11 +1,12 @@
 'use client';
 
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { useFavorites } from '@/lib/context/FavoritesContext';
 import { AssetCard } from '@/components/market/AssetCard';
 import { MarketAsset } from '@/lib/types/market';
 import { TickerData } from '@/lib/hooks/useHyperliquidTicker';
 import { stocks } from '@/lib/markets/stocks';
+import { toMarketAsset } from '@/lib/format-market';
 
 interface FavoritesSectionProps {
   tickers: Record<string, TickerData>;
@@ -13,7 +14,6 @@ interface FavoritesSectionProps {
 
 export function FavoritesSection({ tickers }: FavoritesSectionProps) {
   const t = useTranslations('favorites');
-  const locale = useLocale();
   const { favorites, isLoaded } = useFavorites();
 
   if (!isLoaded) {
@@ -51,28 +51,10 @@ export function FavoritesSection({ tickers }: FavoritesSectionProps) {
     );
   }
 
-  // Convert favorites to MarketAsset format with ticker data
-  const favoriteAssets: MarketAsset[] = favorites.filter(fav => stocks.some(stock => stock.symbol === fav.symbol)).map((fav) => {
-    const ticker = tickers[fav.symbol];
-    const stock = stocks.find((s) => s.symbol === fav.symbol);
-    const slug = fav.slug || stock?.slug || fav.symbol.toLowerCase();
-
-    return {
-      symbol: fav.symbol,
-      name: fav.name,
-      nameKo: fav.nameKo,
-      nameJa: fav.nameJa,
-      nameZh: fav.nameZh,
-      namePt: fav.namePt,
-      nameEs: fav.nameEs,
-      slug,
-      market: fav.market,
-      price: ticker?.price ?? null,
-      prevDayPx: ticker?.prevDayPx ?? null,
-      change24h: ticker?.change24h ?? null,
-      changePercent24h: ticker?.changePercent24h ?? null,
-      hyperliquidSymbol: stock?.hyperliquidSymbol,
-    };
+  // Resolve canonical names and categories instead of stale local-storage labels.
+  const favoriteAssets: MarketAsset[] = favorites.flatMap(fav => {
+    const stock = stocks.find(item => item.symbol === fav.symbol);
+    return stock ? [toMarketAsset(stock, tickers[stock.hyperliquidSymbol.replace(/^xyz:/, '')])] : [];
   });
 
   return (

@@ -1,7 +1,7 @@
 'use client';
 
 import { useMemo } from 'react';
-import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
+import { motion, AnimatePresence, LayoutGroup, useReducedMotion } from 'framer-motion';
 import { MarketAsset } from '@/lib/types/market';
 import { AssetCard } from './AssetCard';
 
@@ -18,6 +18,7 @@ export function AnimatedAssetGrid({
   showMarketBadge = false,
   gridId,
 }: AnimatedAssetGridProps) {
+  const reduceMotion = useReducedMotion();
   // Create a map of symbol to current rank
   const rankMap = useMemo(
     () => new Map(assets.map((asset, index) => [asset.symbol, index + 1])),
@@ -34,14 +35,14 @@ export function AnimatedAssetGrid({
           {assets.map((asset) => (
             <motion.div
               key={`${gridId}-${asset.symbol}`}
-              layout
+              layout={!reduceMotion}
               layoutId={`${gridId}-${asset.symbol}`}
-              initial={{ opacity: 0, scale: 0.9 }}
+              initial={reduceMotion ? false : { opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
               exit={{ opacity: 0, scale: 0.9 }}
               transition={{
                 layout: { type: 'spring', stiffness: 300, damping: 30 },
-                opacity: { duration: 0.2 },
+                opacity: { duration: reduceMotion ? 0 : 0.2 },
               }}
             >
               <AssetCard

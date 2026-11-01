@@ -2,7 +2,7 @@
 
 import { createContext, useContext, useState, useEffect, useCallback, useMemo, useRef, ReactNode } from 'react';
 import { stocks } from '@/lib/markets/stocks';
-import { defaultRankings, MAX_BATCH_SIZE, MAX_EVENT_AGE_MS, validateBatch, type RankingData, type RankingItem, type ViewBatch } from '@/lib/ranking/core';
+import { buildCategoryRankings, MAX_BATCH_SIZE, MAX_EVENT_AGE_MS, MAX_RANKING_AGE_MS, usableRankingTimestamp, validateBatch, type CategoryRankings, type RankingCategory, type RankingData, type RankingItem, type ViewBatch } from '@/lib/ranking/core';
 
 export type SearchRankingItem = RankingItem;
 interface SearchRankingContextValue {
@@ -10,23 +10,29 @@ interface SearchRankingContextValue {
   recordPageView: (symbol: string) => void;
   getTopRankings: (limit?: number) => SearchRankingItem[];
   isLoading: boolean;
+  getCategoryRankings: (category: RankingCategory) => SearchRankingItem[];
+  rankingStatus: 'loading' | 'ready' | 'degraded';
+  lastUpdated: number;
 }
 const SearchRankingContext = createContext<SearchRankingContextValue | null>(null);
 const active = new Set(stocks.map(stock => stock.symbol));
-const CACHE_KEY = 'nightticker_ranking_cache_v3';
+const CACHE_KEY = 'nightticker_ranking_cache_v4';
 const QUEUE_KEY = 'nightticker_ranking_queue_v1';
 const MAX_QUEUED_BATCHES = 10;
 
 function readCache(): RankingData | null {
   try {
     const value = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null') as RankingData | null;
-    if (value && Array.isArray(value.rankings) && Date.now() < value.expiresAt && value.lastUpdated <= Date.now()) return value;
+    if (value && Array.isArray(value.rankings) && Date.now() < value.expiresAt && usableRankingTimestamp(value.lastUpdated)) return value;
   } catch { /* Browser storage may be disabled. */ }
   return null;
 }
 
 export function SearchRankingProvider({ children }: { children: ReactNode }) {
-  const [rankings, setRankings] = useState<SearchRankingItem[]>(() => defaultRankings(active));
+  const [rankings, setRankings] = useState<SearchRankingItem[]>([]);
+  const [categoryRankings, setCategoryRankings] = useState<CategoryRankings>(() => buildCategoryRankings([], stocks));
+  const [rankingStatus, setRankingStatus] = useState<'loading' | 'ready' | 'degraded'>('loading');
+  const [lastUpdated, setLastUpdated] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const queueRef = useRef<ViewBatch[]>([]);
   const loadedRef = useRef(false);
@@ -35,6 +41,38 @@ export function SearchRankingProvider({ children }: { children: ReactNode }) {
   const sendingIdRef = useRef<string | null>(null);
   const flushTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const failuresRef = useRef(0);
+
+  const applySnapshot = useCallback((data: RankingData) => {
+    const usable = usableRankingTimestamp(data.lastUpdated);
+    const measured = usable ? data.rankings.filter(item => item && active.has(item.symbol) && Number.isSafeInteger(item.views) && item.views > 0)
+      .sort((a, b) => b.views - a.views || a.symbol.localeCompare(b.symbol))
+      .map((item, index) => ({ ...item, rank: index + 1 })) : [];
+    const previous: Record<string, number> = {};
+    for (const [category, items] of Object.entries(data.categoryRankings ?? {})) {
+      if (!Array.isArray(items)) continue;
+      for (const item of items) if (item && typeof item.symbol === 'string' && Number.isSafeInteger(item.previousRank) && item.previousRank! > 0) previous[`${category}:${item.symbol}`] = item.previousRank!;
+    }
+    setRankings(measured);
+    setCategoryRankings(buildCategoryRankings(measured, stocks, previous));
+    setRankingStatus(data.degraded || !usable ? 'degraded' : 'ready');
+    setLastUpdated(usable ? data.lastUpdated : 0);
+  }, []);
+
+  // An open/offline tab must not keep a last-good ranking beyond the server's
+  // maximum stale age. Also check visibility after background timer throttling.
+  useEffect(() => {
+    if (!lastUpdated) return;
+    const expire = () => {
+      if (usableRankingTimestamp(lastUpdated)) return;
+      setRankings([]);
+      setCategoryRankings(buildCategoryRankings([], stocks));
+      setLastUpdated(0);
+      setRankingStatus('degraded');
+    };
+    const timer = setTimeout(expire, Math.max(0, lastUpdated + MAX_RANKING_AGE_MS - Date.now()));
+    document.addEventListener('visibilitychange', expire);
+    return () => { clearTimeout(timer); document.removeEventListener('visibilitychange', expire); };
+  }, [lastUpdated]);
 
   const persistQueue = useCallback(() => {
     try { sessionStorage.setItem(QUEUE_KEY, JSON.stringify(queueRef.current)); } catch { /* In-memory delivery still works. */ }
@@ -129,12 +167,13 @@ export function SearchRankingProvider({ children }: { children: ReactNode }) {
         const data: RankingData = await response.json();
         if (!Array.isArray(data.rankings) || !Number.isFinite(data.expiresAt)) throw new Error('Invalid ranking response');
         if (cancelled) return;
-        setRankings(data.rankings.filter(item => active.has(item.symbol)));
+        applySnapshot(data);
         if (!data.degraded) {
           try { localStorage.setItem(CACHE_KEY, JSON.stringify(data)); } catch { /* Optional cache. */ }
         }
         schedule(data.degraded ? 30_000 : data.expiresAt - Date.now());
       } catch {
+        if (!cancelled) setRankingStatus('degraded');
         schedule(60_000);
       } finally {
         fetching = false;
@@ -145,7 +184,7 @@ export function SearchRankingProvider({ children }: { children: ReactNode }) {
       if (cancelled) return;
       const cached = readCache();
       if (cached) {
-        setRankings(cached.rankings.filter(item => active.has(item.symbol)));
+        applySnapshot(cached);
         setIsLoading(false);
         schedule(cached.expiresAt - Date.now());
       } else void refresh();
@@ -164,10 +203,11 @@ export function SearchRankingProvider({ children }: { children: ReactNode }) {
       window.removeEventListener('pagehide', flushOnPageHide);
       persistQueue();
     };
-  }, [loadQueue, flushPendingViews, persistQueue]);
+  }, [loadQueue, flushPendingViews, persistQueue, applySnapshot]);
 
   const getTopRankings = useCallback((limit = 10) => rankings.slice(0, limit), [rankings]);
-  const value = useMemo(() => ({ rankings, recordPageView, getTopRankings, isLoading }), [rankings, recordPageView, getTopRankings, isLoading]);
+  const getCategoryRankings = useCallback((category: RankingCategory) => categoryRankings[category] ?? [], [categoryRankings]);
+  const value = useMemo(() => ({ rankings, recordPageView, getTopRankings, getCategoryRankings, isLoading, rankingStatus, lastUpdated }), [rankings, recordPageView, getTopRankings, getCategoryRankings, isLoading, rankingStatus, lastUpdated]);
   return <SearchRankingContext.Provider value={value}>{children}</SearchRankingContext.Provider>;
 }
 

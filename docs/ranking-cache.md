@@ -40,10 +40,57 @@ cached too, preventing repeated cold-start aggregation. Snapshot storage lasts
 25 hours to support degraded fallback; freshness remains 30 minutes.
 
 On Redis failure the process backs off reads for 30 seconds. A recent last-good
-ranking (up to 24 hours) or defaults is returned with `degraded: true`, five-second
-CDN cache and a 30-second browser retry. Default fallback uses `lastUpdated: 0`,
+ranking (up to 24 hours) or an empty result is returned with `degraded: true`, five-second
+CDN cache and a 30-second browser retry. Empty fallback uses `lastUpdated: 0`,
 so an outage is not persisted as a fresh ranking. Redis reads have five-second
 network aborts and at most one transport retry. Write retries are safe by batch id.
+The browser also expires its last-good result after 24 hours, including in an
+offline open tab and on return from background visibility.
+
+## Overall and category rankings
+
+Overall plus US/KR/JP/INDEX/ETF/COMMODITY/FX/SPECIAL/SEMICONDUCTOR lists are derived
+from the same 288 bucket reads. Semiconductor membership overlaps base categories;
+it never increments the overall count again. Category positions and movement are
+local to that group. Ties sort by symbol. Zero-view recommendations are never
+presented as measured ranks. A legacy snapshot lacking category history produces
+an unavailable comparison, not a claimed unchanged rank.
+
+The existing server v3 cache, lease and hourly snapshot keys are retained. Added
+JSON fields are compatible with the previous reader, while the browser snapshot
+cache is v4. The durable event queue format and batch idempotency are unchanged.
+An immutable old hourly snapshot is not overwritten during rollout; the next
+hourly snapshot includes category fields. Rollback preserves recorded view events.
+
+One multi-field HSET now publishes all hourly rank fields, rather than one HSET
+per symbol. This does not make the larger storage payload free. A fixed fixture
+with all 120 symbols and views 120..1 gives:
+
+| Quantity | Overall only | Overall + categories |
+|---|---:|---:|
+| Raw bucket HGETALL per refresh | 288 | 288 |
+| Previous hourly snapshot HGETALL | 1 | 1 |
+| Hourly snapshot fields | 120 | 270 |
+| Snapshot JSON bytes | 1,227 | 3,615 |
+| Ranking response JSON bytes (without common timestamp fields) | 9,292 | 20,929 |
+| HSET calls when writing a new hourly snapshot | 120 | 1 |
+
+The fixture includes 30 overlapping semiconductor symbols. JSON bytes are wire
+payload measurements, not Redis allocated memory. The publication script uses
+GET/SET/EXISTS/HSET/EXPIRE/DEL (six inner commands for a new nonempty snapshot),
+with no extra per-category request or key. Existing-hour publication uses four
+inner commands. EVAL and actual provider billing must be assessed separately.
+Filtering a previously loaded category makes no API or Redis request; scheduled
+refreshes still occur. A larger response/storage payload is an explicit tradeoff.
+
+## Price and chart freshness (no Redis)
+
+Prices use a 3-second process TTL and at most 60-second fallback; metadata uses
+60 seconds and at most 5 minutes. Candle data uses 2 minutes and at most 10-minute
+fallback. Stale responses are marked and not edge cached. Browser quotes are
+cleared after 60 seconds without fresh data; missing daily baselines stay unknown.
+Candles are 5-minute intervals requested over the last 6 hours. Their visible
+captions distinguish the interval from the range and from the 24-hour price change.
 
 ## Budget model and operational verification
 

@@ -2,7 +2,7 @@ import { createHash, randomUUID } from 'node:crypto';
 import { Redis } from '@upstash/redis';
 import { NextRequest, NextResponse } from 'next/server';
 import { stocks } from '@/lib/markets/stocks';
-import { aggregateRankings, bucketKeys, BUCKET_MS, defaultRankings, remainingCacheSeconds, RANKING_TTL_MS, validateBatch, type RankingData } from '@/lib/ranking/core';
+import { aggregateRankings, bucketKeys, BUCKET_MS, buildCategoryRankings, remainingCacheSeconds, RANKING_TTL_MS, usableRankingTimestamp, validateBatch, type RankingData } from '@/lib/ranking/core';
 import { PUBLISH_SCRIPT, RECORD_BATCH_SCRIPT, RELEASE_SCRIPT } from '@/lib/ranking/scripts';
 
 const CACHE_KEY = 'ranking:cache:v3';
@@ -21,8 +21,9 @@ let inFlight: Promise<RankingData> | null = null;
 let retryAfter = 0;
 
 function fallback(now: number): RankingData {
-  const recent = memoryCache && now - memoryCache.lastUpdated < 24 * 60 * 60 * 1000 ? memoryCache : null;
-  return { rankings: recent?.rankings ?? defaultRankings(active), lastUpdated: recent?.lastUpdated ?? 0, expiresAt: now, degraded: true };
+  const recent = memoryCache && usableRankingTimestamp(memoryCache.lastUpdated, now) ? memoryCache : null;
+  const rankings = (recent?.rankings ?? []).filter(item => active.has(item.symbol) && item.views > 0);
+  return { rankings, categoryRankings: recent?.categoryRankings ?? buildCategoryRankings(rankings, stocks), lastUpdated: recent?.lastUpdated ?? 0, expiresAt: now, degraded: true };
 }
 
 async function loadRankings(): Promise<RankingData> {
@@ -30,6 +31,8 @@ async function loadRankings(): Promise<RankingData> {
   const redis = getRedis();
   const cached = await redis.get<RankingData>(CACHE_KEY);
   if (cached?.rankings && Number.isFinite(cached.expiresAt)) {
+    cached.rankings = cached.rankings.filter(item => active.has(item.symbol) && Number.isSafeInteger(item.views) && item.views > 0);
+    cached.categoryRankings ??= buildCategoryRankings(cached.rankings, stocks);
     memoryCache = cached;
     if (now < cached.expiresAt) return cached;
   }
@@ -51,11 +54,15 @@ async function loadRankings(): Promise<RankingData> {
     const previous = results.pop() as Record<string, unknown> | null;
     const ranked = aggregateRankings(results, previous, active);
     const data: RankingData = {
-      rankings: ranked.length ? ranked : defaultRankings(active),
+      rankings: ranked,
+      categoryRankings: buildCategoryRankings(ranked, stocks, previous),
       lastUpdated: now,
       expiresAt: now + RANKING_TTL_MS,
     };
-    const snapshot = Object.fromEntries(data.rankings.map(item => [item.symbol, item.rank]));
+    const snapshot = Object.fromEntries([
+      ...data.rankings.map(item => [item.symbol, item.rank]),
+      ...Object.entries(data.categoryRankings!).flatMap(([category, items]) => items.map(item => [`${category}:${item.symbol}`, item.rank])),
+    ]);
     const published = await redis.eval(PUBLISH_SCRIPT, [LOCK_KEY, CACHE_KEY, `ranking:snapshot:${hour}`], [owner, JSON.stringify(data), JSON.stringify(snapshot)]);
     if (published !== 1) {
       retryAfter = Date.now() + 5_000;

@@ -21,10 +21,19 @@ function loadModule(path, dependencies = {}) {
   return context.exports;
 }
 const catalog = loadModule('lib/markets/stocks.ts');
+const site = loadModule('lib/seo/site.ts');
+const productInfo = loadModule('lib/markets/product-info.ts', {
+  './product-facts.json': { default: JSON.parse(fs.readFileSync('lib/markets/product-facts.json', 'utf8')) },
+  './product-topics.json': { default: JSON.parse(fs.readFileSync('lib/markets/product-topics.json', 'utf8')) },
+});
+const guide = loadModule('lib/seo/reference-guide.ts', { './site': site });
 const removed = ['uranium', 'aluminium', 'dollar-index', 'vix', 'corn', 'wheat', 'krw', 'h100', 'bovespa'];
 const locales = ['en', 'ko', 'ja', 'zh', 'pt', 'es'];
 const page = loadModule('app/[locale]/stock/[slug]/page.tsx', {
   '@/lib/markets/stocks': catalog,
+  '@/lib/seo/site': site,
+  '@/lib/markets/product-info': productInfo,
+  '@/lib/seo/reference-guide': guide,
   'next/navigation': { notFound: () => { throw new Error('NEXT_NOT_FOUND'); } },
   'next-intl/server': { setRequestLocale: () => {} },
 });
@@ -83,7 +92,7 @@ test('all active detail pages have matching multilingual canonical and hreflang'
 });
 
 test('sitemap includes every active language URL and excludes unsupported details', () => {
-  const sitemap = loadModule('app/sitemap.ts', { '@/lib/markets/stocks': catalog }).default();
+  const sitemap = loadModule('app/sitemap.ts', { '@/lib/markets/stocks': catalog, '@/lib/seo/site': site }).default();
   const urls = new Set(sitemap.map(entry => entry.url));
   assert.equal(urls.size, sitemap.length, 'no duplicate sitemap URLs');
   for (const stock of catalog.stocks) for (const locale of locales) {
@@ -91,7 +100,7 @@ test('sitemap includes every active language URL and excludes unsupported detail
     assert.ok(urls.has(`https://www.nightticker.com${prefix}/stock/${stock.slug}`));
   }
   for (const slug of removed) assert.ok(!sitemap.some(entry => entry.url.endsWith(`/stock/${slug}`)));
-  assert.ok(sitemap.every(entry => Number.isFinite(entry.lastModified.getTime())));
+  assert.ok(sitemap.every(entry => !('lastModified' in entry) && !('changeFrequency' in entry) && !('priority' in entry)), 'unproven revision dates and crawl-frequency hints are omitted');
 });
 
 test('unsupported details return 404 while active server HTML includes product context', async () => {
@@ -125,6 +134,7 @@ test('saved unsupported favorites are hidden on both home and favorites page', (
   ];
   const dependencies = {
     '@/lib/markets/stocks': catalog,
+    '@/lib/format-market': loadModule('lib/format-market.ts'),
     '@/lib/context/FavoritesContext': { useFavorites: () => ({ favorites, isLoaded: true }) },
     '@/lib/hooks/useHyperliquidTicker': { useHyperliquidTicker: () => ({ tickers: {}, status: 'connected', lastUpdate: null }) },
     'next-intl': { useLocale: () => 'en', useTranslations: () => key => key },
@@ -135,8 +145,8 @@ test('saved unsupported favorites are hidden on both home and favorites page', (
     ['components/sections/FavoritesSection.tsx', 'FavoritesSection', { tickers: {} }],
     ['components/pages/FavoritesPage.tsx', 'FavoritesPage', {}],
   ]) {
-    const module = loadModule(path, dependencies);
-    const tree = module[name](props);
+    const loadedModule = loadModule(path, dependencies);
+    const tree = loadedModule[name](props);
     const cards = collect(tree, node => node.type === 'AssetCard');
     assert.equal(cards.length, 1, `${name} has no unsupported asset card`);
     assert.equal(cards[0].props.asset.symbol, 'AAPL');

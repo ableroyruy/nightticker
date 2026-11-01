@@ -8,6 +8,7 @@ import { PriceChange } from '@/components/ui/price-change';
 import { FavoriteButton } from '@/components/ui/favorite-button';
 import { Badge } from '@/components/ui/badge';
 import { useFavorites } from '@/lib/context/FavoritesContext';
+import { formatMarketPrice, getLocalizedAssetName } from '@/lib/format-market';
 
 interface AssetTableProps {
   assets: MarketAsset[];
@@ -25,6 +26,7 @@ export function AssetTable({
   const locale = useLocale();
   const t = useTranslations('table');
   const tMarket = useTranslations('marketBadge');
+  const tFavorites = useTranslations('favorites');
   const { isFavorite, toggleFavorite } = useFavorites();
 
   const marketBadgeColors: Record<MarketType, string> = {
@@ -65,36 +67,31 @@ export function AssetTable({
 
   return (
     <div className={cn('glass-card rounded-2xl overflow-hidden', className)}>
-      <div className="overflow-x-auto">
+      <div className="overflow-x-auto focus-visible:outline-2 focus-visible:outline-primary" role="region" aria-label={`${t('name')} / ${t('price')}`} tabIndex={0}>
         <table className="w-full financial-table">
+          <caption className="sr-only">{t('name')} · {t('price')} · {t('change24h')}</caption>
           <thead>
             <tr className="border-b border-border/50">
               {showRank && (
-                <th className="text-left py-3 px-4 w-12">#</th>
+                <th scope="col" className="text-left py-3 px-4 w-12">#</th>
               )}
-              <th className="text-left py-3 px-4">{t('name')}</th>
+              <th scope="col" className="text-left py-3 px-4">{t('name')}</th>
               {showMarket && (
-                <th className="text-left py-3 px-4 hidden sm:table-cell">
+                <th scope="col" className="text-left py-3 px-4 hidden sm:table-cell">
                   {t('market')}
                 </th>
               )}
-              <th className="text-right py-3 px-4">{t('price')}</th>
-              <th className="text-right py-3 px-4">{t('change24h')}</th>
-              <th className="text-right py-3 px-4 hidden md:table-cell">
+              <th scope="col" className="text-right py-3 px-4">{t('price')}</th>
+              <th scope="col" className="text-right py-3 px-4">{t('change24h')}</th>
+              <th scope="col" className="text-right py-3 px-4 hidden md:table-cell">
                 {t('change')}
               </th>
-              <th className="w-12 py-3 px-4"></th>
+              <th scope="col" className="w-12 py-3 px-4"><span className="sr-only">{tFavorites('title')}</span></th>
             </tr>
           </thead>
           <tbody>
             {assets.map((asset, index) => {
-              const displayName =
-                locale === 'ko' && asset.nameKo ? asset.nameKo :
-                locale === 'ja' && asset.nameJa ? asset.nameJa :
-                locale === 'zh' && asset.nameZh ? asset.nameZh :
-                locale === 'pt' && asset.namePt ? asset.namePt :
-                locale === 'es' && asset.nameEs ? asset.nameEs :
-                asset.name;
+              const displayName = getLocalizedAssetName(asset, locale);
               const isFav = isFavorite(asset.symbol, asset.market);
               const href = `${prefix}/stock/${asset.slug}`;
 
@@ -105,17 +102,17 @@ export function AssetTable({
                       {index + 1}
                     </td>
                   )}
-                  <td>
+                  <th scope="row" className="text-left font-normal py-3 px-4">
                     <Link
                       href={href}
                       className="flex items-center gap-2 hover:text-primary transition-colors"
                     >
                       <div>
-                        <span className="font-medium">{displayName}</span>
+                        <span className="font-medium block max-w-[140px] sm:max-w-[260px] break-words">{displayName}</span>
                         <p className="text-xs text-muted-foreground truncate max-w-[120px] sm:max-w-[200px]">{asset.symbol}</p>
                       </div>
                     </Link>
-                  </td>
+                  </th>
                   {showMarket && (
                     <td className="hidden sm:table-cell">
                       <Badge
@@ -130,13 +127,8 @@ export function AssetTable({
                       </Badge>
                     </td>
                   )}
-                  <td className="text-right tabular-nums font-medium">
-                    {asset.price !== null
-                      ? `${asset.market !== 'INDEX' && asset.market !== 'FX' ? '$' : ''}${asset.price.toLocaleString('en-US', {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: asset.price < 1 ? 6 : 2,
-                        })}`
-                      : '—'}
+                  <td className="text-right tabular-nums font-medium whitespace-nowrap">
+                    {formatMarketPrice(asset.price, asset.market !== 'INDEX' && asset.market !== 'FX')}
                   </td>
                   <td className="text-right">
                     <PriceChange

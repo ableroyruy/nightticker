@@ -3,6 +3,8 @@
 import { useTranslations } from 'next-intl';
 import { Skeleton } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
+import { formatMarketPrice, marketDirection } from '@/lib/format-market';
+import { PriceChange } from '@/components/ui/price-change';
 
 interface PriceDisplayProps {
   price: number | null;
@@ -27,8 +29,8 @@ export function PriceDisplay({
 
   const sizeClasses = {
     sm: 'text-xl font-semibold',
-    md: 'text-3xl font-bold',
-    lg: 'text-5xl font-bold',
+    md: 'text-2xl sm:text-3xl font-bold',
+    lg: 'text-3xl sm:text-5xl font-bold',
   };
 
   const changeSizeClasses = {
@@ -37,17 +39,11 @@ export function PriceDisplay({
     lg: 'text-xl',
   };
 
-  const triangleSizes = {
-    sm: 'text-xs',
-    md: 'text-sm',
-    lg: 'text-base',
-  };
-
   if (isLoading) {
     return <Skeleton className={`h-10 w-32 ${size === 'lg' ? 'h-14 w-48' : ''}`} />;
   }
 
-  if (price === null) {
+  if (price == null || !Number.isFinite(price)) {
     return (
       <span className="text-muted-foreground text-lg">
         {t('priceUnavailable')}
@@ -55,38 +51,16 @@ export function PriceDisplay({
     );
   }
 
-  // Format price with appropriate decimals
-  const formattedPrice = hideCurrency
-    ? new Intl.NumberFormat('en-US', {
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      }).format(price)
-    : new Intl.NumberFormat('en-US', {
-        style: 'currency',
-        currency: 'USD',
-        minimumFractionDigits: 2,
-        maximumFractionDigits: 2,
-      }).format(price);
-
-  const isPositive = changePercent24h != null && changePercent24h > 0;
-  const isNegative = changePercent24h != null && changePercent24h < 0;
-  const isZero = changePercent24h != null && changePercent24h === 0;
-
-  // Format change amount (with or without currency symbol)
-  const formattedChange = change24h != null
-    ? hideCurrency
-      ? `${isPositive ? '+' : '-'}${Math.abs(change24h).toFixed(2)}`
-      : `${isPositive ? '+' : '-'}$${Math.abs(change24h).toFixed(2)}`
-    : null;
-
-  // Format change percent
-  const formattedPercent = changePercent24h != null
-    ? `${isPositive ? '+' : ''}${changePercent24h.toFixed(2)}%`
-    : null;
+  const formattedPrice = formatMarketPrice(price, !hideCurrency);
+  const direction = marketDirection(changePercent24h ?? change24h, changePercent24h != null ? 'percent' : 'amount');
+  const isPositive = direction === 1;
+  const isNegative = direction === -1;
+  const isZero = direction === 0;
 
   return (
     <div className="space-y-2">
       <span className={cn(
+        'max-w-full tabular-nums leading-tight [overflow-wrap:anywhere]',
         sizeClasses[size],
         isPositive && 'text-gain',
         isNegative && 'text-loss',
@@ -94,39 +68,11 @@ export function PriceDisplay({
       )}>{formattedPrice}</span>
       {showChange && (changePercent24h != null || change24h != null) && (
         <div className="flex items-center gap-3 flex-wrap">
-          {/* Change Amount with background */}
-          {formattedChange && (
-            <span
-              className={cn(
-                'inline-flex items-center gap-1 tabular-nums font-medium px-2 py-1 rounded',
-                changeSizeClasses[size],
-                isPositive && 'text-gain bg-gain',
-                isNegative && 'text-loss bg-loss',
-                isZero && 'text-muted-foreground bg-muted'
-              )}
-            >
-              <span className={cn(triangleSizes[size], 'arrow-bounce')}>
-                {isPositive && '▲'}
-                {isNegative && '▼'}
-                {isZero && '−'}
-              </span>
-              {formattedChange}
-            </span>
+          {change24h != null && (
+            <PriceChange value={change24h} type="amount" hideCurrency={hideCurrency} showBackground size={size} className={changeSizeClasses[size]} />
           )}
-
-          {/* Change Percent */}
-          {formattedPercent && (
-            <span
-              className={cn(
-                'inline-flex items-center tabular-nums font-medium',
-                changeSizeClasses[size],
-                isPositive && 'text-gain',
-                isNegative && 'text-loss',
-                isZero && 'text-muted-foreground'
-              )}
-            >
-              {formattedPercent}
-            </span>
+          {changePercent24h != null && (
+            <PriceChange value={changePercent24h} type="percent" showIcon={false} size={size} className={changeSizeClasses[size]} />
           )}
         </div>
       )}

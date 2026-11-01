@@ -14,7 +14,7 @@ import {
   DropdownMenuTrigger,
   DropdownMenuSeparator,
 } from '@/components/ui/dropdown-menu';
-import { useState } from 'react';
+import { useState, useRef, useEffect, useId } from 'react';
 import { cn } from '@/lib/utils';
 import { StockCategory } from '@/lib/providers/types';
 
@@ -37,6 +37,22 @@ export function Header() {
   const locale = useLocale();
   const pathname = usePathname();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const menuId = useId();
+  const menuRef = useRef<HTMLElement>(null);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const menuLabels = { en: { open: 'Open navigation', close: 'Close navigation', navigation: 'Main navigation' }, ko: { open: '메뉴 열기', close: '메뉴 닫기', navigation: '주요 메뉴' }, ja: { open: 'メニューを開く', close: 'メニューを閉じる', navigation: 'メインナビゲーション' }, zh: { open: '打开导航', close: '关闭导航', navigation: '主导航' }, pt: { open: 'Abrir navegação', close: 'Fechar navegação', navigation: 'Navegação principal' }, es: { open: 'Abrir navegación', close: 'Cerrar navegación', navigation: 'Navegación principal' } }[locale as 'en' | 'ko' | 'ja' | 'zh' | 'pt' | 'es'] ?? { open: 'Open navigation', close: 'Close navigation', navigation: 'Main navigation' };
+  useEffect(() => {
+    if (!mobileMenuOpen) return;
+    menuRef.current?.querySelector<HTMLAnchorElement>('a')?.focus();
+    const onOutside = (event: PointerEvent) => {
+      if (!menuRef.current?.contains(event.target as Node) && !menuButtonRef.current?.contains(event.target as Node)) setMobileMenuOpen(false);
+    };
+    const media = window.matchMedia('(min-width: 768px)');
+    const onDesktop = () => { if (media.matches) setMobileMenuOpen(false); };
+    document.addEventListener('pointerdown', onOutside);
+    media.addEventListener('change', onDesktop);
+    return () => { document.removeEventListener('pointerdown', onOutside); media.removeEventListener('change', onDesktop); };
+  }, [mobileMenuOpen]);
 
   const prefix = locale === 'en' ? '' : `/${locale}`;
 
@@ -74,7 +90,7 @@ export function Header() {
             <span className="font-bold text-xl tracking-tight">NightTicker</span>
           </Link>
 
-          <nav className="hidden md:flex items-center gap-1">
+          <nav aria-label={menuLabels.navigation} className="hidden md:flex items-center gap-1">
             {navLinks.map((link) => {
               const Icon = link.icon;
               const active = isActive(link.href);
@@ -82,6 +98,7 @@ export function Header() {
                 <Link
                   key={link.href}
                   href={link.href}
+                  aria-current={active ? 'page' : undefined}
                   className={cn(
                     'flex items-center gap-2 px-3 py-2 rounded-lg text-sm font-medium transition-colors',
                     active
@@ -136,7 +153,12 @@ export function Header() {
           <Button
             variant="ghost"
             size="icon"
-            className="md:hidden"
+            ref={menuButtonRef}
+            type="button"
+            aria-label={mobileMenuOpen ? menuLabels.close : menuLabels.open}
+            aria-expanded={mobileMenuOpen}
+            aria-controls={menuId}
+            className="md:hidden h-11 w-11"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           >
             {mobileMenuOpen ? (
@@ -150,7 +172,10 @@ export function Header() {
 
       {/* Mobile menu */}
       {mobileMenuOpen && (
-        <nav className="md:hidden border-t border-border/50 p-4 space-y-1 bg-background/95 backdrop-blur-xl">
+        <nav ref={menuRef} id={menuId} aria-label={menuLabels.navigation}
+          onKeyDown={event => { if (event.key === 'Escape') { event.preventDefault(); setMobileMenuOpen(false); menuButtonRef.current?.focus(); } }}
+          onBlurCapture={event => { if (!event.currentTarget.contains(event.relatedTarget as Node | null) && !menuButtonRef.current?.contains(event.relatedTarget as Node | null)) setMobileMenuOpen(false); }}
+          className="md:hidden max-h-[calc(100dvh-4rem)] overflow-y-auto border-t border-border/50 p-4 space-y-1 bg-background/95 backdrop-blur-xl">
           {navLinks.map((link) => {
             const Icon = link.icon;
             const active = isActive(link.href);
@@ -158,6 +183,7 @@ export function Header() {
               <Link
                 key={link.href}
                 href={link.href}
+                aria-current={active ? 'page' : undefined}
                 className={cn(
                   'flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors',
                   active

@@ -37,7 +37,7 @@ export function WatchlistButton({
 
   if (!isLoaded) {
     return (
-      <Button variant="ghost" size="icon" disabled className="h-8 w-8">
+      <Button variant="ghost" size="icon" disabled className={size === 'default' ? 'h-11 w-11 sm:h-9 sm:w-9' : 'h-8 w-8'}>
         <Star className="h-4 w-4" />
       </Button>
     );
@@ -49,7 +49,9 @@ export function WatchlistButton({
       size="icon"
       onClick={() => toggleFavorite({ symbol, market, name, nameKo, nameJa, nameZh, namePt, nameEs, slug })}
       title={watched ? t('remove') : t('add')}
-      className={`h-8 w-8 ${watched ? 'text-yellow-500' : 'text-muted-foreground'}`}
+      aria-label={watched ? t('remove') : t('add')}
+      aria-pressed={watched}
+      className={`${size === 'default' ? 'h-11 w-11 sm:h-9 sm:w-9' : 'h-8 w-8'} ${watched ? 'text-yellow-500' : 'text-muted-foreground'}`}
     >
       <Star className={`h-4 w-4 ${watched ? 'fill-current' : ''}`} />
     </Button>

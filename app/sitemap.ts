@@ -1,107 +1,16 @@
-import { MetadataRoute } from 'next';
-import { getAllSlugs } from '@/lib/markets/stocks';
+import type { MetadataRoute } from 'next';
+import type { StockCategory } from '@/lib/providers/types';
+import { getAllSlugs, getStocksByCategory, getStocksBySectorForCategory } from '@/lib/markets/stocks';
+import { languageAlternates, localizedUrl, SEO_LOCALES } from '@/lib/seo/site';
 
-const contentUpdatedAt = new Date('2026-11-01T00:00:00Z');
-
-const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.nightticker.com';
-
-// Category slugs that have stocks
+// No per-route content revision evidence is maintained yet. Omit lastmod rather
+// than implying that every document changed at a shared request/build date.
 const categories = ['us', 'kr', 'jp', 'index', 'etf', 'commodity', 'fx', 'special', 'semiconductor'];
-
+const staticPages = ['', '/gainers', '/losers', '/popular', '/overnight-prices', '/weekend-prices', '/holiday-prices', '/us-market-hours', '/korea-market-hours', '/how-data-works', '/what-is-hyperliquid', '/about', '/disclaimer', '/privacy', '/terms'];
 export default function sitemap(): MetadataRoute.Sitemap {
-  const slugs = getAllSlugs();
-  const locales = ['en', 'ko', 'ja', 'zh', 'pt', 'es'];
-
-  // Static pages
-  const staticPages = [
-    '',
-    '/favorites',
-    '/gainers',
-    '/losers',
-    '/popular',
-    '/overnight-prices',
-    '/weekend-prices',
-    '/holiday-prices',
-    '/us-market-hours',
-    '/korea-market-hours',
-    '/how-data-works',
-    '/what-is-hyperliquid',
-    '/about',
-    '/disclaimer',
-    '/privacy',
-    '/terms',
-  ];
-
-  const routes: MetadataRoute.Sitemap = [];
-
-  // Add static pages for each locale
-  for (const locale of locales) {
-    for (const page of staticPages) {
-      const prefix = locale === 'en' ? '' : `/${locale}`;
-      routes.push({
-        url: `${baseUrl}${prefix}${page}`,
-        lastModified: contentUpdatedAt,
-        changeFrequency: 'daily',
-        priority: page === '' ? 1.0 : 0.8,
-        alternates: {
-          languages: {
-            en: `${baseUrl}${page}`,
-            ko: `${baseUrl}/ko${page}`,
-            ja: `${baseUrl}/ja${page}`,
-            zh: `${baseUrl}/zh${page}`,
-            pt: `${baseUrl}/pt${page}`,
-            es: `${baseUrl}/es${page}`,
-          },
-        },
-      });
-    }
-  }
-
-  // Add category pages for each locale
-  for (const locale of locales) {
-    for (const category of categories) {
-      const prefix = locale === 'en' ? '' : `/${locale}`;
-      routes.push({
-        url: `${baseUrl}${prefix}/category/${category}`,
-        lastModified: contentUpdatedAt,
-        changeFrequency: 'daily',
-        priority: 0.85,
-        alternates: {
-          languages: {
-            en: `${baseUrl}/category/${category}`,
-            ko: `${baseUrl}/ko/category/${category}`,
-            ja: `${baseUrl}/ja/category/${category}`,
-            zh: `${baseUrl}/zh/category/${category}`,
-            pt: `${baseUrl}/pt/category/${category}`,
-            es: `${baseUrl}/es/category/${category}`,
-          },
-        },
-      });
-    }
-  }
-
-  // Add stock pages for each locale
-  for (const locale of locales) {
-    for (const slug of slugs) {
-      const prefix = locale === 'en' ? '' : `/${locale}`;
-      routes.push({
-        url: `${baseUrl}${prefix}/stock/${slug}`,
-        lastModified: contentUpdatedAt,
-        changeFrequency: 'hourly',
-        priority: 0.9,
-        alternates: {
-          languages: {
-            en: `${baseUrl}/stock/${slug}`,
-            ko: `${baseUrl}/ko/stock/${slug}`,
-            ja: `${baseUrl}/ja/stock/${slug}`,
-            zh: `${baseUrl}/zh/stock/${slug}`,
-            pt: `${baseUrl}/pt/stock/${slug}`,
-            es: `${baseUrl}/es/stock/${slug}`,
-          },
-        },
-      });
-    }
-  }
-
-  return routes;
+  const paths = [...staticPages, ...categories.filter(category => category === 'semiconductor' ? getStocksBySectorForCategory('Semiconductors').length > 0 : getStocksByCategory(category.toUpperCase() as StockCategory).length > 0).map(category => `/category/${category}`), ...getAllSlugs().map(slug => `/stock/${slug}`)];
+  return SEO_LOCALES.flatMap(locale => paths.map(path => ({
+    url: localizedUrl(locale, path),
+    alternates: { languages: languageAlternates(path) },
+  })));
 }

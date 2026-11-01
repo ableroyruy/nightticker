@@ -1,3 +1,7 @@
+import { getProductInfo } from '@/lib/markets/product-info';
+import { pageMetadata, localizedUrl, seoLocale } from '@/lib/seo/site';
+import { referenceGuide } from '@/lib/seo/reference-guide';
+import { ProductInfo } from '@/components/stock/ProductInfo';
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { setRequestLocale } from 'next-intl/server';
@@ -7,6 +11,7 @@ import { ComplianceNotice } from '@/components/common/ComplianceNotice';
 import { StudyAILabBanner } from '@/components/common/StudyAILabBanner';
 import { InternalLinks } from '@/components/stock/InternalLinks';
 import { StockPageHeader } from '@/components/stock/StockPageHeader';
+import { SearchRankBadge } from '@/components/market/SearchRankBadge';
 import { getStockBySlug, stocks, categoryNames } from '@/lib/markets/stocks';
 import { Stock } from '@/lib/providers/types';
 
@@ -25,8 +30,6 @@ export async function generateStaticParams() {
     }))
   );
 }
-
-const BASE_URL = 'https://www.nightticker.com';
 
 function getAssetType(stock: Stock, locale: string): { term: string; typeName: string } {
   const isStock = ['US', 'KR', 'JP'].includes(stock.category);
@@ -182,126 +185,10 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
   type MetaKey = 'en' | 'ko' | 'ja' | 'zh' | 'pt' | 'es';
   const current = meta[locale as MetaKey] ?? meta.en;
-  const canonicalUrl = locale === 'en' ? `${BASE_URL}/stock/${slug}` : `${BASE_URL}/${locale}/stock/${slug}`;
-
-  const siteNames: Record<string, string> = {
-    ko: '나이트티커',
-    ja: 'ナイトティッカー',
-    zh: 'NightTicker',
-    pt: 'NightTicker',
-    es: 'NightTicker',
-    en: 'NightTicker',
-  };
-
-  const ogLocales: Record<string, string> = {
-    ko: 'ko_KR',
-    ja: 'ja_JP',
-    zh: 'zh_CN',
-    pt: 'pt_BR',
-    es: 'es_ES',
-    en: 'en_US',
-  };
-
-  return {
-    title: current.title,
-    description: current.description,
-    keywords: current.keywords,
-    alternates: {
-      canonical: canonicalUrl,
-      languages: {
-        en: `${BASE_URL}/stock/${slug}`,
-        ko: `${BASE_URL}/ko/stock/${slug}`,
-        ja: `${BASE_URL}/ja/stock/${slug}`,
-        zh: `${BASE_URL}/zh/stock/${slug}`,
-        pt: `${BASE_URL}/pt/stock/${slug}`,
-        es: `${BASE_URL}/es/stock/${slug}`,
-      },
-    },
-    openGraph: {
-      title: current.title,
-      description: current.description,
-      url: canonicalUrl,
-      siteName: siteNames[locale] ?? 'NightTicker',
-      locale: ogLocales[locale] ?? 'en_US',
-      type: 'website',
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: current.title,
-      description: current.description,
-    },
-  };
-}
-
-// FAQ data for structured data
-function getFAQData(stock: Stock, locale: string) {
-  const name =
-    locale === 'ko' ? stock.nameKo :
-    locale === 'ja' ? (stock.nameJa ?? stock.name) :
-    locale === 'zh' ? (stock.nameZh ?? stock.name) :
-    locale === 'pt' ? (stock.namePt ?? stock.name) :
-    locale === 'es' ? (stock.nameEs ?? stock.name) :
-    stock.name;
-  const { term } = getAssetType(stock, locale);
-
-  if (locale === 'ko') {
-    return [
-      { q: '야간 주가란 무엇인가요?', a: '야간 주가는 전통적인 거래소가 닫힌 시간 동안의 참고 가격입니다. NightTicker는 Hyperliquid Market Prices를 기반으로 야간 참고가격을 제공합니다.' },
-      { q: '주말에도 가격을 확인할 수 있나요?', a: '네, NightTicker에서 주말에도 Hyperliquid Market Prices 기반의 참고 가격을 확인할 수 있습니다.' },
-      { q: '휴일에도 가격이 있나요?', a: '네, 공휴일이나 휴장일에도 Hyperliquid Market Prices를 통해 참고 가격을 확인할 수 있습니다.' },
-      { q: 'Hyperliquid 가격이란 무엇인가요?', a: 'Hyperliquid는 NightTicker에서 표시하는 시장 가격의 소스입니다. 이 가격은 참고용이며 공식 거래소 가격과 다를 수 있습니다.' },
-      { q: '공식 거래소 가격인가요?', a: '아니요, NightTicker에서 표시하는 가격은 Hyperliquid Market Prices로, 공식 거래소 가격이 아닙니다. 투자 결정에 사용하지 마세요.' },
-      { q: `${name}의 야간 ${term}를 어떻게 확인하나요?`, a: `이 페이지에서 ${name}의 야간 ${term}를 실시간으로 확인할 수 있습니다. 가격은 Hyperliquid Market Prices 기반입니다.` },
-    ];
-  }
-
-  if (locale === 'ja') {
-    return [
-      { q: '夜間株価とは何ですか？', a: '夜間株価は、従来の取引所が閉まっている時間帯の参考価格です。NightTickerはHyperliquid Market Pricesに基づいた夜間参考価格を提供します。' },
-      { q: '週末も価格を確認できますか？', a: 'はい、NightTickerでは週末もHyperliquid Market Pricesに基づく参考価格を確認できます。' },
-      { q: '休日も価格がありますか？', a: 'はい、祝日や市場休場日もHyperliquid Market Pricesを通じて参考価格を確認できます。' },
-      { q: 'Hyperliquid価格とは何ですか？', a: 'HyperliquidはNightTickerで表示される市場価格のソースです。この価格は参考用であり、公式取引所価格と異なる場合があります。' },
-      { q: '公式取引所価格ですか？', a: 'いいえ、NightTickerで表示される価格はHyperliquid Market Pricesであり、公式取引所価格ではありません。投資判断に使用しないでください。' },
-    ];
-  }
-
-  if (locale === 'zh') {
-    return [
-      { q: '什么是夜间股价？', a: '夜间股价是传统交易所休市时的参考价格。NightTicker提供基于Hyperliquid Market Prices的夜间参考价格。' },
-      { q: '周末可以查看价格吗？', a: '可以，您可以在NightTicker上查看周末的参考价格，数据来源于Hyperliquid Market Prices。' },
-      { q: '节假日也有价格吗？', a: '是的，您可以通过Hyperliquid Market Prices查看节假日和休市期间的参考价格。' },
-      { q: '什么是Hyperliquid价格？', a: 'Hyperliquid是NightTicker上显示的市场价格的来源。这些价格仅供参考，可能与官方交易所价格不同。' },
-      { q: '这是官方交易所价格吗？', a: '不是，NightTicker上显示的价格是Hyperliquid Market Prices，而非官方交易所价格。请勿用于投资决策。' },
-    ];
-  }
-
-  if (locale === 'pt') {
-    return [
-      { q: 'O que sao precos noturnos de acoes?', a: 'Precos noturnos sao precos de referencia quando as bolsas tradicionais estao fechadas. NightTicker fornece precos de referencia noturnos baseados em Hyperliquid Market Prices.' },
-      { q: 'Posso verificar precos nos fins de semana?', a: 'Sim, voce pode verificar precos de referencia nos fins de semana via NightTicker, alimentado por Hyperliquid Market Prices.' },
-      { q: 'Ha precos em feriados?', a: 'Sim, voce pode verificar precos de referencia em feriados atraves de Hyperliquid Market Prices.' },
-      { q: 'O que sao precos Hyperliquid?', a: 'Hyperliquid e a fonte dos precos de mercado exibidos no NightTicker. Esses precos sao apenas para referencia e podem diferir dos precos oficiais da bolsa.' },
-      { q: 'Sao precos oficiais da bolsa?', a: 'Nao, os precos exibidos no NightTicker sao Hyperliquid Market Prices, nao precos oficiais da bolsa. Nao use para decisoes de investimento.' },
-    ];
-  }
-
-  if (locale === 'es') {
-    return [
-      { q: 'Que son los precios nocturnos de acciones?', a: 'Los precios nocturnos son precios de referencia cuando las bolsas tradicionales estan cerradas. NightTicker proporciona precios de referencia nocturnos basados en Hyperliquid Market Prices.' },
-      { q: 'Puedo verificar precios los fines de semana?', a: 'Si, puedes verificar precios de referencia los fines de semana via NightTicker, impulsado por Hyperliquid Market Prices.' },
-      { q: 'Hay precios en dias festivos?', a: 'Si, puedes verificar precios de referencia en dias festivos a traves de Hyperliquid Market Prices.' },
-      { q: 'Que son los precios de Hyperliquid?', a: 'Hyperliquid es la fuente de los precios de mercado mostrados en NightTicker. Estos precios son solo de referencia y pueden diferir de los precios oficiales de la bolsa.' },
-      { q: 'Son precios oficiales de la bolsa?', a: 'No, los precios mostrados en NightTicker son Hyperliquid Market Prices, no precios oficiales de la bolsa. No uses para decisiones de inversion.' },
-    ];
-  }
-
-  return [
-    { q: 'What are overnight stock prices?', a: 'Overnight stock prices are reference prices during hours when traditional exchanges are closed. NightTicker provides overnight reference prices based on Hyperliquid Market Prices.' },
-    { q: 'Can I check prices on weekends?', a: 'Yes, you can check reference prices on weekends via NightTicker, powered by Hyperliquid Market Prices.' },
-    { q: 'Are there prices on holidays?', a: 'Yes, you can check reference prices on holidays and market closures through Hyperliquid Market Prices.' },
-    { q: 'What are Hyperliquid prices?', a: 'Hyperliquid is the source of market prices displayed on NightTicker. These prices are for reference only and may differ from official exchange prices.' },
-    { q: 'Are these official exchange prices?', a: 'No, prices displayed on NightTicker are Hyperliquid Market Prices, not official exchange prices. Do not use for investment decisions.' },
-  ];
+  const product = getProductInfo(stock, locale);
+  const suffix = { en: 'Overnight, weekend and holiday reference prices from Hyperliquid.', ko: 'Hyperliquid 기반 야간·주말·휴일 참고 시세입니다.', ja: 'Hyperliquidの夜間・週末・休日の参考相場です。', zh: 'Hyperliquid夜间、周末与节假日参考行情。', pt: 'Referência Hyperliquid à noite, em fins de semana e feriados.', es: 'Referencia Hyperliquid de noche, en fines de semana y festivos.' }[seoLocale(locale)];
+  const description = `${product.overview} ${suffix}`;
+  return pageMetadata(locale, `/stock/${stock.slug}`, current.title, description, current.keywords);
 }
 
 export default async function StockPage({ params }: Props) {
@@ -321,15 +208,12 @@ export default async function StockPage({ params }: Props) {
     locale === 'es' ? (stock.nameEs ?? stock.name) :
     stock.name;
   const { term } = getAssetType(stock, locale);
-  const faqData = getFAQData(stock, locale);
+  const guide = referenceGuide(locale, displayName);
+  const faqData = guide.faq;
 
-  // Labels by locale
   const labels = {
-    overnightPrice: locale === 'ko' ? '야간' : locale === 'ja' ? '夜間' : locale === 'zh' ? '夜间' : locale === 'pt' ? 'Noturno' : locale === 'es' ? 'Nocturno' : 'Overnight',
-    weekendPrice: locale === 'ko' ? '주말' : locale === 'ja' ? '週末' : locale === 'zh' ? '周末' : locale === 'pt' ? 'Fim de Semana' : locale === 'es' ? 'Fin de Semana' : 'Weekend',
-    holidayPrice: locale === 'ko' ? '휴일' : locale === 'ja' ? '休日' : locale === 'zh' ? '节假日' : locale === 'pt' ? 'Feriado' : locale === 'es' ? 'Festivo' : 'Holiday',
-    relatedStocks: locale === 'ko' ? '관련 종목' : locale === 'ja' ? '関連銘柄' : locale === 'zh' ? '相关标的' : locale === 'pt' ? 'Relacionados' : locale === 'es' ? 'Relacionados' : 'Related',
-    faq: locale === 'ko' ? 'FAQ' : locale === 'ja' ? 'よくある質問' : locale === 'zh' ? '常见问题' : locale === 'pt' ? 'FAQ' : locale === 'es' ? 'FAQ' : 'FAQ',
+    relatedStocks: { en: 'Related markets', ko: '관련 종목', ja: '関連銘柄', zh: '相关资产', pt: 'Mercados relacionados', es: 'Mercados relacionados' }[seoLocale(locale)],
+    faq: { en: 'Reading this market', ko: '시세 읽기 안내', ja: '相場の見方', zh: '行情阅读指南', pt: 'Como ler este mercado', es: 'Cómo interpretar este mercado' }[seoLocale(locale)],
   };
 
   // JSON-LD for FAQ Schema
@@ -355,134 +239,61 @@ export default async function StockPage({ params }: Props) {
         '@type': 'ListItem',
         position: 1,
         name: locale === 'ko' ? '홈' : locale === 'ja' ? 'ホーム' : locale === 'zh' ? '首页' : locale === 'pt' ? 'Inicio' : locale === 'es' ? 'Inicio' : 'Home',
-        item: locale === 'en' ? BASE_URL : `${BASE_URL}/${locale}`,
+        item: localizedUrl(locale),
       },
       {
         '@type': 'ListItem',
         position: 2,
-        name: categoryNames[stock.category][locale === 'ko' ? 'ko' : locale === 'ja' ? 'ja' : 'en'],
-        item: locale === 'en' ? `${BASE_URL}/category/${stock.category.toLowerCase()}` : `${BASE_URL}/${locale}/category/${stock.category.toLowerCase()}`,
+        name: categoryNames[stock.category][seoLocale(locale)],
+        item: localizedUrl(locale, `/category/${stock.category.toLowerCase()}`),
       },
       {
         '@type': 'ListItem',
         position: 3,
         name: displayName,
-        item: locale === 'en' ? `${BASE_URL}/stock/${slug}` : `${BASE_URL}/${locale}/stock/${slug}`,
+        item: localizedUrl(locale, `/stock/${stock.slug}`),
       },
     ],
   };
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
-      />
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
-      />
-
-      <div className="container py-8 space-y-8">
-        {/* H1: Stock Name + Overnight Price */}
-        <StockPageHeader
-          stock={stock}
-          displayName={displayName}
-          term={term}
-          locale={locale}
-        />
-
-        <Separator />
-
-        <MarketPriceCard hyperliquidSymbol={stock.hyperliquidSymbol} locale={locale} category={stock.category} />
-
-        <section className="space-y-3 text-sm" aria-label={displayName}>
-          <div className="flex flex-wrap items-center gap-2 text-muted-foreground">
-            <span className="rounded-full bg-muted px-3 py-1">{categoryNames[stock.category][locale as keyof typeof categoryNames.US] ?? categoryNames[stock.category].en}</span>
-            <span>{locale === 'ko' ? 'Hyperliquid 참고가격' : locale === 'ja' ? 'Hyperliquid 参考価格' : locale === 'zh' ? 'Hyperliquid 参考价格' : locale === 'pt' ? 'Preco de referencia Hyperliquid' : locale === 'es' ? 'Precio de referencia Hyperliquid' : 'Hyperliquid reference price'}</span>
-          </div>
-          {stock.description && <div className="rounded-xl border px-4 py-3">
-            <h2 className="font-medium">{locale === 'ko' ? '상품 정보' : locale === 'ja' ? '商品情報' : locale === 'zh' ? '产品信息' : locale === 'pt' ? 'Sobre o ativo' : locale === 'es' ? 'Sobre el activo' : 'About this asset'}</h2>
-            <p className="mt-3 leading-relaxed text-muted-foreground">{stock.description}</p>
-            <p className="mt-2 text-xs text-muted-foreground">{locale === 'ko' ? '파생상품 시장의 참고가격으로, 기초자산의 공식 가격과 다를 수 있습니다.' : locale === 'ja' ? 'デリバティブ市場の参考価格であり、原資産の公式価格と異なる場合があります。' : locale === 'zh' ? '衍生品市场参考价格，可能与标的资产官方价格不同。' : locale === 'pt' ? 'Preco de referencia de derivativos; pode diferir da cotacao oficial.' : locale === 'es' ? 'Precio de referencia de derivados; puede diferir de la cotizacion oficial.' : 'Reference price from a derivatives market; may differ from the official underlying price.'}</p>
-          </div>}
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema).replace(/</g, '\\u003c') }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema).replace(/</g, '\\u003c') }} />
+      <div className="container py-6 space-y-6">
+        <section className="space-y-4">
+          <StockPageHeader stock={stock} displayName={displayName} term={term} locale={locale} />
+          <MarketPriceCard hyperliquidSymbol={stock.hyperliquidSymbol} locale={locale} category={stock.category} quoteUnit={getProductInfo(stock, locale).quoteUnit} ranking={<SearchRankBadge symbol={stock.symbol} category={stock.category} />} />
         </section>
 
+        <ProductInfo stock={stock} locale={locale} />
         {locale === 'ko' && <StudyAILabBanner variant="investingGuide" />}
 
-        {/* H2: Weekend Price Section */}
-        <section>
-          <h2 className="text-2xl font-bold mb-4">
-            {displayName} {labels.weekendPrice} {term}
-          </h2>
-          <p className="text-muted-foreground">
-            {locale === 'ko'
-              ? `토요일, 일요일에도 ${displayName}의 참고 가격을 확인할 수 있습니다. Hyperliquid Market Prices 기반.`
-              : locale === 'ja'
-                ? `土曜日、日曜日も${displayName}の参考価格を確認できます。Hyperliquid Market Prices基盤。`
-                : `Check ${displayName} reference prices on Saturday and Sunday. Powered by Hyperliquid Market Prices.`}
-          </p>
-        </section>
-
-        {/* H2: Holiday Price Section */}
-        <section>
-          <h2 className="text-2xl font-bold mb-4">
-            {displayName} {labels.holidayPrice} {term}
-          </h2>
-          <p className="text-muted-foreground">
-            {locale === 'ko'
-              ? `공휴일, 휴장일에도 ${displayName}의 참고 가격을 제공합니다. 투자 결정에 사용하지 마세요.`
-              : locale === 'ja'
-                ? `祝日、市場休場日も${displayName}の参考価格を提供します。投資判断に使用しないでください。`
-                : `${displayName} reference prices available on holidays and market closures. Not for investment decisions.`}
-          </p>
-        </section>
-
-        {/* H2: Night Price Section */}
-        <section>
-          <h2 className="text-2xl font-bold mb-4">
-            {displayName} {locale === 'ko' ? '야간 시세' : locale === 'ja' ? '夜間相場' : 'After Hours'}
-          </h2>
-          <p className="text-muted-foreground">
-            {locale === 'ko'
-              ? `장마감 후 ${displayName}의 시세 동향을 확인하세요. NightTicker는 Hyperliquid Market Prices를 참고용으로 제공합니다.`
-              : locale === 'ja'
-                ? `市場終了後の${displayName}の相場動向を確認。NightTickerはHyperliquid Market Pricesを参考用に提供します。`
-                : `Monitor ${displayName} price trends after market close. NightTicker provides Hyperliquid Market Prices for reference.`}
-          </p>
-        </section>
+        <div className="max-w-3xl space-y-6">
+          {guide.sections.map(section => (
+            <section key={section.title} className="space-y-2">
+              <h2 className="text-xl font-semibold">{section.title}</h2>
+              <p className="leading-relaxed text-muted-foreground">{section.text}</p>
+            </section>
+          ))}
+        </div>
 
         <Separator />
-
-        {/* Compliance Notice (compact) */}
-        <ComplianceNotice variant="compact" />
-
-        <Separator />
-
-        {/* H2: Related Stocks (Internal Links) */}
-        <section>
-          <h2 className="text-2xl font-bold mb-6">{labels.relatedStocks}</h2>
+        <section className="space-y-4">
+          <h2 className="text-xl font-semibold">{labels.relatedStocks}</h2>
           <InternalLinks stock={stock} locale={locale} />
         </section>
 
-        <Separator />
-
-        {/* H2: FAQ Section */}
-        <section className="space-y-6">
-          <h2 className="text-2xl font-bold">{labels.faq}</h2>
-          <div className="space-y-6 max-w-3xl">
-            {faqData.map((item, idx) => (
-              <div key={idx} className="space-y-2">
-                <h3 className="font-semibold">{item.q}</h3>
-                <p className="text-muted-foreground">{item.a}</p>
-              </div>
-            ))}
-          </div>
+        <section className="space-y-4 max-w-3xl">
+          <h2 className="text-xl font-semibold">{labels.faq}</h2>
+          {faqData.map(item => (
+            <div key={item.q} className="space-y-2">
+              <h3 className="font-semibold">{item.q}</h3>
+              <p className="leading-relaxed text-muted-foreground">{item.a}</p>
+            </div>
+          ))}
         </section>
-
         <Separator />
-
-        {/* Full Compliance Notice */}
         <ComplianceNotice />
       </div>
     </>

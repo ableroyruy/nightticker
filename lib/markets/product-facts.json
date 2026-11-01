@@ -1,0 +1,1108 @@
+{
+  "AAPL": {
+    "country": "US",
+    "kind": "equity",
+    "exchange": "Nasdaq: AAPL",
+    "unit": "share",
+    "description": "AAPL references 1 share of Apple Inc. common stock (Nasdaq: AAPL), quoted in USD. Apple designs consumer devices, software, and services.",
+    "topic": "consumer",
+    "source": "specification"
+  },
+  "MSFT": {
+    "country": "US",
+    "kind": "equity",
+    "exchange": "Nasdaq: MSFT",
+    "unit": "share",
+    "description": "MSFT references 1 share of Microsoft Corporation common stock (Nasdaq: MSFT), quoted in USD. Microsoft provides software, cloud computing, devices, and enterprise services.",
+    "topic": "cloud",
+    "source": "specification"
+  },
+  "GOOGL": {
+    "country": "US",
+    "kind": "equity",
+    "exchange": "Nasdaq: GOOGL",
+    "unit": "share",
+    "description": "GOOGL references 1 share of Alphabet Inc. Class A common stock (Nasdaq: GOOGL), quoted in USD. Alphabet operates Google and businesses spanning advertising, cloud computing, and AI.",
+    "topic": "ads",
+    "source": "specification"
+  },
+  "AMZN": {
+    "country": "US",
+    "kind": "equity",
+    "exchange": "Nasdaq: AMZN",
+    "unit": "share",
+    "description": "AMZN references 1 share of Amazon.com, Inc. common stock (Nasdaq: AMZN), quoted in USD. Amazon operates e-commerce, cloud-computing, advertising, and logistics businesses.",
+    "topic": "commerce",
+    "source": "specification"
+  },
+  "META": {
+    "country": "US",
+    "kind": "equity",
+    "exchange": "Nasdaq: META",
+    "unit": "share",
+    "description": "META references 1 share of Meta Platforms, Inc. Class A common stock (Nasdaq: META), quoted in USD. Meta operates Facebook, Instagram, WhatsApp, and related advertising and computing businesses.",
+    "topic": "ads",
+    "source": "specification"
+  },
+  "NFLX": {
+    "country": "US",
+    "kind": "equity",
+    "exchange": "Nasdaq: NFLX",
+    "unit": "share",
+    "description": "NFLX references 1 share of Netflix, Inc. common stock (Nasdaq: NFLX), quoted in USD. Netflix provides subscription video entertainment and advertising-supported streaming.",
+    "topic": "video",
+    "source": "specification"
+  },
+  "ORCL": {
+    "country": "US",
+    "kind": "equity",
+    "exchange": "NYSE: ORCL",
+    "unit": "share",
+    "description": "ORCL references 1 share of Oracle Corporation common stock (NYSE: ORCL), quoted in USD. Oracle provides database software, enterprise applications, and cloud infrastructure.",
+    "topic": "cloud",
+    "source": "specification"
+  },
+  "IBM": {
+    "country": "US",
+    "kind": "equity",
+    "exchange": "NYSE: IBM",
+    "unit": "share",
+    "description": "IBM references 1 share of International Business Machines Corporation common stock (NYSE: IBM), quoted in USD. IBM provides hybrid-cloud, AI, software, infrastructure, and consulting services.",
+    "topic": "cloud",
+    "source": "specification"
+  },
+  "NOW": {
+    "country": "US",
+    "kind": "equity",
+    "exchange": "NYSE: NOW",
+    "unit": "share",
+    "description": "NOW references 1 share of ServiceNow, Inc. common stock (NYSE: NOW), quoted in USD. ServiceNow provides cloud-based workflow and enterprise automation software.",
+    "topic": "cloud",
+    "source": "specification"
+  },
+  "ZM": {
+    "country": "US",
+    "kind": "equity",
+    "exchange": "Nasdaq: ZM",
+    "unit": "share",
+    "description": "ZM references 1 share of Zoom Communications, Inc. Class A common stock (Nasdaq: ZM), quoted in USD. Zoom provides video, voice, contact-center, and workplace collaboration software.",
+    "topic": "collaboration",
+    "source": "specification"
+  },
+  "DELL": {
+    "country": "US",
+    "kind": "equity",
+    "exchange": "NYSE: DELL",
+    "unit": "share",
+    "description": "DELL references 1 share of Dell Technologies Inc. Class C common stock (NYSE: DELL), quoted in USD. Dell provides computers, servers, storage, networking, and enterprise infrastructure.",
+    "topic": "hardware",
+    "source": "specification"
+  },
+  "NVDA": {
+    "country": "US",
+    "kind": "equity",
+    "exchange": "Nasdaq: NVDA",
+    "unit": "share",
+    "description": "NVDA references 1 share of NVIDIA Corporation common stock (Nasdaq: NVDA), quoted in USD. NVIDIA designs accelerated-computing hardware, software, and platforms.",
+    "topic": "semiconductor",
+    "source": "specification"
+  },
+  "AMD": {
+    "country": "US",
+    "kind": "equity",
+    "exchange": "Nasdaq: AMD",
+    "unit": "share",
+    "description": "AMD references 1 share of Advanced Micro Devices, Inc. common stock (Nasdaq: AMD), quoted in USD. AMD designs processors, graphics chips, and data-center accelerators.",
+    "topic": "semiconductor",
+    "source": "specification"
+  },
+  "INTC": {
+    "country": "US",
+    "kind": "equity",
+    "exchange": "Nasdaq: INTC",
+    "unit": "share",
+    "description": "INTC references 1 share of Intel Corporation common stock (Nasdaq: INTC), quoted in USD. Intel designs and manufactures semiconductors and computing platforms.",
+    "topic": "semiconductor",
+    "source": "specification"
+  },
+  "MU": {
+    "country": "US",
+    "kind": "equity",
+    "exchange": "Nasdaq: MU",
+    "unit": "share",
+    "description": "MU references 1 share of Micron Technology, Inc. common stock (Nasdaq: MU), quoted in USD. Micron manufactures memory and storage products, including DRAM and NAND.",
+    "topic": "memory",
+    "source": "specification"
+  },
+  "AVGO": {
+    "country": "US",
+    "kind": "equity",
+    "exchange": "Nasdaq: AVGO",
+    "unit": "share",
+    "description": "AVGO references 1 share of Broadcom Inc. common stock (Nasdaq: AVGO), quoted in USD. Broadcom provides semiconductors and infrastructure software.",
+    "topic": "semiconductor",
+    "source": "specification"
+  },
+  "MRVL": {
+    "country": "US",
+    "kind": "equity",
+    "exchange": "Nasdaq: MRVL",
+    "unit": "share",
+    "description": "MRVL references 1 share of Marvell Technology, Inc. common stock (Nasdaq: MRVL), quoted in USD. Marvell develops semiconductors for data infrastructure, networking, storage, and computing.",
+    "topic": "semiconductor",
+    "source": "specification"
+  },
+  "ARM": {
+    "country": "GB",
+    "kind": "ads",
+    "exchange": "Nasdaq: ARM",
+    "unit": "share",
+    "description": "ARM references 1 Arm Holdings plc ADS (Nasdaq: ARM), representing 1 ordinary share, quoted in USD. Arm designs and licenses processor architectures and related computing technology.",
+    "topic": "semiconductor",
+    "source": "specification",
+    "adsRatio": 1
+  },
+  "ASML": {
+    "country": "NL",
+    "kind": "registry-share",
+    "exchange": "Nasdaq: ASML · Euronext Amsterdam: ASML",
+    "unit": "share",
+    "description": "ASML references 1 registered ordinary share of ASML Holding N.V. (Nasdaq: ASML), quoted in USD. The Nasdaq line consists of New York Registry Shares, each representing one ordinary share (Euronext Amsterdam: ASML). ASML develops lithography systems used in semiconductor manufacturing.",
+    "topic": "equipment",
+    "source": "specification"
+  },
+  "TSM": {
+    "country": "TW",
+    "kind": "ads",
+    "exchange": "NYSE: TSM · TWSE: 2330",
+    "unit": "share",
+    "description": "TSM references 1 Taiwan Semiconductor Manufacturing Company Limited ADS (NYSE: TSM), representing 5 common shares (TWSE: 2330), quoted in USD. TSMC manufactures semiconductors for third-party customers.",
+    "topic": "semiconductor",
+    "source": "specification",
+    "adsRatio": 5
+  },
+  "WDC": {
+    "country": "US",
+    "kind": "equity",
+    "exchange": "Nasdaq: WDC",
+    "unit": "share",
+    "description": "WDC references 1 share of Western Digital Corporation common stock (Nasdaq: WDC), quoted in USD. Western Digital manufactures hard-disk drives and data-storage products.",
+    "topic": "memory",
+    "source": "specification"
+  },
+  "TSLA": {
+    "country": "US",
+    "kind": "equity",
+    "exchange": "Nasdaq: TSLA",
+    "unit": "share",
+    "description": "TSLA references 1 share of Tesla, Inc. common stock (Nasdaq: TSLA), quoted in USD. Tesla designs electric vehicles, energy-storage systems, and related products.",
+    "topic": "vehicles",
+    "source": "specification"
+  },
+  "RIVN": {
+    "country": "US",
+    "kind": "equity",
+    "exchange": "Nasdaq: RIVN",
+    "unit": "share",
+    "description": "RIVN references 1 share of Rivian Automotive, Inc. Class A common stock (Nasdaq: RIVN), quoted in USD. Rivian designs and manufactures electric vehicles and related products.",
+    "topic": "vehicles",
+    "source": "specification"
+  },
+  "COIN": {
+    "country": "US",
+    "kind": "equity",
+    "exchange": "Nasdaq: COIN",
+    "unit": "share",
+    "description": "COIN references 1 share of Coinbase Global, Inc. Class A common stock (Nasdaq: COIN), quoted in USD. Coinbase provides digital-asset trading, custody, and infrastructure services.",
+    "topic": "digitalassets",
+    "source": "specification"
+  },
+  "HOOD": {
+    "country": "US",
+    "kind": "equity",
+    "exchange": "Nasdaq: HOOD",
+    "unit": "share",
+    "description": "HOOD references 1 share of Robinhood Markets, Inc. Class A common stock (Nasdaq: HOOD), quoted in USD. Robinhood operates a financial-services platform for individual investors.",
+    "topic": "finance",
+    "source": "specification"
+  },
+  "BX": {
+    "country": "US",
+    "kind": "equity",
+    "exchange": "NYSE: BX",
+    "unit": "share",
+    "description": "BX references 1 share of Blackstone Inc. common stock (NYSE: BX), quoted in USD. Blackstone is an alternative asset manager investing across private equity, real estate, credit, and infrastructure.",
+    "topic": "finance",
+    "source": "specification"
+  },
+  "MSTR": {
+    "country": "US",
+    "kind": "equity",
+    "exchange": "Nasdaq: MSTR",
+    "unit": "share",
+    "description": "MSTR references 1 share of Strategy Inc Class A common stock (Nasdaq: MSTR), quoted in USD. Strategy operates a Bitcoin treasury and enterprise-analytics software business.",
+    "topic": "digitalassets",
+    "source": "specification"
+  },
+  "PLTR": {
+    "country": "US",
+    "kind": "equity",
+    "exchange": "Nasdaq: PLTR",
+    "unit": "share",
+    "description": "PLTR references 1 share of Palantir Technologies Inc. Class A common stock (Nasdaq: PLTR), quoted in USD. Palantir develops data-integration, analytics, and AI software.",
+    "topic": "ai",
+    "source": "specification"
+  },
+  "CRWV": {
+    "country": "US",
+    "kind": "equity",
+    "exchange": "Nasdaq: CRWV",
+    "unit": "share",
+    "description": "CRWV references 1 share of CoreWeave, Inc. Class A common stock (Nasdaq: CRWV), quoted in USD. CoreWeave provides GPU-based cloud infrastructure.",
+    "topic": "ai",
+    "source": "specification"
+  },
+  "NBIS": {
+    "country": "NL",
+    "kind": "equity",
+    "exchange": "Nasdaq: NBIS",
+    "unit": "share",
+    "description": "NBIS references 1 Nebius Group N.V. Class A ordinary share (Nasdaq: NBIS), quoted in USD. Nebius provides GPU-based cloud and AI infrastructure.",
+    "topic": "ai",
+    "source": "specification"
+  },
+  "COST": {
+    "country": "US",
+    "kind": "equity",
+    "exchange": "Nasdaq: COST",
+    "unit": "share",
+    "description": "COST references 1 share of Costco Wholesale Corporation common stock (Nasdaq: COST), quoted in USD. Costco operates membership-based warehouse retail stores.",
+    "topic": "retail",
+    "source": "specification"
+  },
+  "BABA": {
+    "country": "CN",
+    "kind": "ads",
+    "exchange": "NYSE: BABA · HKEX: 9988",
+    "unit": "share",
+    "description": "BABA references 1 Alibaba Group Holding Limited ADS (NYSE: BABA), representing 8 ordinary shares (HKEX: 9988), quoted in USD. Alibaba operates commerce, cloud-computing, and logistics businesses.",
+    "topic": "commerce",
+    "source": "specification",
+    "adsRatio": 8
+  },
+  "EBAY": {
+    "country": "US",
+    "kind": "equity",
+    "exchange": "Nasdaq: EBAY",
+    "unit": "share",
+    "description": "EBAY references 1 share of eBay Inc. common stock (Nasdaq: EBAY), quoted in USD. eBay operates online marketplaces connecting buyers and sellers.",
+    "topic": "retail",
+    "source": "specification"
+  },
+  "GME": {
+    "country": "US",
+    "kind": "equity",
+    "exchange": "NYSE: GME",
+    "unit": "share",
+    "description": "GME references 1 share of GameStop Corp. Class A common stock (NYSE: GME), quoted in USD. GameStop is a retailer of video games, collectibles, and consumer electronics.",
+    "topic": "retail",
+    "source": "specification"
+  },
+  "LLY": {
+    "country": "US",
+    "kind": "equity",
+    "exchange": "NYSE: LLY",
+    "unit": "share",
+    "description": "LLY references 1 share of Eli Lilly and Company common stock (NYSE: LLY), quoted in USD. Eli Lilly develops and manufactures pharmaceutical products.",
+    "topic": "health",
+    "source": "specification"
+  },
+  "HIMS": {
+    "country": "US",
+    "kind": "equity",
+    "exchange": "NYSE: HIMS",
+    "unit": "share",
+    "description": "HIMS references 1 share of Hims & Hers Health, Inc. Class A common stock (NYSE: HIMS), quoted in USD. Hims & Hers operates a consumer health and telehealth platform.",
+    "topic": "health",
+    "source": "specification"
+  },
+  "RKLB": {
+    "country": "US",
+    "kind": "equity",
+    "exchange": "Nasdaq: RKLB",
+    "unit": "share",
+    "description": "RKLB references 1 share of Rocket Lab Corporation common stock (Nasdaq: RKLB), quoted in USD. Rocket Lab provides launch services, spacecraft, satellite components, and related systems.",
+    "topic": "space",
+    "source": "specification"
+  },
+  "SPCX": {
+    "country": "US",
+    "kind": "equity",
+    "exchange": "Nasdaq: SPCX",
+    "unit": "share",
+    "description": "SPCX references 1 share of Space Exploration Technologies Corp. Class A common stock (Nasdaq: SPCX), quoted in USD. SpaceX develops launch vehicles, spacecraft, satellite communications, and AI technology.",
+    "topic": "space",
+    "source": "specification"
+  },
+  "DKNG": {
+    "country": "US",
+    "kind": "equity",
+    "exchange": "Nasdaq: DKNG",
+    "unit": "share",
+    "description": "DKNG references 1 share of DraftKings Inc. Class A common stock (Nasdaq: DKNG), quoted in USD. DraftKings provides online sports betting, gaming, and digital sports-entertainment products.",
+    "topic": "gaming",
+    "source": "specification"
+  },
+  "SMSN": {
+    "country": "KR",
+    "kind": "equity",
+    "exchange": "KRX: 005930",
+    "unit": "share",
+    "description": "SAMSUNG references 1 Samsung Electronics Co., Ltd. common share (KRX: 005930). The oracle converts the KRW share price to USD at the prevailing USD/KRW FX rate. Samsung Electronics makes semiconductors, displays, and consumer electronics.",
+    "topic": "memory",
+    "source": "specification",
+    "convertedFrom": "KRW"
+  },
+  "SKHX": {
+    "country": "KR",
+    "kind": "equity",
+    "exchange": "KRX: 000660",
+    "unit": "share",
+    "description": "SKHYNIX references 1 SK hynix Inc. common share (KRX: 000660). The oracle converts the KRW share price to USD at the prevailing USD/KRW FX rate. SK hynix manufactures DRAM and NAND memory semiconductors used in data centers, AI hardware, mobile devices, and computing systems.",
+    "topic": "memory",
+    "source": "specification",
+    "convertedFrom": "KRW"
+  },
+  "HYUNDAI": {
+    "country": "US",
+    "kind": "equity",
+    "exchange": "KRX: 005380",
+    "unit": "share",
+    "description": "HYUNDAI references 1 Hyundai Motor Company common share (KRX: 005380). The oracle converts the KRW share price to USD at the prevailing USD/KRW FX rate. Hyundai Motor manufactures vehicles and mobility products.",
+    "topic": "vehicles",
+    "source": "specification",
+    "convertedFrom": "KRW"
+  },
+  "SOFTBANK": {
+    "country": "JP",
+    "kind": "equity",
+    "exchange": "TSE: 9984",
+    "unit": "share",
+    "description": "SOFTBANK references 1 SoftBank Group Corp. ordinary share (TSE: 9984). The oracle converts the JPY share price to USD at the prevailing USD/JPY FX rate. SoftBank Group is an investment holding company.",
+    "topic": "finance",
+    "source": "specification",
+    "convertedFrom": "JPY"
+  },
+  "KIOXIA": {
+    "country": "JP",
+    "kind": "equity",
+    "exchange": "TSE: 285A",
+    "unit": "share",
+    "description": "KIOXIA references 1 Kioxia Holdings Corporation ordinary share (TSE: 285A). The oracle converts the JPY share price to USD at the prevailing USD/JPY FX rate. Kioxia manufactures NAND flash-memory and storage products.",
+    "topic": "memory",
+    "source": "specification",
+    "convertedFrom": "JPY"
+  },
+  "SP500": {
+    "country": "US",
+    "kind": "index",
+    "exchange": "",
+    "unit": "index-points",
+    "description": "S&P500 references the S&P 500 Index, a free-float-capitalization-weighted benchmark of 500 leading publicly-traded U.S. companies, widely regarded as the best single gauge of large-cap U.S. equities. The S&P 500 Index is a product of S&P Dow Jones Indices LLC and has been licensed for use by trade[XYZ]; see https://docs.trade.xyz/legal-and-disclaimers/s-and-p-500-disclaimers.",
+    "topic": "index",
+    "source": "specification"
+  },
+  "XYZ100": {
+    "country": "US",
+    "kind": "index",
+    "exchange": "",
+    "unit": "index-points",
+    "description": "XYZ100 tracks a modified market-capitalization-weighted index of 100 of the largest, most actively-traded, non-financial companies that are listed on a U.S. stock exchange, serving as a benchmark for large-cap U.S. technology and growth equities.",
+    "topic": "index",
+    "source": "specification"
+  },
+  "KR200": {
+    "country": "KR",
+    "kind": "index",
+    "exchange": "",
+    "unit": "index-points",
+    "description": "KR200 references the native KRW level of the Korea 200, a capitalization-weighted index of 200 leading South Korean equities. No FX conversion is applied; index-point P&L is cash-settled in USDC.",
+    "topic": "index",
+    "source": "specification",
+    "nativeIndexCurrency": "KRW"
+  },
+  "JP225": {
+    "country": "JP",
+    "kind": "index",
+    "exchange": "",
+    "unit": "index-points",
+    "description": "JP225 references the native JPY level of the Japan 225, a price-weighted index of 225 leading Japanese equities. No FX conversion is applied; index-point P&L is cash-settled in USDC.",
+    "topic": "index",
+    "source": "specification",
+    "nativeIndexCurrency": "JPY"
+  },
+  "NIFTY": {
+    "country": "IN",
+    "kind": "index",
+    "exchange": "",
+    "unit": "index-points",
+    "description": "NIFTY references the native INR level of the NIFTY 50, a free-float capitalization-weighted index of 50 leading Indian equities. No FX conversion is applied; index-point P&L is cash-settled in USDC.",
+    "topic": "index",
+    "source": "specification",
+    "nativeIndexCurrency": "INR"
+  },
+  "EWY": {
+    "country": "KR",
+    "kind": "etf",
+    "exchange": "NYSE Arca: EWY",
+    "unit": "share",
+    "description": "EWY references 1 share of the iShares MSCI South Korea ETF (NYSE Arca: EWY), quoted in USD. The fund provides exposure to large- and mid-cap South Korean equities; local-currency exposure is embedded in the ETF.",
+    "topic": "fund-EWY",
+    "source": "specification"
+  },
+  "EWJ": {
+    "country": "JP",
+    "kind": "etf",
+    "exchange": "NYSE Arca: EWJ",
+    "unit": "share",
+    "description": "EWJ references 1 share of the iShares MSCI Japan ETF (NYSE Arca: EWJ), quoted in USD. The fund provides exposure to large- and mid-cap Japanese equities; local-currency exposure is embedded in the ETF.",
+    "topic": "fund-EWJ",
+    "source": "specification"
+  },
+  "EWZ": {
+    "country": "BR",
+    "kind": "etf",
+    "exchange": "NYSE Arca: EWZ",
+    "unit": "share",
+    "description": "EWZ references 1 share of the iShares MSCI Brazil ETF (NYSE Arca: EWZ), quoted in USD. The fund provides exposure to large- and mid-cap Brazilian equities; local-currency exposure is embedded in the ETF.",
+    "topic": "fund-EWZ",
+    "source": "specification"
+  },
+  "EWT": {
+    "country": "TW",
+    "kind": "etf",
+    "exchange": "NYSE Arca: EWT",
+    "unit": "share",
+    "description": "EWT references 1 share of the iShares MSCI Taiwan ETF (NYSE Arca: EWT), quoted in USD. The fund provides exposure to large- and mid-cap Taiwanese equities; local-currency exposure is embedded in the ETF.",
+    "topic": "fund-EWT",
+    "source": "specification"
+  },
+  "XLE": {
+    "country": "US",
+    "kind": "etf",
+    "exchange": "NYSE Arca: XLE",
+    "unit": "share",
+    "description": "XLE references 1 share of the State Street Energy Select Sector SPDR ETF (NYSE Arca: XLE), quoted in USD. The fund tracks large U.S. energy companies in the Energy Select Sector Index.",
+    "topic": "fund-XLE",
+    "source": "specification"
+  },
+  "URNM": {
+    "country": "GLOBAL",
+    "kind": "etf",
+    "exchange": "NYSE Arca: URNM",
+    "unit": "share",
+    "description": "URNM references 1 share of the Sprott Uranium Miners ETF (NYSE Arca: URNM), quoted in USD. The fund holds uranium-mining equities and physical uranium exposure.",
+    "topic": "fund-URNM",
+    "source": "specification"
+  },
+  "GOLD": {
+    "country": "GLOBAL",
+    "kind": "commodity",
+    "exchange": "",
+    "unit": "troy-ounce",
+    "description": "GOLD references the USD spot price of 1 troy ounce of gold (XAU/USD).",
+    "topic": "gold",
+    "source": "specification"
+  },
+  "SILVER": {
+    "country": "GLOBAL",
+    "kind": "commodity",
+    "exchange": "",
+    "unit": "troy-ounce",
+    "description": "SILVER references the USD spot price of 1 troy ounce of silver (XAG/USD).",
+    "topic": "silver",
+    "source": "specification"
+  },
+  "COPPER": {
+    "country": "GLOBAL",
+    "kind": "commodity",
+    "exchange": "",
+    "unit": "pound",
+    "description": "COPPER references the USD price of 1 pound of high-grade copper. Copper is a core industrial metal and a widely followed barometer of global manufacturing and infrastructure demand.",
+    "topic": "copper",
+    "source": "specification"
+  },
+  "PLATINUM": {
+    "country": "GLOBAL",
+    "kind": "commodity",
+    "exchange": "",
+    "unit": "troy-ounce",
+    "description": "PLATINUM references the USD spot price of 1 troy ounce of platinum (XPT/USD).",
+    "topic": "platinum",
+    "source": "specification"
+  },
+  "PALLADIUM": {
+    "country": "GLOBAL",
+    "kind": "commodity",
+    "exchange": "",
+    "unit": "troy-ounce",
+    "description": "PALLADIUM references the USD spot price of 1 troy ounce of palladium (XPD/USD).",
+    "topic": "palladium",
+    "source": "specification"
+  },
+  "CL": {
+    "country": "GLOBAL",
+    "kind": "commodity",
+    "exchange": "",
+    "unit": "barrel",
+    "description": "WTIOIL references the USD price of 1 barrel of WTI Light Sweet Crude Oil. WTI serves as a primary global benchmark for oil prices due to its high quality (low density, low sulfur).",
+    "topic": "crude",
+    "source": "specification"
+  },
+  "BRENTOIL": {
+    "country": "GLOBAL",
+    "kind": "commodity",
+    "exchange": "",
+    "unit": "barrel",
+    "description": "BRENTOIL references the USD price of 1 barrel of Brent crude oil. Brent is the world's primary oil benchmark, used to price the majority of globally traded crude.",
+    "topic": "crude",
+    "source": "specification"
+  },
+  "NATGAS": {
+    "country": "GLOBAL",
+    "kind": "commodity",
+    "exchange": "",
+    "unit": "mmbtu",
+    "description": "NATGAS references the USD price of 1 MMBtu of Henry Hub natural gas. Henry Hub serves as the primary U.S. benchmark for natural gas pricing and is widely referenced in global energy markets.",
+    "topic": "gas",
+    "source": "specification"
+  },
+  "EUR": {
+    "country": "EU",
+    "kind": "fx",
+    "exchange": "",
+    "unit": "usd-per-eur",
+    "description": "EURUSD references the EUR/USD spot exchange rate: U.S. dollars per 1 euro. The euro is the official currency of the euro area.",
+    "topic": "fx",
+    "source": "specification"
+  },
+  "JPY": {
+    "country": "JP",
+    "kind": "fx",
+    "exchange": "",
+    "unit": "jpy-per-usd",
+    "description": "USDJPY references the USD/JPY spot exchange rate: Japanese yen per 1 U.S. dollar. The Japanese yen is the official currency of Japan.",
+    "topic": "fx",
+    "source": "specification"
+  },
+  "GBP": {
+    "country": "GB",
+    "kind": "fx",
+    "exchange": "",
+    "unit": "usd-per-gbp",
+    "description": "GBPUSD references the GBP/USD spot exchange rate: U.S. dollars per 1 pound sterling. The pound sterling is the official currency of the United Kingdom.",
+    "topic": "fx",
+    "source": "specification"
+  },
+  "DRAM": {
+    "country": "US",
+    "kind": "etf",
+    "exchange": "Cboe BZX: DRAM",
+    "unit": "share",
+    "description": "DRAM references 1 share of the Roundhill Memory ETF (Cboe BZX: DRAM), quoted in USD. The actively managed fund invests in companies involved in semiconductor memory and storage.",
+    "topic": "fund-DRAM",
+    "source": "specification"
+  },
+  "SNDK": {
+    "country": "US",
+    "kind": "equity",
+    "exchange": "Nasdaq: SNDK",
+    "unit": "share",
+    "description": "SNDK references 1 share of Sandisk Corporation common stock (Nasdaq: SNDK), quoted in USD. Sandisk develops NAND flash-memory and data-storage products.",
+    "topic": "memory",
+    "source": "specification"
+  },
+  "CRCL": {
+    "country": "US",
+    "kind": "equity",
+    "exchange": "NYSE: CRCL",
+    "unit": "share",
+    "description": "CRCL references 1 share of Circle Internet Group, Inc. Class A common stock (NYSE: CRCL), quoted in USD. Circle provides stablecoin and digital-asset payment infrastructure, including USDC.",
+    "topic": "digitalassets",
+    "source": "specification"
+  },
+  "USAR": {
+    "country": "US",
+    "kind": "equity",
+    "exchange": "Nasdaq: USAR",
+    "unit": "share",
+    "description": "USAR references 1 share of USA Rare Earth, Inc. Class A common stock (Nasdaq: USAR), quoted in USD. USA Rare Earth develops rare-earth mining, processing, and magnet-production assets.",
+    "topic": "rareearth",
+    "source": "specification"
+  },
+  "LITE": {
+    "country": "US",
+    "kind": "equity",
+    "exchange": "Nasdaq: LITE",
+    "unit": "share",
+    "description": "LITE references 1 share of Lumentum Holdings Inc. common stock (Nasdaq: LITE), quoted in USD. Lumentum develops optical and photonic components for communications, computing, and industrial applications.",
+    "topic": "networks",
+    "source": "specification"
+  },
+  "CBRS": {
+    "country": "US",
+    "kind": "equity",
+    "exchange": "Nasdaq: CBRS",
+    "unit": "share",
+    "description": "CBRS references 1 share of Cerebras Systems Inc. Class A common stock (Nasdaq: CBRS), quoted in USD. Cerebras develops wafer-scale AI processors, computing systems, and cloud services.",
+    "topic": "ai",
+    "source": "specification"
+  },
+  "MINIMAX": {
+    "country": "HK",
+    "kind": "equity",
+    "exchange": "HKEX: 0100",
+    "unit": "share",
+    "description": "MINIMAX references 1 MiniMax Group Inc. Class A ordinary share (HKEX: 0100). The oracle converts the HKD share price to USD at the prevailing USD/HKD FX rate. MiniMax develops multimodal AI models and applications.",
+    "topic": "ai",
+    "source": "specification",
+    "convertedFrom": "HKD"
+  },
+  "BB": {
+    "country": "CA",
+    "kind": "equity",
+    "exchange": "NYSE: BB",
+    "unit": "share",
+    "description": "BB references 1 share of BlackBerry Limited common stock (NYSE: BB), quoted in USD. BlackBerry provides cybersecurity, secure communications, and embedded software.",
+    "topic": "cybersecurity",
+    "source": "specification"
+  },
+  "NOK": {
+    "country": "FI",
+    "kind": "ads",
+    "exchange": "NYSE: NOK · Nasdaq Helsinki: NOKIA",
+    "unit": "share",
+    "description": "NOK references 1 Nokia Corporation ADS (NYSE: NOK), representing 1 share (Nasdaq Helsinki: NOKIA), quoted in USD. Nokia provides telecommunications networks, infrastructure, software, and related services.",
+    "topic": "networks",
+    "source": "specification",
+    "adsRatio": 1
+  },
+  "SMH": {
+    "country": "US",
+    "kind": "etf",
+    "exchange": "Nasdaq: SMH",
+    "unit": "share",
+    "description": "SMH references 1 share of the VanEck Semiconductor ETF (Nasdaq: SMH), quoted in USD. The fund tracks U.S.-listed companies involved in semiconductor production and equipment.",
+    "topic": "fund-SMH",
+    "source": "specification"
+  },
+  "BE": {
+    "country": "US",
+    "kind": "equity",
+    "exchange": "NYSE: BE",
+    "unit": "share",
+    "description": "BE references 1 share of Bloom Energy Corporation Class A common stock (NYSE: BE), quoted in USD. Bloom Energy develops solid-oxide fuel-cell systems for on-site power generation.",
+    "topic": "power",
+    "source": "specification"
+  },
+  "ZHIPU": {
+    "country": "HK",
+    "kind": "equity",
+    "exchange": "HKEX: 2513",
+    "unit": "share",
+    "description": "ZHIPU references 1 H-share of Knowledge Atlas Technology Joint Stock Company Limited (HKEX: 2513). The oracle converts the HKD share price to USD at the prevailing USD/HKD FX rate. The company, also known as Zhipu AI or Z.ai, develops AI models and applications.",
+    "topic": "ai",
+    "source": "specification",
+    "convertedFrom": "HKD"
+  },
+  "QCOM": {
+    "country": "US",
+    "kind": "equity",
+    "exchange": "Nasdaq: QCOM",
+    "unit": "share",
+    "description": "QCOM references 1 share of QUALCOMM Incorporated common stock (Nasdaq: QCOM), quoted in USD. Qualcomm develops semiconductors, wireless technology, and related software and licensing.",
+    "topic": "semiconductor",
+    "source": "specification"
+  },
+  "STRC": {
+    "country": "US",
+    "kind": "preferred",
+    "exchange": "Nasdaq: STRC",
+    "unit": "share",
+    "description": "STRC references 1 share of Strategy Inc's Variable Rate Series A Perpetual Stretch Preferred Stock (Nasdaq: STRC), quoted in USD. Stretch, the underlying security, pays cumulative monthly cash dividends at a variable rate on a $100 stated amount. Strategy, formerly MicroStrategy, holds bitcoin as its primary treasury asset.",
+    "topic": "finance",
+    "source": "specification"
+  },
+  "AMAT": {
+    "country": "US",
+    "kind": "equity",
+    "exchange": "Nasdaq: AMAT",
+    "unit": "share",
+    "description": "AMAT references 1 share of Applied Materials, Inc. common stock (Nasdaq: AMAT), quoted in USD. Applied Materials provides equipment and services for semiconductor and display manufacturing.",
+    "topic": "equipment",
+    "source": "specification"
+  },
+  "SKHY": {
+    "country": "KR",
+    "kind": "ads",
+    "exchange": "Nasdaq: SKHY · KRX: 000660",
+    "unit": "share",
+    "description": "SKHY references 1 SK hynix Inc. ADS (Nasdaq: SKHY), representing one-tenth of 1 common share (KRX: 000660), quoted in USD. SK hynix manufactures DRAM and NAND memory semiconductors used in data centers, AI hardware, mobile devices, and computing systems.",
+    "topic": "memory",
+    "source": "specification",
+    "adsRatio": 0.1
+  },
+  "CXMT": {
+    "country": "CN",
+    "kind": "equity",
+    "exchange": "SSE STAR: 688825",
+    "unit": "share",
+    "description": "CXMT references 1 CXMT Corporation A-share (SSE STAR: 688825). The oracle converts the CNY share price to USD at the prevailing offshore USD/CNH rate. CXMT Corporation, operating as ChangXin Memory Technologies, is a Chinese developer and manufacturer of DRAM chips.",
+    "topic": "memory",
+    "source": "specification",
+    "convertedFrom": "CNY"
+  },
+  "GEV": {
+    "country": "US",
+    "kind": "equity",
+    "exchange": "NYSE: GEV",
+    "unit": "share",
+    "description": "GEV references 1 share of GE Vernova Inc. common stock (NYSE: GEV), quoted in USD. GE Vernova provides equipment, software, and services for power generation, wind energy, and grid electrification.",
+    "topic": "power",
+    "source": "specification"
+  },
+  "KORU": {
+    "country": "KR",
+    "kind": "leveraged-etf",
+    "exchange": "NYSE Arca: KORU",
+    "unit": "share",
+    "description": "KORU references 1 share of the Direxion Daily MSCI South Korea Bull 3X ETF (NYSE Arca: KORU), quoted in USD. The fund seeks daily investment results, before fees and expenses, of 300% of the performance of the MSCI Korea 25/50 Index; local-currency exposure is embedded in the ETF.",
+    "topic": "fund-KORU",
+    "source": "specification",
+    "dailyLeverage": 3
+  },
+  "UNITREE": {
+    "country": "CN",
+    "kind": "equity",
+    "exchange": "SSE STAR: 688836",
+    "unit": "share",
+    "description": "UNITREE references 1 Yushu Technology Co., Ltd. A-share (SSE STAR: 688836). The oracle converts the CNY share price to USD at the prevailing offshore USD/CNH rate. Yushu Technology, operating as Unitree Robotics, develops and manufactures humanoid robots, quadruped robots, and robot components.",
+    "topic": "robotics",
+    "source": "specification",
+    "convertedFrom": "CNY"
+  },
+  "SOXL": {
+    "country": "US",
+    "kind": "leveraged-etf",
+    "exchange": "NYSE Arca: SOXL",
+    "unit": "share",
+    "description": "SOXL references 1 share of the Direxion Daily Semiconductor Bull 3X Shares (NYSE Arca: SOXL), quoted in USD. The fund seeks daily investment results of 300% of the daily performance of the ICE Semiconductor Index, an index of the 30 largest U.S.-listed semiconductor companies; leverage resets daily.",
+    "topic": "fund-SOXL",
+    "source": "specification",
+    "dailyLeverage": 3
+  },
+  "MAGS": {
+    "country": "US",
+    "kind": "etf",
+    "exchange": "Cboe BZX: MAGS",
+    "unit": "share",
+    "description": "MAGS references 1 share of the Roundhill Magnificent Seven ETF (Cboe BZX: MAGS), quoted in USD. The fund invests in Alphabet, Amazon, Apple, Meta, Microsoft, NVIDIA, and Tesla and targets approximately equal weighting across the seven companies.",
+    "topic": "fund-MAGS",
+    "source": "specification"
+  },
+  "IREN": {
+    "country": "AU",
+    "kind": "equity",
+    "exchange": "Nasdaq: IREN",
+    "unit": "share",
+    "description": "IREN references 1 IREN Limited ordinary share (Nasdaq: IREN), quoted in USD. IREN develops and operates data centers supporting AI cloud computing.",
+    "topic": "ai",
+    "source": "specification"
+  },
+  "NET": {
+    "country": "US",
+    "kind": "equity",
+    "exchange": "NYSE: NET",
+    "unit": "share",
+    "description": "NET references 1 share of Cloudflare, Inc. Class A common stock (NYSE: NET), quoted in USD. Cloudflare provides cloud-based network, security, and developer services for websites, applications, and internet infrastructure.",
+    "topic": "cybersecurity",
+    "source": "specification"
+  },
+  "CRWD": {
+    "country": "US",
+    "kind": "equity",
+    "exchange": "Nasdaq: CRWD",
+    "unit": "share",
+    "description": "CRWD references 1 share of CrowdStrike Holdings, Inc. Class A common stock (Nasdaq: CRWD), quoted in USD. CrowdStrike provides cloud-native cybersecurity software through its Falcon platform for endpoint, identity, cloud, and data protection.",
+    "topic": "cybersecurity",
+    "source": "specification"
+  },
+  "RDDT": {
+    "country": "US",
+    "kind": "equity",
+    "exchange": "NYSE: RDDT",
+    "unit": "share",
+    "description": "RDDT references 1 share of Reddit, Inc. Class A common stock (NYSE: RDDT), quoted in USD. Reddit operates an online platform organized into user-created communities where users share and discuss content.",
+    "topic": "community",
+    "source": "specification"
+  },
+  "AAOI": {
+    "country": "US",
+    "kind": "equity",
+    "exchange": "Nasdaq: AAOI",
+    "unit": "share",
+    "description": "AAOI references 1 share of Applied Optoelectronics, Inc. common stock (Nasdaq: AAOI), quoted in USD. Applied Optoelectronics develops and manufactures fiber-optic networking products for data centers, broadband, and telecommunications.",
+    "topic": "networks",
+    "source": "specification"
+  },
+  "MRNA": {
+    "country": "US",
+    "kind": "equity",
+    "exchange": "Nasdaq: MRNA",
+    "unit": "share",
+    "description": "MRNA references 1 share of Moderna, Inc. common stock (Nasdaq: MRNA), quoted in USD. Moderna develops messenger RNA (mRNA) medicines, including infectious-disease vaccines and oncology therapeutics.",
+    "topic": "health",
+    "source": "specification"
+  },
+  "XBI": {
+    "country": "US",
+    "kind": "etf",
+    "exchange": "NYSE Arca: XBI",
+    "unit": "share",
+    "description": "XBI references 1 share of the SPDR S&P Biotech ETF (NYSE Arca: XBI), quoted in USD. The fund provides diversified, approximately equal-weighted exposure to U.S. biotechnology companies across drug development, therapeutics, and life sciences.",
+    "topic": "fund-XBI",
+    "source": "specification"
+  },
+  "SHEIN": {
+    "country": "HK",
+    "kind": "equity",
+    "exchange": "HKEX: 0625",
+    "unit": "share",
+    "description": "SHEIN references 1 Class B ordinary share of SHEIN Global Holdings Limited (HKEX: 0625). The oracle converts the HKD share price to USD at the prevailing USD/HKD FX rate. SHEIN is an online fashion and lifestyle retailer selling own-brand apparel and third-party marketplace products.",
+    "topic": "retail",
+    "source": "specification",
+    "convertedFrom": "HKD"
+  },
+  "BMNR": {
+    "country": "US",
+    "kind": "equity",
+    "exchange": "NYSE: BMNR",
+    "unit": "share",
+    "description": "BMNR references 1 share of BitMine Immersion Technologies, Inc. common stock (NYSE: BMNR), quoted in USD. BitMine operates an Ethereum treasury and blockchain infrastructure business, with activities including ETH staking and validation, and strategic digital-asset investments.",
+    "topic": "digitalassets",
+    "source": "specification"
+  },
+  "CVX": {
+    "country": "US",
+    "kind": "equity",
+    "exchange": "NYSE: CVX",
+    "unit": "share",
+    "description": "CVX references 1 share of Chevron Corporation common stock (NYSE: CVX), quoted in USD. Chevron produces crude oil and natural gas and manufactures transportation fuels, lubricants, and petrochemicals.",
+    "topic": "oilcompany",
+    "source": "specification"
+  },
+  "TLT": {
+    "country": "US",
+    "kind": "etf",
+    "exchange": "Nasdaq: TLT",
+    "unit": "share",
+    "description": "TLT references 1 share of the iShares 20+ Year Treasury Bond ETF (Nasdaq: TLT), quoted in USD. The fund tracks the ICE U.S. Treasury 20+ Year Bond Index, an index of U.S. Treasury bonds with remaining maturities greater than 20 years.",
+    "topic": "fund-TLT",
+    "source": "specification"
+  },
+  "HO": {
+    "country": "GLOBAL",
+    "kind": "commodity",
+    "exchange": "",
+    "unit": "gallon",
+    "description": "HO (DIESEL) references the USD price of one U.S. gallon of New York Harbor ultra-low sulfur diesel (ULSD).",
+    "topic": "diesel",
+    "source": "specification"
+  },
+  "OURA": {
+    "country": "US",
+    "kind": "pre-ipo",
+    "exchange": "",
+    "unit": "share",
+    "description": "OURA references 1 share of Oura Inc. common stock (Nasdaq: OURA), quoted in USD. OURA is currently a pre-IPO market reflecting the anticipated share price; it is expected to convert to a standard XYZ perpetual upon the IPO. Oura designs the Oura Ring, a smart ring that measures sleep, activity, stress, and heart-health signals, and sells a subscription membership for health insights.",
+    "topic": "wearable",
+    "source": "pre-ipo"
+  },
+  "LRCX": {
+    "country": "US",
+    "kind": "equity",
+    "exchange": "Nasdaq: LRCX",
+    "unit": "share",
+    "description": "LRCX references 1 share of Lam Research Corporation common stock (Nasdaq: LRCX), quoted in USD. Lam Research supplies wafer fabrication equipment and services to the semiconductor industry.",
+    "topic": "equipment",
+    "source": "specification"
+  },
+  "UMC": {
+    "country": "TW",
+    "kind": "ads",
+    "exchange": "NYSE: UMC · TWSE: 2303",
+    "unit": "share",
+    "description": "UMC references 1 ADS of United Microelectronics Corporation (NYSE: UMC), representing 5 common shares (TWSE: 2303), quoted in USD. The company manufactures semiconductors for third-party customers.",
+    "topic": "semiconductor",
+    "source": "specification",
+    "adsRatio": 5
+  },
+  "CAMBRICON": {
+    "country": "CN",
+    "kind": "equity",
+    "exchange": "SSE STAR: 688256",
+    "unit": "share",
+    "description": "CAMBRICON references 1 A-share of Cambricon Technologies Corporation Limited (SSE STAR: 688256). The oracle converts the CNY share price to USD at the prevailing offshore USD/CNH rate. Cambricon designs AI processors and develops supporting software.",
+    "topic": "ai",
+    "source": "specification",
+    "convertedFrom": "CNY"
+  },
+  "TWST": {
+    "country": "US",
+    "kind": "equity",
+    "exchange": "Nasdaq: TWST",
+    "unit": "share",
+    "description": "TWST references 1 share of Twist Bioscience Corporation common stock (Nasdaq: TWST), quoted in USD. Twist Bioscience manufactures synthetic DNA-based products for research, sequencing, and drug discovery.",
+    "topic": "health",
+    "source": "specification"
+  },
+  "GLW": {
+    "country": "US",
+    "kind": "equity",
+    "exchange": "NYSE: GLW",
+    "unit": "share",
+    "description": "GLW references 1 share of Corning Incorporated common stock (NYSE: GLW), quoted in USD. Corning manufactures specialty glass, ceramics, and optical communications products.",
+    "topic": "glass",
+    "source": "specification"
+  },
+  "RELIANCE": {
+    "country": "IN",
+    "kind": "equity",
+    "exchange": "NSE: RELIANCE",
+    "unit": "share",
+    "description": "RELIANCE references 1 equity share of Reliance Industries Limited (NSE: RELIANCE). The oracle converts the INR share price to USD at the prevailing USD/INR FX rate. Reliance Industries operates energy, petrochemicals, retail, and digital services businesses.",
+    "topic": "commerce",
+    "source": "specification",
+    "convertedFrom": "INR"
+  },
+  "JIO": {
+    "country": "IN",
+    "kind": "equity",
+    "exchange": "NSE: JPL",
+    "unit": "share",
+    "description": "JIO references 1 equity share of Jio Platforms Limited (NSE: JPL). The oracle converts the INR share price to USD at the prevailing USD/INR FX rate. Jio Platforms provides digital connectivity and digital services in India.",
+    "topic": "commerce",
+    "source": "specification",
+    "convertedFrom": "INR"
+  },
+  "ANT": {
+    "country": "US",
+    "kind": "pre-ipo",
+    "exchange": "",
+    "unit": "share",
+    "description": "ANT references 1 share of Anthropic, PBC Class A common stock (Nasdaq: ANT), quoted in USD. ANT is currently a pre-IPO market reflecting the anticipated share price; upon the underlying listing, it is expected to convert to a standard XYZ perpetual. Anthropic develops AI models and the Claude assistant.",
+    "topic": "ai",
+    "source": "pre-ipo"
+  },
+  "ICE": {
+    "country": "US",
+    "kind": "equity",
+    "exchange": "NYSE: ICE",
+    "unit": "share",
+    "description": "ICE references 1 share of Intercontinental Exchange, Inc. common stock (NYSE: ICE), quoted in USD. ICE operates exchanges and clearing houses, including the New York Stock Exchange, and provides market data.",
+    "topic": "exchange",
+    "source": "specification"
+  },
+  "PURRDAT": {
+    "country": "US",
+    "kind": "equity",
+    "exchange": "Nasdaq: PURR",
+    "unit": "share",
+    "description": "PURRDAT references 1 share of Hyperliquid Strategies Inc. common stock (Nasdaq: PURR), quoted in USD. Hyperliquid Strategies is a digital-asset treasury company focused on HYPE, Hyperliquid's native token.",
+    "topic": "digitalassets",
+    "source": "specification"
+  },
+  "BIRD": {
+    "country": "US",
+    "kind": "equity",
+    "exchange": "Nasdaq: BIRD",
+    "unit": "share",
+    "description": "BIRD references 1 share of Smartbird, Inc. Class A common stock (Nasdaq: BIRD), quoted in USD. Smartbird develops AI compute infrastructure.",
+    "topic": "ai",
+    "source": "specification"
+  },
+  "QNT": {
+    "country": "US",
+    "kind": "equity",
+    "exchange": "Nasdaq: QNT",
+    "unit": "share",
+    "description": "QNT references 1 share of Quantinuum Inc. Class A common stock (Nasdaq: QNT), quoted in USD. Quantinuum develops trapped-ion quantum computers, software, and related applications.",
+    "topic": "quantum",
+    "source": "specification"
+  },
+  "BOT": {
+    "country": "US",
+    "kind": "investment-company",
+    "exchange": "Nasdaq: BOT",
+    "unit": "share",
+    "description": "BOT references 1 share of RoboStrategy, Inc. common stock (Nasdaq: BOT), quoted in USD. RoboStrategy is a closed-end investment company focused on robotics and embodied AI.",
+    "topic": "robotics",
+    "source": "specification"
+  },
+  "GIGADEV": {
+    "country": "CN",
+    "kind": "equity",
+    "exchange": "SSE: 603986",
+    "unit": "share",
+    "description": "GIGADEV references 1 GigaDevice Semiconductor Inc. A-share (SSE: 603986). The oracle converts the CNY share price to USD at the prevailing offshore USD/CNH rate. GigaDevice is a fabless designer of NOR flash memory, specialty DRAM, microcontrollers, and sensor chips.",
+    "topic": "memory",
+    "source": "specification",
+    "convertedFrom": "CNY"
+  },
+  "SHAZ": {
+    "country": "US",
+    "kind": "equity",
+    "exchange": "Nasdaq: SHAZ",
+    "unit": "share",
+    "description": "SHAZ references 1 share of SharonAI Holdings Inc. Class A common stock (Nasdaq: SHAZ), quoted in USD. Sharon AI provides GPU cloud and high-performance computing infrastructure.",
+    "topic": "ai",
+    "source": "specification"
+  },
+  "KSTR": {
+    "country": "CN",
+    "kind": "etf",
+    "exchange": "NYSE Arca: KSTR",
+    "unit": "share",
+    "description": "KSTR references 1 share of the KraneShares China Technology & Semiconductor STAR 50 Index ETF (NYSE Arca: KSTR), quoted in USD. The fund tracks the STAR 50 Index of the 50 largest companies listed on the Shanghai Stock Exchange STAR Market; local-currency exposure is embedded in the ETF.",
+    "topic": "fund-KSTR",
+    "source": "specification"
+  },
+  "LYTE": {
+    "country": "US",
+    "kind": "etf",
+    "exchange": "Cboe BZX: LYTE",
+    "unit": "share",
+    "description": "LYTE references 1 share of the Roundhill Photonics & Optics ETF (Cboe BZX: LYTE), quoted in USD. The actively managed fund invests in companies involved in photonics and optics, including optical interconnects, lasers, and photonic chips.",
+    "topic": "fund-LYTE",
+    "source": "specification"
+  },
+  "NCLD": {
+    "country": "US",
+    "kind": "etf",
+    "exchange": "Nasdaq: NCLD",
+    "unit": "share",
+    "description": "NCLD references 1 share of the Roundhill Neocloud ETF (Nasdaq: NCLD), quoted in USD. The actively managed fund invests in neocloud companies, including GPU-as-a-Service platforms and data centers built for AI and high-performance computing.",
+    "topic": "fund-NCLD",
+    "source": "specification"
+  },
+  "SNXX": {
+    "country": "US",
+    "kind": "leveraged-etf",
+    "exchange": "Cboe BZX: SNXX · Nasdaq: SNDK",
+    "unit": "share",
+    "description": "SNXX references 1 share of the Tradr 2X Long SNDK Daily ETF (Cboe BZX: SNXX), quoted in USD. The fund seeks daily investment results, before fees and expenses, of 200% of the daily performance of Sandisk Corporation common stock (Nasdaq: SNDK); it does not seek that objective over periods longer than one trading day.",
+    "topic": "fund-SNXX",
+    "source": "specification",
+    "dailyLeverage": 2
+  }
+}

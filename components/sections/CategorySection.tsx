@@ -1,11 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { useTranslations } from 'next-intl';
+import { useLocale, useTranslations } from 'next-intl';
 import { ArrowRight } from 'lucide-react';
 import { MarketAsset, MarketType } from '@/lib/types/market';
 import { AnimatedAssetGrid } from '@/components/market/AnimatedAssetGrid';
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 interface CategorySectionProps {
@@ -15,6 +14,8 @@ interface CategorySectionProps {
 }
 
 export function CategorySection({ market, assets, limit = 10 }: CategorySectionProps) {
+  const locale = useLocale();
+  const prefix = locale === 'en' ? '' : `/${locale}`;
   const t = useTranslations('categories');
   const sectionsT = useTranslations('sections');
   const commonT = useTranslations('common');
@@ -68,11 +69,9 @@ export function CategorySection({ market, assets, limit = 10 }: CategorySectionP
             )}
           </div>
         </div>
-        <Link href={`/category/${market.toLowerCase()}`}>
-          <Button variant="ghost" size="sm" className="gap-1">
+        <Link href={`${prefix}/category/${market.toLowerCase()}`} className="inline-flex shrink-0 items-center gap-1 rounded-lg px-2.5 py-1.5 text-sm hover:bg-accent focus-visible:outline-2 focus-visible:outline-ring">
             {sectionsT('viewAll')}
             <ArrowRight className="h-4 w-4" />
-          </Button>
         </Link>
       </div>
 

@@ -1,7 +1,7 @@
 'use client';
 
 import { useState } from 'react';
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { useHyperliquidTicker } from '@/lib/hooks/useHyperliquidTicker';
 import { stocks } from '@/lib/markets/stocks';
 import { AssetTable } from '@/components/market/AssetTable';
@@ -9,39 +9,20 @@ import { ConnectionStatus } from '@/components/ui/connection-status';
 import { ComplianceNotice } from '@/components/common/ComplianceNotice';
 import { Button } from '@/components/ui/button';
 import { Filter } from 'lucide-react';
-import { MarketAsset, MarketType } from '@/lib/types/market';
+import { toMarketAsset } from '@/lib/format-market';
 import { cn } from '@/lib/utils';
 
-type FilterType = 'all' | 'kr' | 'us' | 'jp' | 'index' | 'etf' | 'commodity' | 'fx' | 'semiconductor';
+type FilterType = 'all' | 'kr' | 'us' | 'jp' | 'index' | 'etf' | 'commodity' | 'fx' | 'semiconductor' | 'special';
 
 export function GainersPage() {
   const t = useTranslations('pages.gainers');
   const filterT = useTranslations('favorites.filter');
   const sectionsT = useTranslations('sections');
-  const locale = useLocale();
   const { tickers, status, lastUpdate } = useHyperliquidTicker();
   const [filter, setFilter] = useState<FilterType>('all');
 
   // Convert stocks to MarketAsset format with ticker data
-  const allAssets: MarketAsset[] = stocks.map((stock) => {
-    // Ticker keys don't have 'xyz:' prefix
-    const tickerKey = stock.hyperliquidSymbol.replace('xyz:', '');
-    const ticker = tickers[tickerKey];
-
-    return {
-      symbol: stock.symbol,
-      name: stock.name,
-      nameKo: stock.nameKo,
-      nameJa: stock.nameJa,
-      slug: stock.slug,
-      market: stock.category as MarketType,
-      price: ticker?.price ?? null,
-      prevDayPx: ticker?.prevDayPx ?? null,
-      change24h: ticker?.change24h ?? null,
-      changePercent24h: ticker?.changePercent24h ?? null,
-      hyperliquidSymbol: stock.hyperliquidSymbol,
-    };
-  });
+  const allAssets = stocks.map(stock => toMarketAsset(stock, tickers[stock.hyperliquidSymbol.replace(/^xyz:/, '')]));
 
   // Filter to gainers only (24h positive change)
   const gainers = allAssets
@@ -58,6 +39,7 @@ export function GainersPage() {
     if (filter === 'etf') return asset.market === 'ETF';
     if (filter === 'commodity') return asset.market === 'COMMODITY';
     if (filter === 'fx') return asset.market === 'FX';
+    if (filter === 'special') return asset.market === 'SPECIAL';
     if (filter === 'semiconductor') return asset.market === 'SEMICONDUCTOR' || stocks.find(s => s.symbol === asset.symbol)?.sector === 'Semiconductors';
     return true;
   });
@@ -73,6 +55,7 @@ export function GainersPage() {
     { key: 'etf', label: categoryT('ETF') },
     { key: 'commodity', label: categoryT('COMMODITY') },
     { key: 'fx', label: categoryT('FX') },
+    { key: 'special', label: categoryT('SPECIAL') },
     { key: 'semiconductor', label: categoryT('SEMICONDUCTOR') },
   ];
 
@@ -86,7 +69,7 @@ export function GainersPage() {
               <span className="text-2xl text-gain arrow-bounce">▲</span>
             </div>
             <div>
-              <h1 className="text-3xl font-bold">{t('title')}</h1>
+              <h1 className="text-3xl font-bold break-words">{t('title')}</h1>
               <p className="text-sm text-muted-foreground">{t('description')}</p>
             </div>
           </div>
@@ -95,15 +78,16 @@ export function GainersPage() {
         </div>
 
         {/* Filters */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-2">
+        <div className="flex items-start gap-2 pb-2">
           <Filter className="h-4 w-4 text-muted-foreground flex-shrink-0" />
-          <div className="flex gap-1 flex-nowrap">
+          <div className="flex flex-wrap gap-1">
             {filters.map((f) => (
               <Button
                 key={f.key}
                 variant={filter === f.key ? 'secondary' : 'ghost'}
                 size="sm"
                 onClick={() => setFilter(f.key)}
+                aria-pressed={filter === f.key}
                 className={cn(
                   'text-xs whitespace-nowrap',
                   filter === f.key && 'bg-accent'

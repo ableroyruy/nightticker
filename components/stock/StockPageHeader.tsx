@@ -2,9 +2,10 @@
 
 import { useEffect } from 'react';
 import { WatchlistButton } from '@/components/market/WatchlistButton';
-import { SearchRankBadge } from '@/components/market/SearchRankBadge';
 import { ShareButton } from '@/components/common/ShareButton';
 import { Stock } from '@/lib/providers/types';
+import Link from 'next/link';
+import { categoryNames, sectorNames } from '@/lib/markets/stocks';
 import { useSearchRanking } from '@/lib/context/SearchRankingContext';
 
 const BASE_URL = 'https://www.nightticker.com';
@@ -47,27 +48,43 @@ export function StockPageHeader({
 
   const shareTitle = `${displayName} ${titleSuffix}`;
 
+  const prefix = locale === 'en' ? '' : `/${locale}`;
+  const language = locale as keyof typeof categoryNames.US;
+  const categoryLabel = categoryNames[stock.category][language] ?? categoryNames[stock.category].en;
+
   return (
-    <div>
-      <div className="flex items-center gap-3 mb-1 flex-wrap">
-        <h1 className="text-3xl md:text-4xl font-bold">
-          {displayName} {titleSuffix}
-        </h1>
-        <WatchlistButton
-          symbol={stock.symbol}
-          market={stock.category}
-          name={stock.name}
-          nameKo={stock.nameKo}
-          nameJa={stock.nameJa}
-          nameZh={stock.nameZh}
-          namePt={stock.namePt}
-          nameEs={stock.nameEs}
-          slug={stock.slug}
-        />
-        <SearchRankBadge symbol={stock.symbol} />
-        <ShareButton title={shareTitle} url={shareUrl} locale={locale} />
+    <header className="space-y-3" data-stock-header>
+      <div className="flex items-start justify-between gap-3">
+        <div className="min-w-0 flex-1">
+          <h1 className="text-2xl font-bold leading-snug break-words [overflow-wrap:anywhere] sm:text-3xl md:text-4xl">
+            {displayName} <span className="text-lg font-medium text-muted-foreground sm:text-2xl">{titleSuffix}</span>
+          </h1>
+          <div className="mt-1.5 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-muted-foreground">
+            <span className="font-medium tracking-wide">{stock.symbol}</span>
+            <span aria-hidden="true">·</span>
+            <Link href={`${prefix}/category/${stock.category.toLowerCase()}`} className="rounded-sm hover:text-foreground hover:underline focus-visible:outline-2 focus-visible:outline-ring">{categoryLabel}</Link>
+            {stock.sector && <>
+              <span aria-hidden="true">·</span>
+              {stock.sector === 'Semiconductors' ? <Link href={`${prefix}/category/semiconductor`} className="hover:text-foreground hover:underline">{sectorNames[stock.sector][language] ?? sectorNames[stock.sector].en}</Link> : <span>{sectorNames[stock.sector][language] ?? sectorNames[stock.sector].en}</span>}
+            </>}
+          </div>
+        </div>
+        <div className="flex shrink-0 items-center gap-1 pt-0.5" data-stock-actions>
+          <WatchlistButton
+            symbol={stock.symbol}
+            market={stock.category}
+            name={stock.name}
+            nameKo={stock.nameKo}
+            nameJa={stock.nameJa}
+            nameZh={stock.nameZh}
+            namePt={stock.namePt}
+            nameEs={stock.nameEs}
+            slug={stock.slug}
+            size="default"
+          />
+          <ShareButton title={shareTitle} url={shareUrl} locale={locale} />
+        </div>
       </div>
-      <p className="text-lg text-muted-foreground">{stock.symbol}</p>
-    </div>
+    </header>
   );
 }

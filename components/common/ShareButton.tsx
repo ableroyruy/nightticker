@@ -78,7 +78,9 @@ export function ShareButton({ title, url, locale }: ShareButtonProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger
-        className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-8 px-3"
+        aria-label={t('share')}
+        title={t('share')}
+        className="inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-colors border border-input bg-background hover:bg-accent hover:text-accent-foreground h-11 w-11 shrink-0 sm:h-9 sm:w-auto sm:px-3"
       >
         {copied ? (
           <Check className="h-4 w-4 text-green-500" />

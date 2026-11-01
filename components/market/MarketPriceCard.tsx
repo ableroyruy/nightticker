@@ -1,6 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
+import type { ReactNode } from 'react';
 import { useTranslations } from 'next-intl';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { useHyperliquidTicker } from '@/lib/hooks/useHyperliquidTicker';
@@ -21,9 +22,11 @@ interface MarketPriceCardProps {
   hyperliquidSymbol: string;
   locale: string;
   category?: string;
+  ranking?: ReactNode;
+  quoteUnit?: string;
 }
 
-export function MarketPriceCard({ hyperliquidSymbol, locale, category }: MarketPriceCardProps) {
+export function MarketPriceCard({ hyperliquidSymbol, locale, category, ranking, quoteUnit }: MarketPriceCardProps) {
   const t = useTranslations('market');
   const { tickers, status, lastUpdate } = useHyperliquidTicker();
 
@@ -38,11 +41,11 @@ export function MarketPriceCard({ hyperliquidSymbol, locale, category }: MarketP
 
   return (
     <Card>
-      <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+      <CardHeader className="flex flex-col items-start gap-2 space-y-0 pb-2 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
         <HyperliquidBadge />
         <ConnectionStatus status={status} lastUpdate={lastUpdate} />
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="min-w-0 space-y-6">
         {isLoading ? (
           <div className="space-y-2">
             <Skeleton className="h-14 w-48" />
@@ -58,6 +61,8 @@ export function MarketPriceCard({ hyperliquidSymbol, locale, category }: MarketP
           />
         )}
 
+        {ranking && <div className="min-w-0">{ranking}</div>}
+
         {/* Chart */}
         <div className="w-full overflow-hidden rounded-lg">
           <MiniChart
@@ -66,6 +71,8 @@ export function MarketPriceCard({ hyperliquidSymbol, locale, category }: MarketP
             error={chartError}
             height={300}
             autoResize
+            variant="detail"
+            quoteUnit={quoteUnit}
           />
         </div>
 

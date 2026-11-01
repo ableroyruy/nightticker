@@ -2,10 +2,10 @@
 
 import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import { useLocale, useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
+import { getLocalizedAssetName } from '@/lib/format-market';
 import { MarketAsset, MarketType } from '@/lib/types/market';
 import { PriceDisplay, PriceChange } from '@/components/ui/price-change';
 import { FavoriteButton } from '@/components/ui/favorite-button';
@@ -73,13 +73,12 @@ function AssetCardInner({
   className,
 }: AssetCardProps) {
   const locale = useLocale();
-  const router = useRouter();
   const t = useTranslations('marketBadge');
   const { isFavorite, toggleFavorite } = useFavorites();
   const { rankings } = useSearchRanking();
   const searchRank = rankings.find((r) => r.symbol === asset.symbol);
 
-  const cardRef = useRef<HTMLAnchorElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
   const [visible, setVisible] = useState(false);
   useEffect(() => {
     const element = cardRef.current;
@@ -98,13 +97,7 @@ function AssetCardInner({
   const displayChange24h = asset.change24h;
   const displayChangePercent24h = asset.changePercent24h;
 
-  const displayName =
-    locale === 'ko' && asset.nameKo ? asset.nameKo :
-    locale === 'ja' && asset.nameJa ? asset.nameJa :
-    locale === 'zh' && asset.nameZh ? asset.nameZh :
-    locale === 'pt' && asset.namePt ? asset.namePt :
-    locale === 'es' && asset.nameEs ? asset.nameEs :
-    asset.name;
+  const displayName = getLocalizedAssetName(asset, locale);
   const isFav = isFavorite(asset.symbol, asset.market);
 
   const marketBadgeColors: Record<MarketType, string> = {
@@ -119,36 +112,25 @@ function AssetCardInner({
     SEMICONDUCTOR: 'bg-violet-500/20 text-violet-400 border-violet-500/30',
   };
 
-  const marketFlags: Record<MarketType, string> = {
-    KR: '🇰🇷',
-    US: '🇺🇸',
-    JP: '🇯🇵',
-    INDEX: '📊',
-    ETF: '📈',
-    COMMODITY: '🛢️',
-    FX: '💱',
-    SPECIAL: '⚡',
-    SEMICONDUCTOR: '💎',
-  };
-
   const getMarketLabel = (market: MarketType) => t(market);
 
   const href = `/stock/${asset.slug}`;
   const prefix = locale === 'en' ? '' : `/${locale}`;
 
   return (
-    <Link ref={cardRef} href={`${prefix}${href}`} className="block group">
+    <div ref={cardRef} className="block group relative">
       <div
         className={cn(
-          'glass-card glass-card-hover rounded-xl p-2.5 h-full cursor-pointer overflow-hidden',
+          'glass-card glass-card-hover rounded-xl p-2.5 h-full overflow-hidden relative',
           'transition-all duration-300 active:scale-[0.98]',
           'group-hover:shadow-lg',
           marketAccentBorders[asset.market],
           className
         )}
       >
-        <div className="flex items-start justify-between gap-2 mb-2">
-          <div className="flex items-center gap-2 min-w-0">
+        <Link href={`${prefix}${href}`} className="absolute inset-0 z-10 rounded-xl focus-visible:outline-2 focus-visible:outline-ring focus-visible:-outline-offset-2" aria-label={`${displayName} (${asset.symbol})`} />
+        <div className="pointer-events-none flex items-start justify-between gap-2 mb-2">
+          <div className="flex flex-1 items-center gap-2 min-w-0">
             {rank && (
               <span className="text-xs font-medium text-muted-foreground w-5">
                 #{rank}
@@ -156,25 +138,20 @@ function AssetCardInner({
             )}
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="font-semibold truncate">{displayName}</span>
+                <span className="min-w-0 max-w-full font-semibold break-words [overflow-wrap:anywhere]">{displayName}</span>
                 <span className="text-xs text-muted-foreground">{asset.symbol}</span>
                 {searchRank && searchRank.rank <= 10 && (
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      router.push(`${prefix}/popular`);
-                    }}
+                  <Link href={`${prefix}/popular`}
+                    aria-label={`${{ en: 'View popularity rank', ko: '인기순위 보기', ja: '人気順位を見る', zh: '查看人气排名', pt: 'Ver posição no ranking', es: 'Ver posición en el ranking' }[locale as 'en' | 'ko' | 'ja' | 'zh' | 'pt' | 'es'] ?? 'View popularity rank'}: ${searchRank.rank}`}
                     className={cn(
-                      'text-[10px] px-1.5 py-0.5 rounded-full font-medium flex items-center gap-0.5 transition-colors cursor-pointer',
+                      'pointer-events-auto relative z-20 text-[10px] px-1.5 py-0.5 rounded-full font-medium flex items-center gap-0.5 transition-colors cursor-pointer',
                       searchRank.rank <= 3
                         ? 'bg-amber-500/20 text-amber-400 hover:bg-amber-500/30'
                         : 'bg-primary/20 text-primary hover:bg-primary/30'
                     )}
                   >
                     #{searchRank.rank}
-                  </button>
+                  </Link>
                 )}
                 {showMarketBadge && (
                   <Badge
@@ -190,6 +167,7 @@ function AssetCardInner({
               </div>
             </div>
           </div>
+          <div className="pointer-events-auto relative z-20 shrink-0">
           <FavoriteButton
             isFavorite={isFav}
             onToggle={() =>
@@ -207,6 +185,7 @@ function AssetCardInner({
             }
             size="sm"
           />
+          </div>
         </div>
 
         {/* Price and Chart Row - Category colored background */}
@@ -227,9 +206,9 @@ function AssetCardInner({
             )}
           />
 
-          <div className="relative flex items-center justify-between gap-3 overflow-hidden">
+          <div className="relative flex flex-wrap items-center justify-between gap-3">
             {/* Price and Change */}
-            <div className="space-y-1 min-w-0 flex-shrink">
+            <div className="min-w-[120px] flex-1 space-y-1">
               <PriceDisplay
                 price={displayPrice}
                 change={displayChange24h}
@@ -261,7 +240,7 @@ function AssetCardInner({
             {/* Mini Chart with glow container */}
             <div
               className={cn(
-                'flex-shrink-0 max-w-[140px] overflow-hidden rounded-lg',
+                'ml-auto w-[140px] max-w-full shrink-0 overflow-hidden rounded-lg',
                 'shadow-inner',
                 marketGlowColors[asset.market]
               )}
@@ -277,7 +256,7 @@ function AssetCardInner({
           </div>
         </div>
       </div>
-    </Link>
+    </div>
   );
 }
 

@@ -26,8 +26,15 @@ if redis.call('GET', KEYS[1]) ~= ARGV[1] then return 0 end
 redis.call('SET', KEYS[2], ARGV[2], 'EX', 90000)
 if redis.call('EXISTS', KEYS[3]) == 0 then
   local ranks = cjson.decode(ARGV[3])
-  for symbol, rank in pairs(ranks) do redis.call('HSET', KEYS[3], symbol, rank) end
-  if next(ranks) ~= nil then redis.call('EXPIRE', KEYS[3], 90000) end
+  local fields = {}
+  for symbol, rank in pairs(ranks) do
+    fields[#fields + 1] = symbol
+    fields[#fields + 1] = rank
+  end
+  if #fields > 0 then
+    redis.call('HSET', KEYS[3], unpack(fields))
+    redis.call('EXPIRE', KEYS[3], 90000)
+  end
 end
 redis.call('DEL', KEYS[1])
 return 1

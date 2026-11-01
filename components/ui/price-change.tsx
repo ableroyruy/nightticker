@@ -2,14 +2,7 @@
 
 import { useTranslations } from 'next-intl';
 import { cn } from '@/lib/utils';
-
-function formatPrice(value: number, showCurrency: boolean = true): string {
-  const formatted = value.toLocaleString('en-US', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  });
-  return showCurrency ? '$' + formatted : formatted;
-}
+import { formatMarketPrice, formatMarketChange, marketDirection } from '@/lib/format-market';
 
 interface PriceChangeProps {
   value: number | null;
@@ -31,13 +24,14 @@ export function PriceChange({
   hideCurrency = false,
 }: PriceChangeProps) {
 
-  if (value === null || value === undefined) {
+  if (value == null || !Number.isFinite(value)) {
     return <span className="text-muted-foreground">—</span>;
   }
 
-  const isPositive = value > 0;
-  const isNegative = value < 0;
-  const isZero = value === 0;
+  const direction = marketDirection(value, type);
+  const isPositive = direction === 1;
+  const isNegative = direction === -1;
+  const isZero = direction === 0;
 
   const sizeClasses = {
     sm: 'text-xs',
@@ -51,11 +45,7 @@ export function PriceChange({
     lg: 'text-xs',
   };
 
-  // For amount type, optionally show currency
-  const formattedValue =
-    type === 'percent'
-      ? `${isPositive ? '+' : ''}${value.toFixed(2)}%`
-      : `${isPositive ? '+' : ''}${formatPrice(value, !hideCurrency)}`;
+  const formattedValue = formatMarketChange(value, type, !hideCurrency);
 
   return (
     <span
@@ -118,7 +108,7 @@ export function PriceDisplay({
     xl: 'text-4xl',
   };
 
-  if (price === null || price === undefined) {
+  if (price == null || !Number.isFinite(price)) {
     return (
       <div className={cn('tabular-nums', className)}>
         <span className="text-muted-foreground">{t('priceUnavailable')}</span>
@@ -127,7 +117,7 @@ export function PriceDisplay({
   }
 
   // Format price (with or without currency symbol)
-  const formattedPrice = formatPrice(price, !hideCurrency);
+  const formattedPrice = formatMarketPrice(price, !hideCurrency);
 
   // Calculate change from previous price if not provided
   const calculatedChange =
@@ -138,32 +128,16 @@ export function PriceDisplay({
       ? ((price - previousPrice) / previousPrice) * 100
       : null);
 
-  const isUp =
-    calculatedChange !== null
-      ? calculatedChange > 0
-      : previousPrice !== null && previousPrice !== undefined
-        ? price > previousPrice
-        : null;
-
-  const isDown =
-    calculatedChange !== null
-      ? calculatedChange < 0
-      : previousPrice !== null && previousPrice !== undefined
-        ? price < previousPrice
-        : null;
-
-  const isFlat =
-    calculatedChange !== null
-      ? calculatedChange === 0
-      : previousPrice !== null && previousPrice !== undefined
-        ? price === previousPrice
-        : null;
+  const direction = marketDirection(calculatedChangePercent ?? calculatedChange, calculatedChangePercent != null ? 'percent' : 'amount');
+  const isUp = direction === 1;
+  const isDown = direction === -1;
+  const isFlat = direction === 0;
 
   return (
     <div className={cn('flex flex-col gap-1', className)}>
       <span
         className={cn(
-          'tabular-nums font-semibold',
+          'max-w-full tabular-nums font-semibold [overflow-wrap:anywhere]',
           sizeClasses[size],
           isUp === true && 'text-gain',
           isDown === true && 'text-loss',
@@ -173,7 +147,7 @@ export function PriceDisplay({
         {formattedPrice}
       </span>
       {showChange && calculatedChange !== null && (
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <PriceChange value={calculatedChange} type="amount" size="sm" hideCurrency={hideCurrency} />
           {calculatedChangePercent !== null && (
             <PriceChange

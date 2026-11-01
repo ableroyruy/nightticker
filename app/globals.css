@@ -256,7 +256,7 @@
 }
 
 /* Table styles for financial data */
-.financial-table th {
+.financial-table thead th {
   @apply text-xs font-medium text-muted-foreground uppercase tracking-wider;
 }
 
@@ -318,4 +318,15 @@
 /* Ticker hover effect */
 .animate-ticker:hover {
   cursor: pointer;
+}
+
+/* Price direction stays readable without continuous motion. */
+.arrow-bounce { animation: none; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
 }

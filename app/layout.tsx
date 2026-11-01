@@ -3,10 +3,7 @@ import './globals.css';
 
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://www.nightticker.com'),
-  title: {
-    default: 'NightTicker - The Market Never Sleeps',
-    template: '%s | NightTicker',
-  },
+  title: 'NightTicker - The Market Never Sleeps',
   description: 'Monitor stock-related market activity when traditional exchanges are closed. Overnight, weekend, and holiday reference prices powered by Hyperliquid Market Prices.',
   keywords: ['night stock price', 'overnight stock price', 'weekend stock price', 'market closed price', 'hyperliquid'],
   authors: [{ name: 'NightTicker' }],

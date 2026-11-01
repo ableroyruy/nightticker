@@ -1,13 +1,13 @@
 'use client';
 
-import { useTranslations, useLocale } from 'next-intl';
+import { useTranslations } from 'next-intl';
 import { useHyperliquidTicker } from '@/lib/hooks/useHyperliquidTicker';
 import { getStocksByCategory, getStocksBySectorForCategory } from '@/lib/markets/stocks';
 import { ComplianceNotice } from '@/components/common/ComplianceNotice';
 import { ConnectionStatus } from '@/components/ui/connection-status';
 import { AssetTable } from '@/components/market/AssetTable';
 import { StockCategory } from '@/lib/providers/types';
-import { MarketAsset, MarketType } from '@/lib/types/market';
+import { toMarketAsset } from '@/lib/format-market';
 import { Building2, BarChart3, Coins, DollarSign, Cpu } from 'lucide-react';
 
 const categoryIcons: Record<StockCategory, React.ElementType> = {
@@ -29,7 +29,6 @@ interface CategoryPageProps {
 export function CategoryPage({ category }: CategoryPageProps) {
   const t = useTranslations('categories');
   const commonT = useTranslations('common');
-  const locale = useLocale();
   const { tickers, status, lastUpdate } = useHyperliquidTicker();
 
   // SEMICONDUCTOR is a special case - it shows stocks by sector, not category
@@ -39,23 +38,7 @@ export function CategoryPage({ category }: CategoryPageProps) {
   const Icon = categoryIcons[category];
 
   // Convert stock data to MarketAsset format with live prices
-  const assets: MarketAsset[] = stocks.map((stock) => {
-    const tickerKey = stock.hyperliquidSymbol.replace('xyz:', '');
-    const ticker = tickers[tickerKey];
-
-    return {
-      symbol: stock.symbol,
-      name: stock.name,
-      nameKo: stock.nameKo,
-      slug: stock.slug,
-      market: stock.category as MarketType,
-      price: ticker?.price ?? null,
-      prevDayPx: ticker?.prevDayPx ?? null,
-      change24h: ticker?.change24h ?? null,
-      changePercent24h: ticker?.changePercent24h ?? null,
-      hyperliquidSymbol: stock.hyperliquidSymbol,
-    };
-  });
+  const assets = stocks.map(stock => toMarketAsset(stock, tickers[stock.hyperliquidSymbol.replace(/^xyz:/, '')]));
 
   // Sort by change percent (gainers first)
   const sortedAssets = [...assets].sort((a, b) => {
@@ -70,13 +53,13 @@ export function CategoryPage({ category }: CategoryPageProps) {
       {/* Header */}
       <div className="border-b border-border/50 bg-gradient-to-b from-accent/20 to-background">
         <div className="container py-8">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-4">
-              <div className="p-3 rounded-xl bg-primary/10 text-primary">
+          <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex min-w-0 items-center gap-4">
+              <div className="shrink-0 p-3 rounded-xl bg-primary/10 text-primary">
                 <Icon className="h-8 w-8" />
               </div>
-              <div>
-                <h1 className="text-3xl font-bold">{t(category)}</h1>
+              <div className="min-w-0">
+                <h1 className="text-3xl font-bold break-words">{t(category)}</h1>
                 <p className="text-muted-foreground mt-1">
                   {sortedAssets.length} {commonT('assets')}
                 </p>

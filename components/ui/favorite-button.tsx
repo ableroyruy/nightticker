@@ -1,5 +1,6 @@
 'use client';
 
+import { useLocale } from 'next-intl';
 import { Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
@@ -17,6 +18,9 @@ export function FavoriteButton({
   size = 'md',
   className,
 }: FavoriteButtonProps) {
+  const locale = useLocale();
+  const labels = { en: ['Add to favorites', 'Remove from favorites'], ko: ['즐겨찾기 추가', '즐겨찾기 해제'], ja: ['お気に入りに追加', 'お気に入りから削除'], zh: ['添加到收藏', '从收藏中移除'], pt: ['Adicionar aos favoritos', 'Remover dos favoritos'], es: ['Añadir a favoritos', 'Quitar de favoritos'] }[locale as 'en' | 'ko' | 'ja' | 'zh' | 'pt' | 'es'] ?? ['Add to favorites', 'Remove from favorites'];
+  const label = labels[isFavorite ? 1 : 0];
   const sizeClasses = {
     sm: 'h-7 w-7',
     md: 'h-8 w-8',
@@ -46,9 +50,13 @@ export function FavoriteButton({
           : 'text-muted-foreground hover:text-yellow-500',
         className
       )}
-      aria-label={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+      aria-label={label}
+      aria-pressed={isFavorite}
+      title={label}
+      type="button"
     >
       <Star
+        aria-hidden="true"
         className={cn(
           iconSizes[size],
           'transition-all',

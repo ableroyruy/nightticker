@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useMemo, useRef } from 'react';
+import { useState, useMemo, useRef, useEffect, useId } from 'react';
 import { useRouter } from 'next/navigation';
 import { useTranslations, useLocale } from 'next-intl';
 import { Search, TrendingUp, X } from 'lucide-react';
@@ -33,20 +33,20 @@ export function StockSearch({ className, onSelect, showTrending = true }: StockS
   const [isOpen, setIsOpen] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(0);
   const inputRef = useRef<HTMLInputElement>(null);
+  const optionRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const composingRef = useRef(false);
+  const listId = useId();
   const router = useRouter();
   const t = useTranslations('search');
   const tNav = useTranslations('nav');
   const locale = useLocale();
   const prefix = locale === 'en' ? '' : `/${locale}`;
+  const labels = { en: { clear: 'Clear search', results: 'Search results', suggested: 'Explore assets' }, ko: { clear: '검색어 지우기', results: '검색 결과', suggested: '종목 둘러보기' }, ja: { clear: '検索をクリア', results: '検索結果', suggested: '銘柄を探す' }, zh: { clear: '清除搜索', results: '搜索结果', suggested: '浏览品种' }, pt: { clear: 'Limpar pesquisa', results: 'Resultados da pesquisa', suggested: 'Explorar ativos' }, es: { clear: 'Borrar búsqueda', results: 'Resultados de búsqueda', suggested: 'Explorar activos' } }[locale as 'en' | 'ko' | 'ja' | 'zh' | 'pt' | 'es'] ?? { clear: 'Clear search', results: 'Search results', suggested: 'Explore assets' };
   const { getTopRankings } = useSearchRanking();
 
   // Get popular stocks based on search ranking
   const popularStocks = useMemo(() => {
-    const topRankings = getTopRankings(8);
-    if (topRankings.length === 0) {
-      // Fallback to default stocks if no rankings
-      return stocks.slice(0, 6);
-    }
+    const topRankings = getTopRankings(8).filter(ranking => ranking.views > 0);
     // Map rankings to stock objects
     return topRankings
       .map((ranking) => stocks.find((s) => s.symbol === ranking.symbol))
@@ -56,7 +56,7 @@ export function StockSearch({ className, onSelect, showTrending = true }: StockS
   const filteredStocks = useMemo(() => {
     if (!query.trim()) {
       // Show popular stocks based on ranking when no query
-      return popularStocks;
+      return popularStocks.length ? popularStocks : stocks.slice(0, 6);
     }
 
     const lowerQuery = query.toLowerCase();
@@ -83,33 +83,32 @@ export function StockSearch({ className, onSelect, showTrending = true }: StockS
     onSelect?.();
   };
 
-  const handleKeyDown = (e: React.KeyboardEvent) => {
-    if (!isOpen) return;
+  useEffect(() => {
+    if (isOpen) optionRefs.current[selectedIndex]?.scrollIntoView({ block: 'nearest' });
+  }, [isOpen, selectedIndex, filteredStocks]);
 
-    switch (e.key) {
-      case 'ArrowDown':
-        e.preventDefault();
-        setSelectedIndex((prev) =>
-          prev < filteredStocks.length - 1 ? prev + 1 : 0
-        );
-        break;
-      case 'ArrowUp':
-        e.preventDefault();
-        setSelectedIndex((prev) =>
-          prev > 0 ? prev - 1 : filteredStocks.length - 1
-        );
-        break;
-      case 'Enter':
-        e.preventDefault();
-        if (filteredStocks[selectedIndex]) {
-          handleSelect(filteredStocks[selectedIndex].slug);
-        }
-        break;
-      case 'Escape':
-        e.preventDefault();
-        setIsOpen(false);
-        inputRef.current?.blur();
-        break;
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    // Safari can report keyCode 229 when composition has just ended.
+    if (composingRef.current || e.nativeEvent.isComposing || e.keyCode === 229) return;
+    if (e.key === 'Tab') { setIsOpen(false); return; }
+    if (e.key === 'Escape') {
+      if (isOpen) e.preventDefault();
+      setIsOpen(false);
+      return; // Keep DOM focus on the combobox, rather than dropping it.
+    }
+    if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+      e.preventDefault();
+      setIsOpen(true);
+      if (!filteredStocks.length) return;
+      if (!isOpen) setSelectedIndex(e.key === 'ArrowDown' ? 0 : filteredStocks.length - 1);
+      else setSelectedIndex(previous => e.key === 'ArrowDown'
+        ? (previous + 1) % filteredStocks.length
+        : (previous - 1 + filteredStocks.length) % filteredStocks.length);
+      return;
+    }
+    if (isOpen && e.key === 'Enter' && filteredStocks[selectedIndex]) {
+      e.preventDefault();
+      handleSelect(filteredStocks[selectedIndex].slug);
     }
   };
 
@@ -119,12 +118,23 @@ export function StockSearch({ className, onSelect, showTrending = true }: StockS
   };
 
   return (
-    <div className={cn('relative w-full max-w-lg', className)}>
+    <div className={cn('relative w-full max-w-lg', className)} onBlurCapture={event => {
+      if (!event.currentTarget.contains(event.relatedTarget as Node | null)) setIsOpen(false);
+    }}>
       <div className="relative">
         <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
         <Input
           ref={inputRef}
           type="text"
+          role="combobox"
+          aria-label={t('placeholder')}
+          aria-autocomplete="list"
+          aria-expanded={isOpen}
+          aria-controls={listId}
+          aria-activedescendant={isOpen && filteredStocks[selectedIndex] ? `${listId}-${selectedIndex}` : undefined}
+          autoComplete="off"
+          onCompositionStart={() => { composingRef.current = true; }}
+          onCompositionEnd={() => { composingRef.current = false; }}
           placeholder={t('placeholder')}
           value={query}
           onChange={(e) => {
@@ -132,14 +142,15 @@ export function StockSearch({ className, onSelect, showTrending = true }: StockS
             setIsOpen(true);
           }}
           onFocus={() => setIsOpen(true)}
-          onBlur={() => setTimeout(() => setIsOpen(false), 200)}
           onKeyDown={handleKeyDown}
           className="h-12 pl-12 pr-10 text-base glass-card border-border/50 focus:border-primary/50 rounded-xl"
         />
         {query && (
           <button
+            type="button"
+            aria-label={labels.clear}
             onClick={clearQuery}
-            className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+            className="absolute right-1 top-1/2 -translate-y-1/2 flex h-11 w-9 items-center justify-center rounded text-muted-foreground hover:text-foreground transition-colors focus-visible:outline-2 focus-visible:outline-ring"
           >
             <X className="h-4 w-4" />
           </button>
@@ -158,15 +169,20 @@ export function StockSearch({ className, onSelect, showTrending = true }: StockS
         <div className="absolute top-full mt-2 w-full glass-card border border-border/50 rounded-xl shadow-2xl z-50 max-h-80 overflow-auto">
           {!query.trim() && (
             <div className="px-4 py-2 text-xs font-medium text-muted-foreground uppercase tracking-wide border-b border-border/50">
-              {tNav('popular')}
+              {popularStocks.length ? tNav('popular') : labels.suggested}
             </div>
           )}
 
           {filteredStocks.length > 0 ? (
-            <div className="py-1">
+            <div id={listId} role="listbox" aria-label={labels.results} className="py-1">
               {filteredStocks.map((stock, index) => (
-                <button
+                <div
                   key={stock.symbol}
+                  ref={element => { optionRefs.current[index] = element; }}
+                  id={`${listId}-${index}`}
+                  role="option"
+                  aria-selected={index === selectedIndex}
+                  onMouseDown={event => event.preventDefault()}
                   className={cn(
                     'w-full px-4 py-3 text-left flex items-center gap-3 transition-colors',
                     index === selectedIndex
@@ -177,7 +193,7 @@ export function StockSearch({ className, onSelect, showTrending = true }: StockS
                   onMouseEnter={() => setSelectedIndex(index)}
                 >
                   <div className="p-1.5 rounded-lg bg-primary/10">
-                    {!query.trim() ? (
+                    {!query.trim() && popularStocks.length > 0 ? (
                       <span className="flex items-center justify-center h-4 w-4 text-xs font-bold text-primary">
                         {index + 1}
                       </span>
@@ -186,8 +202,8 @@ export function StockSearch({ className, onSelect, showTrending = true }: StockS
                     )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className="font-semibold">{getLocalizedName(stock, locale)}</span>
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="font-semibold break-words [overflow-wrap:anywhere]">{getLocalizedName(stock, locale)}</span>
                       <span className="text-xs px-1.5 py-0.5 rounded bg-muted text-muted-foreground">
                         {stock.category}
                       </span>
@@ -196,13 +212,13 @@ export function StockSearch({ className, onSelect, showTrending = true }: StockS
                       {stock.symbol}
                     </span>
                   </div>
-                </button>
+                </div>
               ))}
             </div>
           ) : (
-            <div className="px-4 py-8 text-center text-muted-foreground">
+            <div id={listId} role="listbox" aria-label={labels.results} className="px-4 py-8 text-center text-muted-foreground">
               <Search className="h-8 w-8 mx-auto mb-2 opacity-50" />
-              <p>{t('noResults')}</p>
+              <p role="option" aria-disabled="true" aria-selected="false">{t('noResults')}</p>
             </div>
           )}
         </div>
