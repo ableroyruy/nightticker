@@ -120,7 +120,7 @@ export function PopularSearchesPage() {
                         {ticker?.changePercent24h !== undefined && ticker?.changePercent24h !== null && (
                           <div className="flex items-center gap-2">
                             {/* Change Amount with background */}
-                            {ticker.change24h !== undefined && (
+                            {ticker.change24h != null && (
                               <span
                                 className={cn(
                                   'inline-flex items-center gap-1 text-xs font-medium px-1.5 py-0.5 rounded tabular-nums',

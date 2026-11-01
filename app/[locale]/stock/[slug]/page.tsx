@@ -7,7 +7,7 @@ import { ComplianceNotice } from '@/components/common/ComplianceNotice';
 import { StudyAILabBanner } from '@/components/common/StudyAILabBanner';
 import { InternalLinks } from '@/components/stock/InternalLinks';
 import { StockPageHeader } from '@/components/stock/StockPageHeader';
-import { getStockBySlug, getAllSlugs, categoryNames } from '@/lib/markets/stocks';
+import { getStockBySlug, stocks, categoryNames } from '@/lib/markets/stocks';
 import { Stock } from '@/lib/providers/types';
 
 type Props = {
@@ -15,7 +15,7 @@ type Props = {
 };
 
 export async function generateStaticParams() {
-  const slugs = getAllSlugs();
+  const slugs = stocks.map(stock => stock.slug);
   const locales = ['en', 'ko', 'ja', 'zh', 'pt', 'es'];
 
   return locales.flatMap((locale) =>
@@ -90,7 +90,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const stock = getStockBySlug(slug);
 
   if (!stock) {
-    return { title: 'Not Found' };
+    notFound();
   }
 
   const name =
@@ -320,8 +320,7 @@ export default async function StockPage({ params }: Props) {
     locale === 'pt' ? (stock.namePt ?? stock.name) :
     locale === 'es' ? (stock.nameEs ?? stock.name) :
     stock.name;
-  const { term, typeName } = getAssetType(stock, locale);
-  const isStock = ['US', 'KR', 'JP'].includes(stock.category);
+  const { term } = getAssetType(stock, locale);
   const faqData = getFAQData(stock, locale);
 
   // Labels by locale
@@ -395,7 +394,18 @@ export default async function StockPage({ params }: Props) {
 
         <Separator />
 
-        {/* Real-time Price Card */}
+        <section className="rounded-xl border p-4 space-y-2" aria-label={displayName}>
+          <h2 className="text-lg font-semibold">{displayName} ({stock.symbol})</h2>
+          <p>{categoryNames[stock.category][locale as keyof typeof categoryNames.US] ?? categoryNames[stock.category].en} · {stock.hyperliquidSymbol}</p>
+          {stock.description && <p className="text-muted-foreground">{stock.description}</p>}
+          <p className="text-sm text-muted-foreground">{locale === 'ko'
+            ? 'Hyperliquid XYZ 파생상품 시장의 참고가격입니다. 기초자산의 공식 거래소 가격이나 소유권을 의미하지 않습니다.'
+            : locale === 'ja' ? 'Hyperliquid XYZ デリバティブ市場の参考価格です。原資産の公式取引所価格や所有権を示すものではありません。'
+            : locale === 'zh' ? '此为 Hyperliquid XYZ 衍生品市场参考价格，不代表标的资产的官方交易所价格或所有权。'
+            : locale === 'pt' ? 'Preco de referencia do mercado de derivativos Hyperliquid XYZ. Nao representa a cotacao oficial nem a propriedade do ativo subjacente.'
+            : locale === 'es' ? 'Precio de referencia del mercado de derivados Hyperliquid XYZ. No representa la cotizacion oficial ni la propiedad del activo subyacente.'
+            : 'Reference price from the Hyperliquid XYZ derivatives market. It does not represent an official exchange quote or ownership of the underlying asset.'}</p>
+        </section>
         <MarketPriceCard hyperliquidSymbol={stock.hyperliquidSymbol} locale={locale} category={stock.category} />
 
         {locale === 'ko' && <StudyAILabBanner variant="investingGuide" />}

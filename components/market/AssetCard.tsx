@@ -1,6 +1,6 @@
 'use client';
 
-import { memo } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
@@ -79,9 +79,19 @@ function AssetCardInner({
   const { rankings } = useSearchRanking();
   const searchRank = rankings.find((r) => r.symbol === asset.symbol);
 
+  const cardRef = useRef<HTMLAnchorElement>(null);
+  const [visible, setVisible] = useState(false);
+  useEffect(() => {
+    const element = cardRef.current;
+    if (!element) return;
+    if (typeof IntersectionObserver === 'undefined') { const id = requestAnimationFrame(() => setVisible(true)); return () => cancelAnimationFrame(id); }
+    const observer = new IntersectionObserver(entries => setVisible(entries.some(entry => entry.isIntersecting)), { rootMargin: '160px' });
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, []);
   // Chart data
   const candleSymbol = asset.hyperliquidSymbol?.replace('xyz:', '') ?? asset.symbol;
-  const { candles, loading: chartLoading, error: chartError } = useCandleData(candleSymbol);
+  const { candles, loading: chartLoading, error: chartError } = useCandleData(candleSymbol, visible);
 
   // Use allMids-based price from props (real-time)
   const displayPrice = asset.price;
@@ -127,7 +137,7 @@ function AssetCardInner({
   const prefix = locale === 'en' ? '' : `/${locale}`;
 
   return (
-    <Link href={`${prefix}${href}`} className="block group">
+    <Link ref={cardRef} href={`${prefix}${href}`} className="block group">
       <div
         className={cn(
           'glass-card glass-card-hover rounded-xl p-2.5 h-full cursor-pointer overflow-hidden',

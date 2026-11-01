@@ -1,4 +1,5 @@
 import { ImageResponse } from 'next/og';
+import { notFound } from 'next/navigation';
 import { getStockBySlug } from '@/lib/markets/stocks';
 
 export const runtime = 'edge';
@@ -18,27 +19,7 @@ export default async function Image({
   const { locale, slug } = await params;
   const stock = getStockBySlug(slug);
 
-  if (!stock) {
-    return new ImageResponse(
-      (
-        <div
-          style={{
-            background: '#0f172a',
-            width: '100%',
-            height: '100%',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            color: 'white',
-            fontSize: '48px',
-          }}
-        >
-          Not Found
-        </div>
-      ),
-      { ...size }
-    );
-  }
+  if (!stock) notFound();
 
   const name =
     locale === 'ko' ? stock.nameKo :
@@ -47,8 +28,7 @@ export default async function Image({
     locale === 'pt' ? (stock.namePt ?? stock.name) :
     locale === 'es' ? (stock.nameEs ?? stock.name) :
     stock.name;
-  const priceLabel =
-    locale === 'ko' ? '야간 시세' :
+  const priceLabel = locale === 'ko' ? '야간 시세' :
     locale === 'ja' ? '夜間相場' :
     locale === 'zh' ? '夜间行情' :
     locale === 'pt' ? 'Preço Noturno' :

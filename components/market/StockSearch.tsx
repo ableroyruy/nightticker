@@ -64,7 +64,7 @@ export function StockSearch({ className, onSelect, showTrending = true }: StockS
       (stock) =>
         stock.symbol.toLowerCase().includes(lowerQuery) ||
         stock.name.toLowerCase().includes(lowerQuery) ||
-        stock.nameKo.includes(query)
+        [stock.nameKo, stock.nameJa, stock.nameZh, stock.namePt, stock.nameEs].some(name => name?.toLowerCase().includes(lowerQuery))
     );
   }, [query, popularStocks]);
 

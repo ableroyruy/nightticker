@@ -36,6 +36,7 @@ export function FavoritesPage() {
     const slug = fav.slug || stock.slug;
 
     return [{
+      nameJa: stock.nameJa, nameZh: stock.nameZh, namePt: stock.namePt, nameEs: stock.nameEs,
       symbol: stock.symbol,
       name: stock.name,
       nameKo: stock.nameKo,

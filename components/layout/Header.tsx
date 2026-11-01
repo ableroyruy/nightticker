@@ -48,7 +48,7 @@ export function Header() {
     { href: `${prefix}/losers`, label: t('topLosers'), icon: TrendingDown },
   ];
 
-  const categories: (StockCategory | 'all')[] = ['all', 'US', 'KR', 'JP', 'INDEX', 'ETF', 'COMMODITY', 'FX', 'SEMICONDUCTOR'];
+  const categories: (StockCategory | 'all')[] = ['all', 'US', 'KR', 'JP', 'INDEX', 'ETF', 'COMMODITY', 'FX', 'SPECIAL', 'SEMICONDUCTOR'];
 
   const isActive = (href: string) => {
     if (href === prefix || href === `${prefix}/`) {

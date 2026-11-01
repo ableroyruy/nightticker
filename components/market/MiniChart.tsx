@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef } from 'react';
+import { useLocale } from 'next-intl';
 import {
   createChart,
   IChartApi,
@@ -34,6 +35,8 @@ export function MiniChart({
   className,
   autoResize = false,
 }: MiniChartProps) {
+  const locale = useLocale();
+  const delayedLabels: Record<string, string> = { en: 'Delayed', ko: '지연', ja: '遅延', zh: '延迟', pt: 'Atrasado', es: 'Retrasado' };
   const containerRef = useRef<HTMLDivElement>(null);
   const chartRef = useRef<IChartApi | null>(null);
   const seriesRef = useRef<CandlestickSeriesApi | null>(null);
@@ -134,13 +137,13 @@ export function MiniChart({
 
     resizeObserver.observe(containerRef.current);
     return () => resizeObserver.disconnect();
-  }, [autoResize, height]);
+  }, [autoResize, height, candles]);
 
   const containerStyle = autoResize
     ? { height, width: '100%' }
     : { width, height };
 
-  if (loading) {
+  if (loading && !candles.length) {
     return (
       <Skeleton
         className={cn('rounded', className)}
@@ -149,7 +152,7 @@ export function MiniChart({
     );
   }
 
-  if (error) {
+  if (error && !candles.length) {
     return (
       <div
         className={cn(
@@ -178,10 +181,13 @@ export function MiniChart({
   }
 
   return (
-    <div
-      ref={containerRef}
-      className={cn('overflow-hidden pointer-events-none', className)}
-      style={containerStyle}
-    />
+    <div className={cn('relative overflow-hidden pointer-events-none', className)} style={containerStyle}>
+      <div ref={containerRef} style={containerStyle} className={error ? 'opacity-60' : undefined} />
+      {error && (
+        <span role="status" className="absolute right-1 top-0.5 rounded bg-background/90 px-1 text-[10px] text-muted-foreground">
+          {delayedLabels[locale] ?? delayedLabels.en}
+        </span>
+      )}
+    </div>
   );
 }

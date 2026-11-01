@@ -35,7 +35,7 @@ export function FavoritesSection({ tickers }: FavoritesSectionProps) {
     );
   }
 
-  if (favorites.length === 0) {
+  if (favorites.filter(fav => stocks.some(stock => stock.symbol === fav.symbol)).length === 0) {
     return (
       <section className="space-y-3">
         <h2 className="text-lg font-semibold flex items-center gap-2 pl-3">
@@ -52,7 +52,7 @@ export function FavoritesSection({ tickers }: FavoritesSectionProps) {
   }
 
   // Convert favorites to MarketAsset format with ticker data
-  const favoriteAssets: MarketAsset[] = favorites.map((fav) => {
+  const favoriteAssets: MarketAsset[] = favorites.filter(fav => stocks.some(stock => stock.symbol === fav.symbol)).map((fav) => {
     const ticker = tickers[fav.symbol];
     const stock = stocks.find((s) => s.symbol === fav.symbol);
     const slug = fav.slug || stock?.slug || fav.symbol.toLowerCase();
@@ -83,7 +83,7 @@ export function FavoritesSection({ tickers }: FavoritesSectionProps) {
           {t('title')}
         </h2>
         <span className="text-sm text-muted-foreground">
-          {favorites.length} {t('itemCount')}
+          {favoriteAssets.length} {t('itemCount')}
         </span>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">

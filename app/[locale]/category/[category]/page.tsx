@@ -257,6 +257,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
         en: `${BASE_URL}/category/${categorySlug}`,
         ko: `${BASE_URL}/ko/category/${categorySlug}`,
         ja: `${BASE_URL}/ja/category/${categorySlug}`,
+        zh: `${BASE_URL}/zh/category/${categorySlug}`,
+        pt: `${BASE_URL}/pt/category/${categorySlug}`,
+        es: `${BASE_URL}/es/category/${categorySlug}`,
       },
     },
     openGraph: {
@@ -289,5 +292,6 @@ export default async function Page({ params }: Props) {
     notFound();
   }
 
-  return <CategoryPage category={category} />;
+  const prefix = locale === 'en' ? '' : `/${locale}`;
+  return <><CategoryPage category={category} /><section className="container py-6"><h2 className="text-lg font-semibold mb-3">{locale === 'ko' ? '전체 종목' : 'Market directory'}</h2><ul className="flex flex-wrap gap-3">{stocks.map(stock => <li key={stock.symbol}><a className="text-sm underline" href={`${prefix}/stock/${stock.slug}`}>{locale === 'ko' ? stock.nameKo : stock.name} ({stock.symbol})</a></li>)}</ul></section></>;
 }

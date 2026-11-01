@@ -71,7 +71,7 @@ export function TrendingTicker({
 
   if (topRankings.length === 0) return null;
 
-  const currentItem = topRankings[currentIndex];
+  const currentItem = topRankings[currentIndex % topRankings.length];
   const stock = getStockBySymbol(currentItem.symbol);
   if (!stock) return null;
 

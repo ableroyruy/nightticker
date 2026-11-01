@@ -1,222 +1,178 @@
 'use client';
 
-import {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  useCallback,
-  useMemo,
-  useRef,
-  ReactNode,
-} from 'react';
+import { createContext, useContext, useState, useEffect, useCallback, useMemo, useRef, ReactNode } from 'react';
+import { stocks } from '@/lib/markets/stocks';
+import { defaultRankings, MAX_BATCH_SIZE, MAX_EVENT_AGE_MS, validateBatch, type RankingData, type RankingItem, type ViewBatch } from '@/lib/ranking/core';
 
-// Default popular stocks (fallback)
-const DEFAULT_POPULAR_STOCKS = [
-  'NVDA', 'TSLA', 'AAPL', 'SMSN', 'SP500',
-  'MSFT', 'GOOGL', 'AMZN', 'META', 'AMD',
-];
-
-export interface SearchRankingItem {
-  symbol: string;
-  views: number;
-  rank: number;
-  previousRank: number | null;
-  rankChange: number | null;
-}
-
+export type SearchRankingItem = RankingItem;
 interface SearchRankingContextValue {
   rankings: SearchRankingItem[];
   recordPageView: (symbol: string) => void;
   getTopRankings: (limit?: number) => SearchRankingItem[];
   isLoading: boolean;
 }
-
 const SearchRankingContext = createContext<SearchRankingContextValue | null>(null);
+const active = new Set(stocks.map(stock => stock.symbol));
+const CACHE_KEY = 'nightticker_ranking_cache_v3';
+const QUEUE_KEY = 'nightticker_ranking_queue_v1';
+const MAX_QUEUED_BATCHES = 10;
 
-// Get default rankings
-const getDefaultRankings = (): SearchRankingItem[] => {
-  return DEFAULT_POPULAR_STOCKS.map((symbol, index) => ({
-    symbol,
-    views: 0,
-    rank: index + 1,
-    previousRank: null,
-    rankChange: null,
-  }));
-};
-
-// Local storage cache key - v2 to invalidate old cache
-const CACHE_KEY = 'nightticker_ranking_cache_v2';
-const CACHE_TTL = 30 * 60 * 1000; // 30 minute cache
-
-interface CachedData {
-  rankings: SearchRankingItem[];
-  timestamp: number;
+function readCache(): RankingData | null {
+  try {
+    const value = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null') as RankingData | null;
+    if (value && Array.isArray(value.rankings) && Date.now() < value.expiresAt && value.lastUpdated <= Date.now()) return value;
+  } catch { /* Browser storage may be disabled. */ }
+  return null;
 }
 
-// Load from cache
-const loadCache = (): SearchRankingItem[] | null => {
-  if (typeof window === 'undefined') return null;
-  try {
-    const cached = localStorage.getItem(CACHE_KEY);
-    if (cached) {
-      const data: CachedData = JSON.parse(cached);
-      // Use cache if less than 30 minutes old
-      if (Date.now() - data.timestamp < CACHE_TTL) {
-        return data.rankings;
-      }
-    }
-  } catch (e) {
-    console.error('Cache load error:', e);
-  }
-  return null;
-};
-
-// Save to cache
-const saveCache = (rankings: SearchRankingItem[], timestamp: number): void => {
-  if (typeof window === 'undefined') return;
-  try {
-    const data: CachedData = { rankings, timestamp };
-    localStorage.setItem(CACHE_KEY, JSON.stringify(data));
-  } catch (e) {
-    console.error('Cache save error:', e);
-  }
-};
-
 export function SearchRankingProvider({ children }: { children: ReactNode }) {
-  const [rankings, setRankings] = useState<SearchRankingItem[]>(getDefaultRankings);
+  const [rankings, setRankings] = useState<SearchRankingItem[]>(() => defaultRankings(active));
   const [isLoading, setIsLoading] = useState(true);
-  const pendingViewsRef = useRef<string[]>([]);
-  const flushTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  const queueRef = useRef<ViewBatch[]>([]);
+  const loadedRef = useRef(false);
+  const mountedRef = useRef(false);
+  const flushingRef = useRef(false);
+  const sendingIdRef = useRef<string | null>(null);
+  const flushTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const failuresRef = useRef(0);
 
-  // Fetch rankings from API with retry
-  const fetchRankings = useCallback(async function fetchWithRetry(retryCount = 0): Promise<SearchRankingItem[] | null> {
-    const maxRetries = 2;
+  const persistQueue = useCallback(() => {
+    try { sessionStorage.setItem(QUEUE_KEY, JSON.stringify(queueRef.current)); } catch { /* In-memory delivery still works. */ }
+  }, []);
+
+  const loadQueue = useCallback(() => {
+    if (loadedRef.current) return;
+    loadedRef.current = true;
     try {
-      const response = await fetch('/api/ranking');
-      if (response.ok) {
-        const data = await response.json();
-        if (data.rankings && data.rankings.length > 0) {
-          setRankings(data.rankings);
-          saveCache(data.rankings, data.lastUpdated);
-          return data.rankings;
-        }
+      const stored: unknown = JSON.parse(sessionStorage.getItem(QUEUE_KEY) || '[]');
+      if (Array.isArray(stored)) {
+        queueRef.current = stored.slice(0, MAX_QUEUED_BATCHES).map(value => validateBatch(value, active, Date.now())).filter((value): value is ViewBatch => value !== null);
+        for (const batch of queueRef.current) Object.freeze(batch.events);
+      }
+    } catch { /* A malformed queue must not break the page. */ }
+  }, []);
+
+  const flushPendingViews = useCallback(async function flush(): Promise<void> {
+    loadQueue();
+    if (flushingRef.current) return;
+    if (flushTimerRef.current) { clearTimeout(flushTimerRef.current); flushTimerRef.current = null; }
+    queueRef.current = queueRef.current.filter(batch => batch.events.every(event => Date.now() - event.timestamp < MAX_EVENT_AGE_MS));
+    const batch = queueRef.current[0];
+    persistQueue();
+    if (!batch) return;
+    flushingRef.current = true;
+    sendingIdRef.current = batch.id;
+    // Freeze the batch before the first attempt. Future views get a new id,
+    // so retries and pagehide never reuse an id for a changed payload.
+    Object.freeze(batch.events);
+    let delay = 0;
+    try {
+      const response = await fetch('/api/ranking', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(batch), keepalive: true, signal: AbortSignal.timeout(10_000),
+      });
+      if (response.ok || [400, 403, 409, 413].includes(response.status)) {
+        queueRef.current = queueRef.current.filter(item => item.id !== batch.id);
+        failuresRef.current = 0;
       } else {
-        console.error('Fetch rankings failed:', response.status, response.statusText);
+        failuresRef.current++;
+        const retrySeconds = Number(response.headers.get('Retry-After'));
+        delay = Math.min(300_000, Math.max(Number.isFinite(retrySeconds) ? retrySeconds * 1000 : 0, 30_000 * 2 ** Math.min(failuresRef.current - 1, 4)));
       }
-    } catch (e) {
-      console.error('Fetch rankings error:', e);
-      // Retry on network error
-      if (retryCount < maxRetries) {
-        await new Promise((resolve) => setTimeout(resolve, 1000 * (retryCount + 1)));
-        return fetchWithRetry(retryCount + 1);
-      }
+    } catch {
+      failuresRef.current++;
+      delay = Math.min(300_000, 30_000 * 2 ** Math.min(failuresRef.current - 1, 4));
+    } finally {
+      flushingRef.current = false;
+      sendingIdRef.current = null;
+      persistQueue();
+      if (mountedRef.current && queueRef.current.length) flushTimerRef.current = setTimeout(flush, delay || 2000);
     }
-    return null;
-  }, []);
+  }, [loadQueue, persistQueue]);
 
-  // Flush pending views to server
-  const flushPendingViews = useCallback(async () => {
-    if (pendingViewsRef.current.length === 0) return;
-
-    const views = [...pendingViewsRef.current];
-    pendingViewsRef.current = [];
-
-    // Send each view (could batch but keeping simple)
-    for (const symbol of views) {
-      try {
-        await fetch('/api/ranking', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ symbol }),
-        });
-      } catch (e) {
-        console.error('Record view error:', e);
-      }
+  const recordPageView = useCallback((symbol: string) => {
+    if (!active.has(symbol)) return;
+    loadQueue();
+    const now = Date.now();
+    const tail = queueRef.current.at(-1);
+    // Suppress React Strict Mode's duplicate mount effect without suppressing a
+    // later visit to the same stock. No extra Redis read is needed.
+    const last = tail?.events.at(-1);
+    if (last?.symbol === symbol && now - last.timestamp < 1000) return;
+    if (tail && tail.id !== sendingIdRef.current && !Object.isFrozen(tail.events) && tail.events.length < MAX_BATCH_SIZE) {
+      tail.events.push({ symbol, timestamp: now });
+    } else {
+      if (queueRef.current.length >= MAX_QUEUED_BATCHES) return;
+      queueRef.current.push({ id: crypto.randomUUID(), events: [{ symbol, timestamp: now }] });
     }
+    persistQueue();
+    if (!flushTimerRef.current && !flushingRef.current) flushTimerRef.current = setTimeout(flushPendingViews, 2000);
+  }, [loadQueue, persistQueue, flushPendingViews]);
 
-    // Rankings refresh on their own 30-minute schedule.
-  }, []);
-
-  // Record a page view (debounced)
-  const recordPageView = useCallback(
-    (symbol: string) => {
-      pendingViewsRef.current.push(symbol);
-
-      // Debounce: flush after 2 seconds of no new views
-      if (flushTimeoutRef.current) {
-        clearTimeout(flushTimeoutRef.current);
-      }
-      flushTimeoutRef.current = setTimeout(() => {
-        flushPendingViews();
-      }, 2000);
-    },
-    [flushPendingViews]
-  );
-
-  // Initialize
   useEffect(() => {
-    // Try cache first for instant display
+    mountedRef.current = true;
+    loadQueue();
+    // Persisted batches may have been sent before a reload; never append to them.
+    for (const batch of queueRef.current) Object.freeze(batch.events);
     let cancelled = false;
-    Promise.resolve().then(async () => {
-      if (cancelled) return;
-      const cached = loadCache();
-      if (cached && cached.length > 0) {
-        setRankings(cached);
-      } else {
-        await fetchRankings();
+    let refreshTimer: ReturnType<typeof setTimeout> | null = null;
+    let fetching = false;
+    const schedule = (delay: number) => {
+      if (!cancelled) refreshTimer = setTimeout(refresh, Math.max(30_000, delay));
+    };
+    async function refresh() {
+      if (cancelled || fetching) return;
+      fetching = true;
+      try {
+        const response = await fetch('/api/ranking', { signal: AbortSignal.timeout(10_000) });
+        if (!response.ok) throw new Error('Ranking unavailable');
+        const data: RankingData = await response.json();
+        if (!Array.isArray(data.rankings) || !Number.isFinite(data.expiresAt)) throw new Error('Invalid ranking response');
+        if (cancelled) return;
+        setRankings(data.rankings.filter(item => active.has(item.symbol)));
+        if (!data.degraded) {
+          try { localStorage.setItem(CACHE_KEY, JSON.stringify(data)); } catch { /* Optional cache. */ }
+        }
+        schedule(data.degraded ? 30_000 : data.expiresAt - Date.now());
+      } catch {
+        schedule(60_000);
+      } finally {
+        fetching = false;
+        if (!cancelled) setIsLoading(false);
       }
-      if (!cancelled) setIsLoading(false);
+    }
+    Promise.resolve().then(() => {
+      if (cancelled) return;
+      const cached = readCache();
+      if (cached) {
+        setRankings(cached.rankings.filter(item => active.has(item.symbol)));
+        setIsLoading(false);
+        schedule(cached.expiresAt - Date.now());
+      } else void refresh();
+      if (queueRef.current.length && !flushTimerRef.current) flushTimerRef.current = setTimeout(flushPendingViews, 2000);
     });
-
-    // Refresh every 30 minutes
-    const interval = setInterval(() => {
-      fetchRankings();
-    }, CACHE_TTL);
-
-    // Cleanup
+    const flushOnHide = () => { if (document.visibilityState === 'hidden') void flushPendingViews(); };
+    const flushOnPageHide = () => { void flushPendingViews(); };
+    document.addEventListener('visibilitychange', flushOnHide);
+    window.addEventListener('pagehide', flushOnPageHide);
     return () => {
       cancelled = true;
-      clearInterval(interval);
-      if (flushTimeoutRef.current) {
-        clearTimeout(flushTimeoutRef.current);
-        // Flush any pending views on unmount
-        flushPendingViews();
-      }
+      mountedRef.current = false;
+      if (refreshTimer) clearTimeout(refreshTimer);
+      if (flushTimerRef.current) { clearTimeout(flushTimerRef.current); flushTimerRef.current = null; }
+      document.removeEventListener('visibilitychange', flushOnHide);
+      window.removeEventListener('pagehide', flushOnPageHide);
+      persistQueue();
     };
-  }, [fetchRankings, flushPendingViews]);
+  }, [loadQueue, flushPendingViews, persistQueue]);
 
-  // Get top N rankings
-  const getTopRankings = useCallback(
-    (limit: number = 10) => {
-      return rankings.slice(0, limit);
-    },
-    [rankings]
-  );
-
-  const value = useMemo(
-    () => ({
-      rankings,
-      recordPageView,
-      getTopRankings,
-      isLoading,
-    }),
-    [rankings, recordPageView, getTopRankings, isLoading]
-  );
-
-  return (
-    <SearchRankingContext.Provider value={value}>
-      {children}
-    </SearchRankingContext.Provider>
-  );
+  const getTopRankings = useCallback((limit = 10) => rankings.slice(0, limit), [rankings]);
+  const value = useMemo(() => ({ rankings, recordPageView, getTopRankings, isLoading }), [rankings, recordPageView, getTopRankings, isLoading]);
+  return <SearchRankingContext.Provider value={value}>{children}</SearchRankingContext.Provider>;
 }
 
 export function useSearchRanking() {
   const context = useContext(SearchRankingContext);
-  if (!context) {
-    throw new Error(
-      'useSearchRanking must be used within a SearchRankingProvider'
-    );
-  }
+  if (!context) throw new Error('useSearchRanking must be used within a SearchRankingProvider');
   return context;
 }

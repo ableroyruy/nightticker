@@ -16,7 +16,7 @@ interface InternalLinksProps {
   locale: string;
 }
 
-const allCategories: StockCategory[] = ['US', 'KR', 'JP', 'INDEX', 'ETF', 'COMMODITY', 'FX'];
+const allCategories: StockCategory[] = ['US', 'KR', 'JP', 'INDEX', 'ETF', 'COMMODITY', 'FX', 'SPECIAL'];
 
 export function InternalLinks({ stock, locale }: InternalLinksProps) {
   const t = useTranslations('stockDetail');

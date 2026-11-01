@@ -32,6 +32,7 @@ export type StockSector =
   | 'Other';
 
 export interface Stock {
+  description?: string;
   symbol: string;
   name: string;
   nameKo: string;

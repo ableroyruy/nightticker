@@ -13,7 +13,7 @@ import { stocks, getStocksBySectorForCategory } from '@/lib/markets/stocks';
 import { MarketAsset, MarketType } from '@/lib/types/market';
 import { cn } from '@/lib/utils';
 
-type SectionId = 'favorites' | 'KR' | 'US' | 'SEMICONDUCTOR' | 'INDEX' | 'ETF' | 'COMMODITY' | 'FX';
+type SectionId = 'favorites' | 'KR' | 'US' | 'SEMICONDUCTOR' | 'INDEX' | 'ETF' | 'COMMODITY' | 'FX' | 'JP' | 'SPECIAL';
 
 // Section background colors - alternating warm/cool for better contrast
 const sectionBgColors: Record<SectionId, string> = {
@@ -25,14 +25,16 @@ const sectionBgColors: Record<SectionId, string> = {
   ETF: 'bg-gradient-to-br from-rose-500/8 to-pink-500/5',
   COMMODITY: 'bg-gradient-to-br from-yellow-500/8 to-amber-500/5',
   FX: 'bg-gradient-to-br from-sky-500/8 to-blue-500/5',
+  JP: 'bg-gradient-to-br from-red-500/8 to-rose-500/5',
+  SPECIAL: 'bg-gradient-to-br from-fuchsia-500/8 to-purple-500/5',
 };
 
 // Fixed section order based on locale
 const getSectionOrder = (locale: string): SectionId[] => {
   if (locale === 'ko') {
-    return ['favorites', 'KR', 'US', 'SEMICONDUCTOR', 'INDEX', 'ETF', 'COMMODITY', 'FX'];
+    return ['favorites', 'KR', 'US', 'SEMICONDUCTOR', 'INDEX', 'ETF', 'COMMODITY', 'FX', 'JP', 'SPECIAL'];
   }
-  return ['favorites', 'US', 'KR', 'SEMICONDUCTOR', 'INDEX', 'ETF', 'COMMODITY', 'FX'];
+  return ['favorites', 'US', 'KR', 'SEMICONDUCTOR', 'INDEX', 'ETF', 'COMMODITY', 'FX', 'JP', 'SPECIAL'];
 };
 
 export function HomePage() {
@@ -105,6 +107,8 @@ export function HomePage() {
       ETF: etfAssets,
       COMMODITY: commodityAssets,
       FX: fxAssets,
+      JP: allAssets.filter(a => a.market === 'JP'),
+      SPECIAL: allAssets.filter(a => a.market === 'SPECIAL'),
       SEMICONDUCTOR: semiconductorAssets,
     };
   }, [allAssets, tickers]);

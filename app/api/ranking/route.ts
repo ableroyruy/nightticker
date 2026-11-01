@@ -1,263 +1,156 @@
+import { createHash, randomUUID } from 'node:crypto';
 import { Redis } from '@upstash/redis';
 import { NextRequest, NextResponse } from 'next/server';
+import { stocks } from '@/lib/markets/stocks';
+import { aggregateRankings, bucketKeys, BUCKET_MS, defaultRankings, remainingCacheSeconds, RANKING_TTL_MS, validateBatch, type RankingData } from '@/lib/ranking/core';
+import { PUBLISH_SCRIPT, RECORD_BATCH_SCRIPT, RELEASE_SCRIPT } from '@/lib/ranking/scripts';
 
-const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL!,
-  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
-});
-
-const FIVE_MINUTES_MS = 5 * 60 * 1000;
-const ONE_HOUR_MS = 60 * 60 * 1000;
-const TWENTY_FOUR_HOURS_MS = 24 * 60 * 60 * 1000;
-const BUCKET_TTL_SECONDS = 25 * 60 * 60; // 25 hours TTL
-const SNAPSHOT_TTL_SECONDS = 25 * 60 * 60; // 25 hours TTL
-const CACHE_TTL_SECONDS = 30 * 60; // 30 minutes cache
-const CACHE_KEY = 'ranking:cache';
-
-// Default popular stocks for cold start
-const DEFAULT_POPULAR_STOCKS = [
-  'NVDA', 'TSLA', 'AAPL', 'SMSN', 'SP500',
-  'MSFT', 'GOOGL', 'AMZN', 'META', 'AMD',
-];
-
-interface RankingItem {
-  symbol: string;
-  views: number;
-  rank: number;
-  previousRank: number | null;
-  rankChange: number | null;
+const CACHE_KEY = 'ranking:cache:v3';
+const LOCK_KEY = 'ranking:refresh:v3';
+const active = new Set(stocks.map(stock => stock.symbol));
+let redisInstance: Redis | null = null;
+function getRedis(): Redis {
+  const url = process.env.UPSTASH_REDIS_REST_URL;
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+  if (!url || !token) throw new Error('Ranking storage unavailable');
+  return redisInstance ??= new Redis({ url, token, retry: { retries: 1, backoff: () => 200 }, signal: () => AbortSignal.timeout(5000) });
 }
 
-// ===== In-memory cache for GET (reduces Redis reads) =====
-let memoryCache: { data: { rankings: RankingItem[]; lastUpdated: number } | null; expires: number } = {
-  data: null,
-  expires: 0,
-};
-const MEMORY_CACHE_TTL_MS = 30 * 60 * 1000; // 30 minutes memory cache
+let memoryCache: RankingData | null = null;
+let inFlight: Promise<RankingData> | null = null;
+let retryAfter = 0;
 
-// ===== In-memory write buffer (reduces Redis writes) =====
-const writeBuffer: Map<string, number> = new Map();
-let lastFlushTime = Date.now();
-const FLUSH_INTERVAL_MS = 30 * 60 * 1000; // Flush on the next POST after 30 minutes
-const FLUSH_THRESHOLD = 100; // Or when buffer has 100+ items
-
-// Get the start of the current 5-minute bucket
-function getBucketTimestamp(timestamp: number): number {
-  return Math.floor(timestamp / FIVE_MINUTES_MS) * FIVE_MINUTES_MS;
+function fallback(now: number): RankingData {
+  const recent = memoryCache && now - memoryCache.lastUpdated < 24 * 60 * 60 * 1000 ? memoryCache : null;
+  return { rankings: recent?.rankings ?? defaultRankings(active), lastUpdated: recent?.lastUpdated ?? 0, expiresAt: now, degraded: true };
 }
 
-// Get the start of the current hour
-function getHourTimestamp(timestamp: number): number {
-  return Math.floor(timestamp / ONE_HOUR_MS) * ONE_HOUR_MS;
-}
-
-// Get bucket key for Redis
-function getBucketKey(timestamp: number): string {
-  return `ranking:bucket:${timestamp}`;
-}
-
-// Get hourly snapshot key for Redis
-function getSnapshotKey(timestamp: number): string {
-  return `ranking:snapshot:${timestamp}`;
-}
-
-// GET - Fetch rankings (with server-side cache)
-export async function GET() {
-  try {
-    const now = Date.now();
-
-    // 1. Check memory cache first (0 Redis calls)
-    if (memoryCache.data && now < memoryCache.expires) {
-      return NextResponse.json(memoryCache.data, {
-        headers: {
-          'Cache-Control': 'public, max-age=0, s-maxage=1800, stale-while-revalidate=60',
-        },
-      });
-    }
-
-    // 2. Check Redis cache (1 Redis call)
-    const cached = await redis.get(CACHE_KEY) as { rankings: RankingItem[]; lastUpdated: number } | null;
-    if (cached && now - cached.lastUpdated < MEMORY_CACHE_TTL_MS) {
-      // Update memory cache
-      memoryCache = { data: cached, expires: cached.lastUpdated + MEMORY_CACHE_TTL_MS };
-      return NextResponse.json(cached, {
-        headers: {
-          'Cache-Control': 'public, max-age=0, s-maxage=1800, stale-while-revalidate=60',
-        },
-      });
-    }
-
-    // 3. Cache miss - aggregate from buckets
-    const cutoff24h = now - TWENTY_FOUR_HOURS_MS;
-
-    // Get all bucket keys from last 24 hours
-    const bucketKeys: string[] = [];
-    let bucketTime = getBucketTimestamp(now);
-    while (bucketTime > cutoff24h) {
-      bucketKeys.push(getBucketKey(bucketTime));
-      bucketTime -= FIVE_MINUTES_MS;
-    }
-
-    // Fetch all buckets in parallel (pipeline)
-    const pipeline = redis.pipeline();
-    bucketKeys.forEach((key) => pipeline.hgetall(key));
-    const results = await pipeline.exec();
-
-    // Aggregate view counts
-    const viewCounts: Record<string, number> = {};
-    results.forEach((result) => {
-      if (result && typeof result === 'object') {
-        Object.entries(result).forEach(([symbol, count]) => {
-          const numCount = typeof count === 'number' ? count : parseInt(count as string, 10);
-          if (!isNaN(numCount)) {
-            viewCounts[symbol] = (viewCounts[symbol] || 0) + numCount;
-          }
-        });
-      }
-    });
-
-    // Get previous rankings from 1 hour ago snapshot
-    const previousHourTimestamp = getHourTimestamp(now) - ONE_HOUR_MS;
-    const previousSnapshotKey = getSnapshotKey(previousHourTimestamp);
-    const previousRanks = (await redis.hgetall(previousSnapshotKey)) as Record<string, number> | null;
-
-    // If no data, return defaults (but don't cache defaults)
-    if (Object.keys(viewCounts).length === 0) {
-      return NextResponse.json(
-        {
-          rankings: DEFAULT_POPULAR_STOCKS.map((symbol, index) => ({
-            symbol,
-            views: 0,
-            rank: index + 1,
-            previousRank: null,
-            rankChange: null,
-          })),
-          lastUpdated: now,
-        },
-        {
-          headers: {
-            'Cache-Control': 'public, max-age=0, s-maxage=1800, stale-while-revalidate=60',
-          },
-        }
-      );
-    }
-
-    // Sort by view count (descending)
-    const sorted = Object.entries(viewCounts).sort((a, b) => b[1] - a[1]);
-
-    const rankings: RankingItem[] = sorted.map(([symbol, views], index) => {
-      const rank = index + 1;
-      const prevRank = previousRanks?.[symbol];
-      const previousRank = prevRank !== undefined ? Number(prevRank) : null;
-      const rankChange = previousRank !== null ? previousRank - rank : null;
-
-      return { symbol, views, rank, previousRank, rankChange };
-    });
-
-    const response = { rankings, lastUpdated: now };
-
-    // Cache the result for 30 minutes in Redis
-    await redis.set(CACHE_KEY, JSON.stringify(response), { ex: CACHE_TTL_SECONDS });
-
-    // Also update memory cache
-    memoryCache = { data: response, expires: now + MEMORY_CACHE_TTL_MS };
-
-    return NextResponse.json(response, {
-      headers: {
-        'Cache-Control': 'public, max-age=0, s-maxage=1800, stale-while-revalidate=60',
-      },
-    });
-  } catch (error) {
-    console.error('GET ranking error:', error);
-    return NextResponse.json({
-      rankings: DEFAULT_POPULAR_STOCKS.map((symbol, index) => ({
-        symbol,
-        views: 0,
-        rank: index + 1,
-        previousRank: null,
-        rankChange: null,
-      })),
-      lastUpdated: Date.now(),
-    });
-  }
-}
-
-// Flush write buffer to Redis
-async function flushWriteBuffer(): Promise<void> {
-  if (writeBuffer.size === 0) return;
-
+async function loadRankings(): Promise<RankingData> {
   const now = Date.now();
-  const currentBucketTime = getBucketTimestamp(now);
-  const bucketKey = getBucketKey(currentBucketTime);
-
-  // Batch all writes into a single pipeline
-  const pipeline = redis.pipeline();
-  for (const [symbol, count] of writeBuffer) {
-    pipeline.hincrby(bucketKey, symbol, count);
+  const redis = getRedis();
+  const cached = await redis.get<RankingData>(CACHE_KEY);
+  if (cached?.rankings && Number.isFinite(cached.expiresAt)) {
+    memoryCache = cached;
+    if (now < cached.expiresAt) return cached;
   }
-  pipeline.expire(bucketKey, BUCKET_TTL_SECONDS);
-  await pipeline.exec();
 
-  // Clear buffer and update flush time
-  writeBuffer.clear();
-  lastFlushTime = now;
-}
-
-// POST - Record a page view (with write buffering)
-export async function POST(request: NextRequest) {
+  const owner = randomUUID();
+  const acquired = await redis.set(LOCK_KEY, owner, { nx: true, ex: 30 });
+  if (!acquired) {
+    // Do not fan out 288 reads while another instance rebuilds the snapshot.
+    retryAfter = now + 5_000;
+    return fallback(now);
+  }
   try {
-    const { symbol } = await request.json();
-
-    if (!symbol || typeof symbol !== 'string') {
-      return NextResponse.json({ error: 'Invalid symbol' }, { status: 400 });
+    const keys = bucketKeys(now);
+    const hour = Math.floor(now / 3_600_000) * 3_600_000;
+    const pipeline = redis.pipeline();
+    for (const key of keys) pipeline.hgetall(key);
+    pipeline.hgetall(`ranking:snapshot:${hour - 3_600_000}`);
+    const results = await pipeline.exec();
+    const previous = results.pop() as Record<string, unknown> | null;
+    const ranked = aggregateRankings(results, previous, active);
+    const data: RankingData = {
+      rankings: ranked.length ? ranked : defaultRankings(active),
+      lastUpdated: now,
+      expiresAt: now + RANKING_TTL_MS,
+    };
+    const snapshot = Object.fromEntries(data.rankings.map(item => [item.symbol, item.rank]));
+    const published = await redis.eval(PUBLISH_SCRIPT, [LOCK_KEY, CACHE_KEY, `ranking:snapshot:${hour}`], [owner, JSON.stringify(data), JSON.stringify(snapshot)]);
+    if (published !== 1) {
+      retryAfter = Date.now() + 5_000;
+      return fallback(Date.now());
     }
-
-    const now = Date.now();
-
-    // Add to write buffer (no Redis call)
-    writeBuffer.set(symbol, (writeBuffer.get(symbol) || 0) + 1);
-
-    // Check if we should flush the buffer
-    const shouldFlush =
-      writeBuffer.size >= FLUSH_THRESHOLD ||
-      now - lastFlushTime >= FLUSH_INTERVAL_MS;
-
-    if (shouldFlush) {
-      // Flush buffer to Redis (batched writes)
-      await flushWriteBuffer();
-
-      // Check if we need to save hourly snapshot (only on flush)
-      const currentHourTimestamp = getHourTimestamp(now);
-      const snapshotKey = getSnapshotKey(currentHourTimestamp);
-      const snapshotExists = await redis.exists(snapshotKey);
-
-      if (!snapshotExists) {
-        const currentRankings = await getCurrentRankings();
-        if (currentRankings.length > 0) {
-          const snapshotData: Record<string, number> = {};
-          currentRankings.forEach((item) => {
-            snapshotData[item.symbol] = item.rank;
-          });
-          await redis.hset(snapshotKey, snapshotData);
-          await redis.expire(snapshotKey, SNAPSHOT_TTL_SECONDS);
-        }
-      }
-    }
-
-    return NextResponse.json({ success: true });
+    memoryCache = data;
+    return data;
   } catch (error) {
-    console.error('POST ranking error:', error);
-    const message = error instanceof Error ? error.message : 'Unknown error';
-    return NextResponse.json({ error: 'Failed to record view', message }, { status: 500 });
+    // Lease expiry also recovers the lock if Redis is unreachable during release.
+    await redis.eval(RELEASE_SCRIPT, [LOCK_KEY], [owner]).catch(() => undefined);
+    throw error;
   }
 }
 
-// Helper to get current rankings from cache (for saving as snapshot)
-async function getCurrentRankings(): Promise<RankingItem[]> {
-  // Try cache first (1 Redis call instead of 288)
-  const cached = await redis.get(CACHE_KEY) as { rankings: RankingItem[]; lastUpdated: number } | null;
-  if (cached && cached.rankings) {
-    return cached.rankings;
+export async function GET() {
+  let data: RankingData;
+  const now = Date.now();
+  if (memoryCache && now < memoryCache.expiresAt) data = memoryCache;
+  else if (now < retryAfter) data = fallback(now);
+  else {
+    inFlight ??= loadRankings().finally(() => { inFlight = null; });
+    try {
+      data = await inFlight;
+    } catch {
+      retryAfter = Date.now() + 30_000;
+      data = fallback(Date.now());
+    }
   }
-  return [];
+  const ttl = remainingCacheSeconds(data, Date.now());
+  return NextResponse.json(data, { headers: {
+    // Cache only the remaining lifetime, never renew an old snapshot for 30m.
+    'Cache-Control': `public, max-age=0, s-maxage=${data.degraded ? 5 : ttl}, stale-while-revalidate=60`,
+    ...(data.degraded ? { 'Retry-After': '30' } : {}),
+  } });
+}
+
+export async function POST(request: NextRequest) {
+  if (request.headers.get('origin') && request.headers.get('origin') !== request.nextUrl.origin) {
+    return NextResponse.json({ error: 'Invalid origin' }, { status: 403 });
+  }
+  // Bound parsing work as well as Redis work, including requests without Content-Length.
+  const declaredLength = Number(request.headers.get('content-length') || 0);
+  if (declaredLength > 8192) return NextResponse.json({ error: 'Request too large' }, { status: 413 });
+  let raw: unknown;
+  try {
+    const reader = request.body?.getReader();
+    if (!reader) return NextResponse.json({ error: 'Invalid batch' }, { status: 400 });
+    const chunks: Uint8Array[] = [];
+    let size = 0;
+    while (true) {
+      const { done, value } = await reader.read();
+      if (done) break;
+      size += value.byteLength;
+      if (size > 8192) {
+        await reader.cancel();
+        return NextResponse.json({ error: 'Request too large' }, { status: 413 });
+      }
+      chunks.push(value);
+    }
+    raw = JSON.parse(Buffer.concat(chunks).toString('utf8'));
+  } catch {
+    return NextResponse.json({ error: 'Invalid batch' }, { status: 400 });
+  }
+  const now = Date.now();
+  // Keep old deployed browser tabs working during the rollout. New clients always
+  // send stable batch ids; the legacy endpoint cannot provide retry deduplication.
+  if (raw && typeof raw === 'object' && 'symbol' in raw && !('events' in raw)) {
+    raw = { id: randomUUID(), events: [{ symbol: raw.symbol, timestamp: now }] };
+  }
+  const batch = validateBatch(raw, active, now);
+  if (!batch) return NextResponse.json({ error: 'Invalid batch' }, { status: 400 });
+
+  const bucketMap = new Map<string, number>();
+  const keys = [`ranking:batch:${batch.id}`];
+  // Hash the platform-provided client address; no raw address is stored in Redis.
+  // Deployments behind another proxy must overwrite this header at their trusted edge.
+  const address = request.headers.get('x-vercel-forwarded-for')?.split(',')[0]?.trim() ?? request.headers.get('x-real-ip') ?? request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown';
+  const digest = (value: string) => createHash('sha256').update(value).digest('hex');
+  keys.push(`ranking:rate:${digest(address)}:${Math.floor(now / 60_000)}`);
+  const counts = new Map<string, { key: number; symbol: string; count: number }>();
+  for (const event of batch.events) {
+    const bucket = `ranking:bucket:${Math.floor(event.timestamp / BUCKET_MS) * BUCKET_MS}`;
+    if (!bucketMap.has(bucket)) { keys.push(bucket); bucketMap.set(bucket, keys.length); }
+    const key = bucketMap.get(bucket)!;
+    const group = `${key}:${event.symbol}`;
+    const item = counts.get(group) ?? { key, symbol: event.symbol, count: 0 };
+    item.count++;
+    counts.set(group, item);
+  }
+  try {
+    const result = await getRedis().eval(RECORD_BATCH_SCRIPT, keys, [digest(JSON.stringify(batch.events)), batch.events.length, 120, JSON.stringify([...counts.values()])]);
+    if (result === -1) return NextResponse.json({ error: 'Too many views' }, { status: 429, headers: { 'Retry-After': '60' } });
+    if (result === -2) return NextResponse.json({ error: 'Batch id conflict' }, { status: 409 });
+    return NextResponse.json({ success: true }, { headers: { 'Cache-Control': 'no-store' } });
+  } catch {
+    return NextResponse.json({ error: 'Ranking storage unavailable' }, { status: 503, headers: { 'Retry-After': '30', 'Cache-Control': 'no-store' } });
+  }
 }

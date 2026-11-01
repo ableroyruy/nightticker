@@ -1,6 +1,8 @@
 import { MetadataRoute } from 'next';
 import { getAllSlugs } from '@/lib/markets/stocks';
 
+const contentUpdatedAt = new Date('2026-11-01T00:00:00Z');
+
 const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://www.nightticker.com';
 
 // Category slugs that have stocks
@@ -38,7 +40,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       const prefix = locale === 'en' ? '' : `/${locale}`;
       routes.push({
         url: `${baseUrl}${prefix}${page}`,
-        lastModified: new Date(),
+        lastModified: contentUpdatedAt,
         changeFrequency: 'daily',
         priority: page === '' ? 1.0 : 0.8,
         alternates: {
@@ -61,7 +63,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       const prefix = locale === 'en' ? '' : `/${locale}`;
       routes.push({
         url: `${baseUrl}${prefix}/category/${category}`,
-        lastModified: new Date(),
+        lastModified: contentUpdatedAt,
         changeFrequency: 'daily',
         priority: 0.85,
         alternates: {
@@ -84,7 +86,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
       const prefix = locale === 'en' ? '' : `/${locale}`;
       routes.push({
         url: `${baseUrl}${prefix}/stock/${slug}`,
-        lastModified: new Date(),
+        lastModified: contentUpdatedAt,
         changeFrequency: 'hourly',
         priority: 0.9,
         alternates: {

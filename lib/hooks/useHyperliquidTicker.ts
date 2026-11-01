@@ -1,247 +1,148 @@
 'use client';
 
-import { useState, useEffect, useRef, useCallback } from 'react';
-import { ConnectionStatus } from '@/lib/types/market';
-
-const WS_URL = 'wss://api.hyperliquid.xyz/ws';
-const CACHED_TICKER_URL = '/api/market/ticker'; // 통합 API (prices + meta)
-const RECONNECT_DELAY = 3000;
-const CACHE_TTL = 30000; // 30초
-
-interface WsMessage {
-  channel: string;
-  data: {
-    mids: Record<string, string>;
-  };
-}
+import { useSyncExternalStore } from 'react';
+import type { ConnectionStatus } from '@/lib/types/market';
+import { stocks } from '@/lib/markets/stocks';
 
 export interface TickerData {
   price: number;
-  prevDayPx: number;
-  change24h: number;
-  changePercent24h: number;
+  prevDayPx: number | null;
+  change24h: number | null;
+  changePercent24h: number | null;
 }
-
-interface UseHyperliquidTickerReturn {
+interface Snapshot {
   tickers: Record<string, TickerData>;
   status: ConnectionStatus;
   lastUpdate: Date | null;
   error: string | null;
 }
+const EMPTY: Snapshot = { tickers: {}, status: 'connecting', lastUpdate: null, error: null };
+let snapshot = EMPTY;
+const listeners = new Set<() => void>();
+const allowed = new Set(stocks.map(stock => stock.hyperliquidSymbol.replace(/^xyz:/, '')));
+let socket: WebSocket | null = null;
+let timer: ReturnType<typeof setInterval> | null = null;
+let retry: ReturnType<typeof setTimeout> | null = null;
+let disposeTimer: ReturnType<typeof setTimeout> | null = null;
+let request: Promise<void> | null = null;
+let controller: AbortController | null = null;
+let lastMessage = 0;
+let connectionStarted = 0;
+let metaTimestamp = 0;
+let lastMetaAttempt = 0;
+let generation = 0;
+let baselines: Record<string, number | null> = {};
 
-// ========== 전역 캐시 ==========
-interface GlobalCache {
-  tickers: Record<string, TickerData>;
-  prevDayPrices: Record<string, number>;
-  timestamp: number;
+function publish(next: Snapshot) {
+  snapshot = next;
+  listeners.forEach(listener => listener());
 }
-
-let globalCache: GlobalCache | null = null;
-
-function getGlobalCache(): GlobalCache | null {
-  if (globalCache && Date.now() - globalCache.timestamp < CACHE_TTL) {
-    return globalCache;
-  }
-  return null;
+function ticker(price: number, baseline: number | null): TickerData {
+  const prevDayPx = Date.now() - metaTimestamp < 300000 ? baseline : null;
+  const change24h = prevDayPx && prevDayPx > 0 ? price - prevDayPx : null;
+  return { price, prevDayPx, change24h, changePercent24h: change24h !== null && prevDayPx ? change24h / prevDayPx * 100 : null };
 }
-
-function setGlobalCache(tickers: Record<string, TickerData>, prevDayPrices: Record<string, number>) {
-  globalCache = { tickers, prevDayPrices, timestamp: Date.now() };
-}
-
-export function useHyperliquidTicker(): UseHyperliquidTickerReturn {
-  // 전역 캐시가 있으면 초기값으로 사용
-  const cached = getGlobalCache();
-  const [tickers, setTickers] = useState<Record<string, TickerData>>(cached?.tickers ?? {});
-  const [status, setStatus] = useState<ConnectionStatus>(cached ? 'connected' : 'connecting');
-  const [lastUpdate, setLastUpdate] = useState<Date | null>(null);
-  const [error, setError] = useState<string | null>(null);
-
-  const mountedRef = useRef(true);
-  const wsRef = useRef<WebSocket | null>(null);
-  const reconnectTimeoutRef = useRef<NodeJS.Timeout | null>(null);
-  const prevDayPricesRef = useRef<Record<string, number>>({});
-  const tickersRef = useRef<Record<string, TickerData>>({});
-
-  // Process WebSocket price updates
-  const processPriceUpdate = useCallback((mids: Record<string, string>) => {
-    if (!mountedRef.current) return;
-
-    const prevDayPrices = prevDayPricesRef.current;
-    const newTickers: Record<string, TickerData> = {};
-
-    for (const [rawSymbol, priceStr] of Object.entries(mids)) {
-      const price = parseFloat(priceStr);
-      if (isNaN(price)) continue;
-
-      const symbol = rawSymbol.replace('xyz:', '');
-      const prevDayPx = prevDayPrices[symbol] || 0;
-      let change24h = 0;
-      let changePercent24h = 0;
-
-      if (prevDayPx > 0) {
-        change24h = price - prevDayPx;
-        changePercent24h = (change24h / prevDayPx) * 100;
-      }
-
-      newTickers[symbol] = {
-        price,
-        prevDayPx,
-        change24h,
-        changePercent24h,
-      };
-    }
-
-    tickersRef.current = newTickers;
-    setTickers(newTickers);
-    setLastUpdate(new Date());
-  }, []);
-
-  // Fetch initial data from cached ticker API (fast, single request)
-  const fetchCachedTicker = useCallback(async () => {
-    if (!mountedRef.current) return;
-
-    // 전역 캐시가 있으면 먼저 적용
-    const cached = getGlobalCache();
-    if (cached) {
-      prevDayPricesRef.current = cached.prevDayPrices;
-      tickersRef.current = cached.tickers;
-      // 이미 useState 초기값으로 설정됨
-    }
-
+async function refresh() {
+  if (request) return request;
+  const current = generation;
+  lastMetaAttempt = Date.now();
+  const abort = new AbortController();
+  controller = abort;
+  const timeout = setTimeout(() => abort.abort(), 10000);
+  request = (async () => {
     try {
-      const response = await fetch(CACHED_TICKER_URL);
-      if (!response.ok) return;
-
+      const response = await fetch('/api/market/ticker', { signal: abort.signal });
+      if (!response.ok) throw new Error('Market data temporarily unavailable');
       const data: Record<string, TickerData> = await response.json();
-      if (!mountedRef.current) return;
-
-      // Store prevDayPx for WebSocket updates
-      const prevDayPrices: Record<string, number> = {};
-      for (const [symbol, ticker] of Object.entries(data)) {
-        prevDayPrices[symbol] = ticker.prevDayPx;
+      if (generation !== current || !listeners.size) return;
+      const stamp = Number(response.headers.get('X-Data-Timestamp'));
+      const metaStamp = Number(response.headers.get('X-Meta-Timestamp'));
+      if (!Number.isFinite(stamp) || stamp <= 0 || Date.now() - stamp > 60000) throw new Error('Market data is delayed');
+      metaTimestamp = Number.isFinite(metaStamp) && metaStamp > 0 ? metaStamp : 0;
+      baselines = Object.fromEntries(Object.entries(data).map(([symbol, value]) => [symbol, value.prevDayPx]));
+      // Never replace a newer WebSocket quote with an older HTTP cache snapshot.
+      const live = lastMessage > stamp;
+      const source = live ? snapshot.tickers : data;
+      const tickers: Record<string, TickerData> = {};
+      for (const [symbol, value] of Object.entries(source)) {
+        if (allowed.has(symbol) && Number.isFinite(value.price) && value.price > 0) tickers[symbol] = ticker(value.price, baselines[symbol] ?? null);
       }
-      prevDayPricesRef.current = prevDayPrices;
-
-      // Set tickers and update global cache
-      tickersRef.current = data;
-      setTickers(data);
-      setLastUpdate(new Date());
-      setGlobalCache(data, prevDayPrices);
-    } catch (e) {
-      console.error('Failed to fetch cached ticker:', e);
+      publish({ tickers, lastUpdate: live ? snapshot.lastUpdate : new Date(stamp), status: live && socket?.readyState === WebSocket.OPEN ? 'connected' : 'disconnected', error: live ? null : 'Waiting for live prices' });
+    } catch {
+      if (generation === current && listeners.size && Date.now() - lastMessage > 45000) publish({ ...snapshot, status: 'disconnected', error: 'Market data temporarily unavailable' });
+    } finally {
+      clearTimeout(timeout);
+      if (generation === current) { request = null; controller = null; }
     }
-  }, []);
-
-  // Connect to WebSocket
-  const connectWebSocket = useCallback(function connect() {
-    if (!mountedRef.current) return;
-    if (wsRef.current?.readyState === WebSocket.OPEN) return;
-
-    try {
-      const ws = new WebSocket(WS_URL);
-      wsRef.current = ws;
-
-      ws.onopen = () => {
-        if (!mountedRef.current) {
-          ws.close();
-          return;
-        }
-
-        setStatus('connected');
-        setError(null);
-
-        // Subscribe to allMids for XYZ DEX
-        ws.send(JSON.stringify({
-          method: 'subscribe',
-          subscription: {
-            type: 'allMids',
-            dex: 'xyz',
-          },
-        }));
-      };
-
-      ws.onmessage = (event) => {
-        if (!mountedRef.current) return;
-
-        try {
-          const message: WsMessage = JSON.parse(event.data);
-
-          if (message.channel === 'allMids' && message.data?.mids) {
-            processPriceUpdate(message.data.mids);
-          }
-        } catch (e) {
-          console.error('Failed to parse WebSocket message:', e);
-        }
-      };
-
-      ws.onerror = (event) => {
-        console.error('WebSocket error:', event);
-        if (mountedRef.current) {
-          setError('WebSocket connection error');
-        }
-      };
-
-      ws.onclose = () => {
-        if (!mountedRef.current) return;
-
-        setStatus('disconnected');
-        wsRef.current = null;
-
-        // Attempt to reconnect
-        reconnectTimeoutRef.current = setTimeout(() => {
-          if (mountedRef.current) {
-            setStatus('connecting');
-            connect();
-          }
-        }, RECONNECT_DELAY);
-      };
-    } catch (e) {
-      console.error('Failed to create WebSocket:', e);
-      if (mountedRef.current) {
-        setStatus('disconnected');
-        setError('Failed to connect');
-
-        reconnectTimeoutRef.current = setTimeout(() => {
-          if (mountedRef.current) {
-            connect();
-          }
-        }, RECONNECT_DELAY);
-      }
-    }
-  }, [processPriceUpdate]);
-
-  useEffect(() => {
-    mountedRef.current = true;
-
-    // Fast init: single API call -> WebSocket
-    const init = async () => {
-      // 1. Get cached ticker (prices + meta in one request)
-      await fetchCachedTicker();
-      // 2. Connect WebSocket for real-time updates
-      connectWebSocket();
-    };
-    init();
-
-    return () => {
-      mountedRef.current = false;
-
-      if (wsRef.current) {
-        wsRef.current.close();
-        wsRef.current = null;
-      }
-
-      if (reconnectTimeoutRef.current) {
-        clearTimeout(reconnectTimeoutRef.current);
-        reconnectTimeoutRef.current = null;
-      }
-    };
-  }, [fetchCachedTicker, connectWebSocket]);
-
-  return {
-    tickers,
-    status,
-    lastUpdate,
-    error,
+  })();
+  return request;
+}
+function connect() {
+  if (!listeners.size || socket) return;
+  const current = generation;
+  const ws = new WebSocket('wss://api.hyperliquid.xyz/ws');
+  socket = ws;
+  connectionStarted = Date.now();
+  ws.onopen = () => {
+    if (current !== generation) return;
+    ws.send(JSON.stringify({ method: 'subscribe', subscription: { type: 'allMids', dex: 'xyz' } }));
+    void refresh();
   };
+  ws.onmessage = event => {
+    if (current !== generation) return;
+    try {
+      const message = JSON.parse(event.data);
+      if (message.channel !== 'allMids' || !message.data?.mids) return;
+      const tickers: Record<string, TickerData> = {};
+      for (const [raw, value] of Object.entries(message.data.mids)) {
+        const symbol = raw.replace(/^xyz:/, '');
+        const price = Number(value);
+        if (allowed.has(symbol) && Number.isFinite(price) && price > 0) tickers[symbol] = ticker(price, baselines[symbol] ?? null);
+      }
+      if (!Object.keys(tickers).length) return;
+      lastMessage = Date.now();
+      publish({ tickers, status: 'connected', lastUpdate: new Date(lastMessage), error: null });
+    } catch { /* Ignore non-price messages. */ }
+  };
+  ws.onerror = () => ws.close();
+  ws.onclose = () => {
+    if (current !== generation) return;
+    socket = null;
+    publish({ ...snapshot, status: 'disconnected', error: 'Live connection interrupted' });
+    if (listeners.size) retry = setTimeout(() => { retry = null; connect(); }, 3000);
+  };
+}
+function stop() {
+  generation++;
+  controller?.abort(); controller = null; request = null;
+  if (timer) clearInterval(timer);
+  if (retry) clearTimeout(retry);
+  timer = null; retry = null;
+  const ws = socket; socket = null;
+  if (ws) { ws.onclose = null; ws.close(); }
+  publish({ ...snapshot, status: 'disconnected' });
+}
+function subscribe(listener: () => void) {
+  if (disposeTimer) { clearTimeout(disposeTimer); disposeTimer = null; }
+  listeners.add(listener);
+  if (!timer) {
+    if (snapshot.lastUpdate && Date.now() - snapshot.lastUpdate.getTime() >= 60000) snapshot = EMPTY;
+    void refresh(); connect();
+    timer = setInterval(() => {
+      if (Date.now() - lastMetaAttempt >= 60000) void refresh();
+      if (socket?.readyState === WebSocket.CONNECTING && Date.now() - connectionStarted > 15000) socket.close();
+      if (socket?.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify({ method: 'ping' }));
+        if (Date.now() - Math.max(lastMessage, connectionStarted) > 45000) socket.close();
+      }
+      if (snapshot.lastUpdate && Date.now() - snapshot.lastUpdate.getTime() >= 60000) publish({ ...EMPTY, status: 'disconnected', error: 'Prices are delayed' });
+    }, 10000);
+  }
+  return () => {
+    listeners.delete(listener);
+    if (!listeners.size) disposeTimer = setTimeout(stop, 0);
+  };
+}
+export function useHyperliquidTicker(): Snapshot {
+  return useSyncExternalStore(subscribe, () => snapshot, () => EMPTY);
 }
