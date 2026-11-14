@@ -82,6 +82,8 @@ test('catalog matches every active market in the reviewed upstream snapshot', ()
   assert.equal(catalog.getStockBySymbol('TSM').category, 'US');
   assert.equal(catalog.getStockBySymbol('MUU').category, 'ETF');
   assert.equal(catalog.getStockBySymbol('TTWO').category, 'US');
+  assert.deepEqual(Array.from(catalog.getStocksByCategory('IN'), stock => stock.symbol).sort(), ['JIO', 'RELIANCE']);
+  assert.deepEqual(Array.from(catalog.getStocksByCategory('SPECIAL'), stock => stock.symbol).sort(), ['ANT', 'OURA']);
 });
 
 test('index names follow supplier references while existing detail URLs remain available', () => {

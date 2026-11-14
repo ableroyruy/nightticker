@@ -32,7 +32,7 @@ export async function generateStaticParams() {
 }
 
 function getAssetType(stock: Stock, locale: string): { term: string; typeName: string } {
-  const isStock = ['US', 'KR', 'CN', 'JP'].includes(stock.category);
+  const isStock = ['US', 'KR', 'CN', 'IN', 'JP'].includes(stock.category);
 
   if (locale === 'ko') {
     if (isStock) return { term: '주가', typeName: '주식' };
@@ -104,7 +104,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     locale === 'es' ? (stock.nameEs ?? stock.name) :
     stock.name;
   const { term } = getAssetType(stock, locale);
-  const isStock = ['US', 'KR', 'CN', 'JP'].includes(stock.category);
+  const isStock = ['US', 'KR', 'CN', 'IN', 'JP'].includes(stock.category);
 
   // New SEO Strategy: Stock name first, "야간 주가" terminology
   const meta = {

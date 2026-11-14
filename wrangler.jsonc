@@ -1,12 +1,14 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "nightticker",
-  "main": ".open-next/worker.js",
+  "main": "cloudflare/worker.mjs",
   "compatibility_date": "2026-11-14",
   "compatibility_flags": ["nodejs_compat", "global_fetch_strictly_public"],
   "assets": { "directory": ".open-next/assets", "binding": "ASSETS" },
   "images": { "binding": "IMAGES" },
+  "version_metadata": { "binding": "CF_VERSION_METADATA" },
   "previews": {
+    "version_metadata": { "binding": "CF_VERSION_METADATA" },
     "images": { "binding": "IMAGES" }
   }
 }

@@ -71,7 +71,7 @@ export function remainingCacheSeconds(data: RankingData, now: number): number {
   return Math.max(0, Math.floor((data.expiresAt - now) / 1000));
 }
 
-export const RANKING_CATEGORIES = ['US', 'KR', 'CN', 'JP', 'INDEX', 'ETF', 'COMMODITY', 'FX', 'SPECIAL', 'SEMICONDUCTOR'] as const;
+export const RANKING_CATEGORIES = ['US', 'KR', 'CN', 'IN', 'JP', 'INDEX', 'ETF', 'COMMODITY', 'FX', 'SPECIAL', 'SEMICONDUCTOR'] as const;
 export type RankingCategory = typeof RANKING_CATEGORIES[number];
 export type CategoryRankings = Record<RankingCategory, RankingItem[]>;
 interface CatalogEntry { symbol: string; category: string; sector?: string }

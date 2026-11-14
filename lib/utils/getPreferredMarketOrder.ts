@@ -50,8 +50,8 @@ export function sortMarketsByPreference<T extends { market: MarketType }>(
 ): T[] {
   const orderMap: Record<MarketType, number> =
     order === 'KR_FIRST'
-      ? { KR: 0, US: 1, CN: 2, JP: 3, INDEX: 4, ETF: 5, COMMODITY: 6, FX: 7, SPECIAL: 8, SEMICONDUCTOR: 9 }
-      : { US: 0, KR: 1, CN: 2, JP: 3, INDEX: 4, ETF: 5, COMMODITY: 6, FX: 7, SPECIAL: 8, SEMICONDUCTOR: 9 };
+      ? { KR: 0, US: 1, CN: 2, IN: 3, JP: 4, INDEX: 5, ETF: 6, COMMODITY: 7, FX: 8, SPECIAL: 9, SEMICONDUCTOR: 10 }
+      : { US: 0, KR: 1, CN: 2, IN: 3, JP: 4, INDEX: 5, ETF: 6, COMMODITY: 7, FX: 8, SPECIAL: 9, SEMICONDUCTOR: 10 };
 
   return [...items].sort((a, b) => {
     return (orderMap[a.market] ?? 99) - (orderMap[b.market] ?? 99);

@@ -56,10 +56,10 @@ test('reviewed product content covers all 122 active markets in all six locales'
   }
 });
 
-test('Chinese equities move to CN while other international equities remain SPECIAL', () => {
+test('Chinese and Indian equities use country categories rather than SPECIAL', () => {
   const expected = { MINIMAX: 'HK', ZHIPU: 'HK', CXMT: 'CN', CAMBRICON: 'CN', GIGADEV: 'CN', UNITREE: 'CN', RELIANCE: 'IN', JIO: 'IN' };
   for (const [symbol, country] of Object.entries(expected)) {
-    assert.equal(stock(symbol).category, ['CN', 'HK'].includes(country) ? 'CN' : 'SPECIAL');
+    assert.equal(stock(symbol).category, ['CN', 'HK'].includes(country) ? 'CN' : 'IN');
     const product = info.getProductInfo(stock(symbol), 'ko');
     assert.equal(product.countryCode, country);
     assert.equal(product.kind, 'equity');

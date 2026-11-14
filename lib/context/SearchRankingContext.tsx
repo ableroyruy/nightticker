@@ -16,7 +16,7 @@ interface SearchRankingContextValue {
 }
 const SearchRankingContext = createContext<SearchRankingContextValue | null>(null);
 const active = new Set(stocks.map(stock => stock.symbol));
-const CACHE_KEY = 'nightticker_ranking_cache_v5';
+const CACHE_KEY = 'nightticker_ranking_cache_v6';
 const QUEUE_KEY = 'nightticker_ranking_queue_v1';
 const MAX_QUEUED_BATCHES = 10;
 

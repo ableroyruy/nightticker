@@ -12,7 +12,7 @@ import { Filter } from 'lucide-react';
 import { toMarketAsset } from '@/lib/format-market';
 import { cn } from '@/lib/utils';
 
-type FilterType = 'all' | 'kr' | 'us' | 'cn' | 'jp' | 'index' | 'etf' | 'commodity' | 'fx' | 'semiconductor' | 'special';
+type FilterType = 'all' | 'kr' | 'us' | 'cn' | 'in' | 'jp' | 'index' | 'etf' | 'commodity' | 'fx' | 'semiconductor' | 'special';
 
 export function GainersPage() {
   const t = useTranslations('pages.gainers');
@@ -35,6 +35,7 @@ export function GainersPage() {
     if (filter === 'kr') return asset.market === 'KR';
     if (filter === 'us') return asset.market === 'US';
     if (filter === 'cn') return asset.market === 'CN';
+    if (filter === 'in') return asset.market === 'IN';
     if (filter === 'jp') return asset.market === 'JP';
     if (filter === 'index') return asset.market === 'INDEX';
     if (filter === 'etf') return asset.market === 'ETF';
@@ -52,6 +53,7 @@ export function GainersPage() {
     { key: 'us', label: categoryT('US') },
     { key: 'kr', label: categoryT('KR') },
     { key: 'cn', label: categoryT('CN') },
+    { key: 'in', label: categoryT('IN') },
     { key: 'jp', label: categoryT('JP') },
     { key: 'index', label: categoryT('INDEX') },
     { key: 'etf', label: categoryT('ETF') },
