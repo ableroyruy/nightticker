@@ -1,11 +1,12 @@
 # Catalog and Chinese category release — 2026-11-14
 
-- Production Next.js 16.2.7 build and TypeScript passed. ESLint reports no errors and 14 existing warnings.
+- Production Next.js 16.4.6 and OpenNext 1.20.17 builds and TypeScript passed. ESLint reports no errors and 14 existing warnings.
 - Automated suite: 68 tests, 67 passed, one existing Redis integration test skipped because local Redis binaries are unavailable. Catalog lifecycle, Chinese classification, favorites migration, measured category rankings, all six locales, canonical/hreflang and sitemap are covered.
 - Local production HTTP checks passed for the Chinese category, both additions, all five indices, live ticker, both new candle symbols and the 882-entry sitemap. Live TTWO and MUU quotes are positive.
 - Real Chrome verification used ggg (Profile 6) with the matching extension token. Chinese category shows eight rows, quotes and Chinese badges. At 390px width the mobile menu navigates to Chinese Stocks and the document has no horizontal overflow. A mobile screenshot was visually inspected. Local ranking is degraded without production Redis credentials; production ranking requires the existing Upstash secrets.
 - Existing Vercel project confirmed via GitHub deployment status: `able-s-projects1/nightticker`, source `40e734c3aecf439f2475bf48161443d2edad3973`, serves `www.nightticker.com`. Vercel is paused for Function Invocations until 2026-12-11.
 - Existing Cloudflare target confirmed: `nightticker.lemoningz55.workers.dev`, account ID `b3d3658581bd5bc5dfe0d9f411c3a9c3`, connected to `ableroyruy/nightticker` main. Its existing automatic OpenNext build succeeded; the paused local vinext experiment is not part of this release.
+- Explicit Cloudflare config replaces automatic migration, with isolated preview bindings and read-only static prerender cache. Local workerd checks pass for CN, TTWO, MUU, sitemap, social images, Apple icon and apex-to-www 308 redirect. Dry-run Worker gzip is 2,619 KiB, below the free-plan 3 MiB limit.
 - Deployment and domain verification evidence will be recorded below after publishing.
 
 # Verification — 2026-11-01

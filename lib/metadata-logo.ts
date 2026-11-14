@@ -1,0 +1,2 @@
+// Keep metadata generation independent of the public deployment origin.
+export const metadataLogo = `data:image/svg+xml,${encodeURIComponent("<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\" role=\"img\" aria-label=\"NightTicker logo\">\n  <path d=\"M154 384V128\" stroke=\"#8E5CFF\" stroke-width=\"80\" stroke-linecap=\"round\"/>\n  <path d=\"M358 384V128\" stroke=\"#8E5CFF\" stroke-width=\"80\" stroke-linecap=\"round\"/>\n  <path d=\"M154 128L358 384\" stroke=\"#8E5CFF\" stroke-width=\"80\" stroke-linecap=\"round\"/>\n</svg>")}`;

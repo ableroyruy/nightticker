@@ -1,11 +1,12 @@
+import { metadataLogo } from '@/lib/metadata-logo';
 import { ImageResponse } from 'next/og';
 
-export const runtime = 'edge';
+export const runtime = 'nodejs';
 export const size = { width: 180, height: 180 };
 export const contentType = 'image/png';
 
 export default function AppleIcon() {
-  const logoUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.nightticker.com'}/nightticker-logo-transparent-512.png`;
+  const logoUrl = metadataLogo;
 
   return new ImageResponse(
     (

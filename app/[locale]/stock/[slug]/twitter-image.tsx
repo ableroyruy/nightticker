@@ -1,8 +1,9 @@
+import { metadataLogo } from '@/lib/metadata-logo';
 import { ImageResponse } from 'next/og';
 import { notFound } from 'next/navigation';
 import { getStockBySlug } from '@/lib/markets/stocks';
 
-export const runtime = 'edge';
+export const runtime = 'nodejs';
 
 export const size = {
   width: 1200,
@@ -63,7 +64,7 @@ export default async function Image({
         >
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={`${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.nightticker.com'}/nightticker-logo-transparent-512.png`}
+            src={metadataLogo}
             alt="NightTicker Logo"
             width={60}
             height={60}
