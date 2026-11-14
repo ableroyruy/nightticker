@@ -13,7 +13,7 @@ import { stocks, getStocksBySectorForCategory } from '@/lib/markets/stocks';
 import { MarketAsset, MarketType } from '@/lib/types/market';
 import { cn } from '@/lib/utils';
 
-type SectionId = 'favorites' | 'KR' | 'US' | 'SEMICONDUCTOR' | 'INDEX' | 'ETF' | 'COMMODITY' | 'FX' | 'CN' | 'JP' | 'SPECIAL';
+type SectionId = 'favorites' | 'KR' | 'US' | 'SEMICONDUCTOR' | 'INDEX' | 'ETF' | 'COMMODITY' | 'FX' | 'CN' | 'IN' | 'JP' | 'SPECIAL';
 
 // Section background colors - alternating warm/cool for better contrast
 const sectionBgColors: Record<SectionId, string> = {
@@ -26,6 +26,7 @@ const sectionBgColors: Record<SectionId, string> = {
   COMMODITY: 'bg-gradient-to-br from-yellow-500/8 to-amber-500/5',
   FX: 'bg-gradient-to-br from-sky-500/8 to-blue-500/5',
   CN: 'bg-gradient-to-br from-orange-500/8 to-red-500/5',
+  IN: 'bg-gradient-to-br from-orange-500/8 to-red-500/5',
   JP: 'bg-gradient-to-br from-red-500/8 to-rose-500/5',
   SPECIAL: 'bg-gradient-to-br from-fuchsia-500/8 to-purple-500/5',
 };
@@ -33,9 +34,9 @@ const sectionBgColors: Record<SectionId, string> = {
 // Fixed section order based on locale
 const getSectionOrder = (locale: string): SectionId[] => {
   if (locale === 'ko') {
-    return ['favorites', 'KR', 'US', 'SEMICONDUCTOR', 'INDEX', 'ETF', 'COMMODITY', 'FX', 'CN', 'JP', 'SPECIAL'];
+    return ['favorites', 'KR', 'US', 'SEMICONDUCTOR', 'INDEX', 'ETF', 'COMMODITY', 'FX', 'CN', 'IN', 'JP', 'SPECIAL'];
   }
-  return ['favorites', 'US', 'KR', 'SEMICONDUCTOR', 'INDEX', 'ETF', 'COMMODITY', 'FX', 'CN', 'JP', 'SPECIAL'];
+  return ['favorites', 'US', 'KR', 'SEMICONDUCTOR', 'INDEX', 'ETF', 'COMMODITY', 'FX', 'CN', 'IN', 'JP', 'SPECIAL'];
 };
 
 export function HomePage() {
@@ -109,6 +110,7 @@ export function HomePage() {
       COMMODITY: commodityAssets,
       FX: fxAssets,
       CN: allAssets.filter(a => a.market === 'CN'),
+      IN: allAssets.filter(a => a.market === 'IN'),
       JP: allAssets.filter(a => a.market === 'JP'),
       SPECIAL: allAssets.filter(a => a.market === 'SPECIAL'),
       SEMICONDUCTOR: semiconductorAssets,

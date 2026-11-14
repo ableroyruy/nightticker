@@ -76,7 +76,8 @@
     "FX": "通貨",
     "SPECIAL": "特別",
     "SEMICONDUCTOR": "半導体",
-    "CN": "中国株"
+    "CN": "中国株",
+    "IN": "インド株"
   },
   "marketBadge": {
     "KR": "韓国",
@@ -88,7 +89,8 @@
     "FX": "通貨",
     "SPECIAL": "特別",
     "SEMICONDUCTOR": "半導体",
-    "CN": "中国"
+    "CN": "中国",
+    "IN": "インド"
   },
   "stockDetail": {
     "overnight": "夜間",

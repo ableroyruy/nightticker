@@ -38,6 +38,7 @@ export function AssetTable({
     COMMODITY: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
     FX: 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30',
     CN: 'bg-orange-500/20 text-orange-400 border-orange-500/30',
+    IN: 'bg-orange-500/20 text-orange-400 border-orange-500/30',
     SPECIAL: 'bg-pink-500/20 text-pink-400 border-pink-500/30',
     SEMICONDUCTOR: 'bg-violet-500/20 text-violet-400 border-violet-500/30',
   };
@@ -51,6 +52,7 @@ export function AssetTable({
     COMMODITY: '🛢️',
     FX: '💱',
     CN: '🇨🇳',
+    IN: '🇮🇳',
     SPECIAL: '⚡',
     SEMICONDUCTOR: '💎',
   };

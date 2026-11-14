@@ -76,7 +76,8 @@
     "FX": "통화",
     "SPECIAL": "특별",
     "SEMICONDUCTOR": "반도체",
-    "CN": "중국 주식"
+    "CN": "중국 주식",
+    "IN": "인도 주식"
   },
   "marketBadge": {
     "KR": "한국",
@@ -88,7 +89,8 @@
     "FX": "통화",
     "SPECIAL": "특수",
     "SEMICONDUCTOR": "반도체",
-    "CN": "중국"
+    "CN": "중국",
+    "IN": "인도"
   },
   "stockDetail": {
     "overnight": "야간",

@@ -76,7 +76,8 @@
     "FX": "Currencies",
     "SPECIAL": "Special",
     "SEMICONDUCTOR": "Semiconductors",
-    "CN": "Chinese Stocks"
+    "CN": "Chinese Stocks",
+    "IN": "Indian Stocks"
   },
   "marketBadge": {
     "KR": "KR",
@@ -88,7 +89,8 @@
     "FX": "FX",
     "SPECIAL": "Special",
     "SEMICONDUCTOR": "Semiconductor",
-    "CN": "CN"
+    "CN": "CN",
+    "IN": "IN"
   },
   "stockDetail": {
     "overnight": "Overnight",

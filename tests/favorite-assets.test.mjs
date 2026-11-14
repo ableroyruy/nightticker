@@ -29,3 +29,13 @@ test('Chinese category migration preserves saved favorites and their original or
   assert.deepEqual(restored.map(item => [item.symbol, item.market, item.addedAt]), [['BABA', 'CN', 10], ['CAMBRICON', 'CN', 20]]);
   assert.deepEqual(normalizeFavoriteAssets(restored, updated), restored);
 });
+
+test('Indian category migration preserves former special-market favorites', () => {
+  const updated = [
+    { symbol: 'RELIANCE', category: 'IN', name: 'Reliance', slug: 'reliance' },
+    { symbol: 'JIO', category: 'IN', name: 'Jio', slug: 'jio' },
+  ];
+  const saved = updated.map((asset, index) => ({ ...asset, market: 'SPECIAL', addedAt: index + 1 }));
+  const result = normalizeFavoriteAssets(saved, updated);
+  assert.deepEqual(result.map(item => [item.symbol, item.market, item.addedAt]), [['RELIANCE', 'IN', 1], ['JIO', 'IN', 2]]);
+});

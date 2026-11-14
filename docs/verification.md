@@ -1,3 +1,10 @@
+# CDN and Indian category follow-up — 2026-11-14
+
+- Reviewed all four remaining SPECIAL entries against supplier specifications and pre-IPO status. RELIANCE and converted JIO move to IN; live pre-IPO ANT and OURA remain SPECIAL. Country menus, filters, badges, rankings, favorites migration and six-language metadata include India. Sitemap now has 888 canonical entries.
+- Public API edge cache honors remaining API freshness: quotes/prices at most 3s, metadata 60s, candles 120s, healthy ranking snapshots at most 30m. Writes, credentials, partial/error/stale/degraded/private responses bypass cache. Query and Worker version isolate cache entries; client address forwarding is normalized at the Cloudflare edge.
+- Local workerd verifies MISS then HIT for quotes, metadata and candles; degraded rankings bypass caching. Quote requests measured 338ms then 6ms. Hashed static files receive one-year immutable browser caching; logos/icons/banners receive one day in browsers and 30 days on CDN.
+- All 888 sitemap URLs pass local workerd HTTP/canonical checks. Next/OpenNext build and TypeScript pass. ESLint has zero errors and 14 existing warnings. Automated tests: 73 total, 72 passed, one Redis integration skip. Compressed Worker is 2,621 KiB, within the free limit. Tests cover cache freshness, isolation, failure recovery, writes/credentials, trusted addresses and category/favorites migration.
+
 # Catalog and Chinese category release — 2026-11-14
 
 - Production Next.js 16.4.6 and OpenNext 1.20.17 builds and TypeScript passed. ESLint reports no errors and 14 existing warnings.
@@ -7,7 +14,7 @@
 - Existing Vercel project confirmed via GitHub deployment status: `able-s-projects1/nightticker`, source `40e734c3aecf439f2475bf48161443d2edad3973`, serves `www.nightticker.com`. Vercel is paused for Function Invocations until 2026-12-11.
 - Existing Cloudflare target confirmed: `nightticker.lemoningz55.workers.dev`, account ID `b3d3658581bd5bc5dfe0d9f411c3a9c3`, connected to `ableroyruy/nightticker` main. Its existing automatic OpenNext build succeeded; the paused local vinext experiment is not part of this release.
 - Explicit Cloudflare config replaces automatic migration, with isolated preview bindings and read-only static prerender cache. Local workerd checks pass for CN, TTWO, MUU, sitemap, social images, Apple icon and apex-to-www 308 redirect. Dry-run Worker gzip is 2,619 KiB, below the free-plan 3 MiB limit.
-- Deployment and domain verification evidence will be recorded below after publishing.
+- Published via merged PR #1 at main `8510895f490678de10ca9a1537347f9cdd14b0a4`; Cloudflare production build `a129883f-82e8-40e5-aa0f-d30b0ad01228` succeeded. Zone is active and its universal SSL certificate is active. HTTPS on www returns 200 through Cloudflare; apex is configured to redirect to www. Existing Upstash credentials still require authenticated access before ranking storage can be connected.
 
 # Verification — 2026-11-01
 

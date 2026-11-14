@@ -5,8 +5,8 @@ import { stocks } from '@/lib/markets/stocks';
 import { aggregateRankings, bucketKeys, BUCKET_MS, buildCategoryRankings, remainingCacheSeconds, RANKING_TTL_MS, usableRankingTimestamp, validateBatch, type RankingData } from '@/lib/ranking/core';
 import { PUBLISH_SCRIPT, RECORD_BATCH_SCRIPT, RELEASE_SCRIPT } from '@/lib/ranking/scripts';
 
-const CACHE_KEY = 'ranking:cache:v4';
-const LOCK_KEY = 'ranking:refresh:v4';
+const CACHE_KEY = 'ranking:cache:v5';
+const LOCK_KEY = 'ranking:refresh:v5';
 const active = new Set(stocks.map(stock => stock.symbol));
 let redisInstance: Redis | null = null;
 function getRedis(): Redis {

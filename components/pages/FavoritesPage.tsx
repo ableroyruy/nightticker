@@ -14,7 +14,7 @@ import { MarketAsset } from '@/lib/types/market';
 import { getLocalizedAssetName, toMarketAsset } from '@/lib/format-market';
 import { cn } from '@/lib/utils';
 
-type FilterType = 'all' | 'kr' | 'us' | 'cn' | 'jp' | 'index' | 'etf' | 'commodity' | 'fx' | 'special' | 'semiconductor';
+type FilterType = 'all' | 'kr' | 'us' | 'cn' | 'in' | 'jp' | 'index' | 'etf' | 'commodity' | 'fx' | 'special' | 'semiconductor';
 type SortType = 'added' | 'gainers' | 'losers' | 'name';
 
 export function FavoritesPage() {
@@ -65,7 +65,7 @@ export function FavoritesPage() {
     { key: 'all', label: t('filter.all') },
     { key: 'kr', label: t('filter.kr') },
     { key: 'us', label: t('filter.us') },
-    ...(['CN', 'JP', 'INDEX', 'ETF', 'COMMODITY', 'FX', 'SPECIAL', 'SEMICONDUCTOR'] as const).map(category => ({ key: category.toLowerCase() as FilterType, label: tCategory(category) })),
+    ...(['CN', 'IN', 'JP', 'INDEX', 'ETF', 'COMMODITY', 'FX', 'SPECIAL', 'SEMICONDUCTOR'] as const).map(category => ({ key: category.toLowerCase() as FilterType, label: tCategory(category) })),
   ];
 
   const sorts: { key: SortType; label: string }[] = [

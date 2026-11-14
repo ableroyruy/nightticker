@@ -31,3 +31,19 @@ records are apex CNAME `3f47cd565ec6ba4c.vercel-dns-017.com` and wildcard CNAME
 `cname.vercel-dns-017.com`, with former nameservers `ns1.vercel-dns.com` and
 `ns2.vercel-dns.com`. Vercel is currently paused for usage limits, so restoring
 those records alone does not restore service until the pause is resolved.
+
+## CDN
+
+`public/_headers` sets one-year immutable browser caching for hashed Next assets;
+public branding assets use one-day browser and 30-day CDN lifetimes. Static
+assets are served directly by Workers Assets. `cloudflare/worker.mjs` wraps
+OpenNext with a Cache API layer for explicitly public JSON GET endpoints only.
+It avoids Next rendering and upstream/Redis reads on hits, but a cached API
+request still invokes the small Worker wrapper. Cache entries are local to each
+Cloudflare data center and isolated by deployed version and full query.
+
+The API response controls freshness: quotes 3s, metadata 60s, candles 120s,
+healthy ranking snapshots up to 30m. Errors, partial/stale/degraded data, private
+responses, authorization and POST view recording bypass caching. HTML is kept
+out of this cache because locale cookies and RSC navigation affect responses.
+`X-Nightticker-CDN: HIT|MISS|BYPASS` makes API verification visible.

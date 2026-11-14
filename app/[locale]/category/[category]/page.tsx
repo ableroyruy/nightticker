@@ -7,7 +7,7 @@ import { categoryNames, getStocksByCategory, getStocksBySectorForCategory } from
 import { pageMetadata, SEO_LOCALES, seoLocale } from '@/lib/seo/site';
 
 type Props = { params: Promise<{ locale: string; category: string }> };
-const validCategories: StockCategory[] = ['US', 'KR', 'CN', 'JP', 'INDEX', 'ETF', 'COMMODITY', 'FX', 'SPECIAL', 'SEMICONDUCTOR'];
+const validCategories: StockCategory[] = ['US', 'KR', 'CN', 'IN', 'JP', 'INDEX', 'ETF', 'COMMODITY', 'FX', 'SPECIAL', 'SEMICONDUCTOR'];
 function getCategoryFromSlug(slug: string): StockCategory | null {
   const category = slug.toUpperCase() as StockCategory;
   return validCategories.includes(category) ? category : null;

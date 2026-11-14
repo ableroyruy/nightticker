@@ -1,3 +1,7 @@
+# Special category review — 2026-11-14
+
+RELIANCE references Reliance Industries equity on NSE; JIO references Jio Platforms equity on NSE and the supplier pre-IPO table marks it Converted. Both belong to the new Indian Stocks (IN) category. ANT and OURA are still Live pre-IPO markets and remain SPECIAL. No active market is removed. India is integrated into six-language navigation, favorites, ranking groups and sitemap; existing detail slugs remain unchanged.
+
 # XYZ catalog review — 2026-11-14
 
 Cross-checked the live `metaAndAssetCtxs` and `allMids` (`dex: xyz`) against the official specification and pre-IPO indexes. The approved snapshot is in `tests/fixtures/xyz-markets-2026-11-14.json`.
