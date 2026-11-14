@@ -15,8 +15,8 @@ The build populates prerendered page data into Workers static assets; no R2 or
 ISR service is required. Do not add runtime page revalidation without replacing
 the read-only cache. Live quotes and candles use uncached API routes.
 
-Production needs the existing `UPSTASH_REDIS_REST_URL` and
-`UPSTASH_REDIS_REST_TOKEN` as Worker secrets to preserve measured rankings and
+Production is connected to the existing `UPSTASH_REDIS_REST_URL` and
+`UPSTASH_REDIS_REST_TOKEN` as Worker secrets, preserving measured rankings and
 view history. Transfer credentials from the existing Upstash database; creating
 a replacement empty database loses history. Previews intentionally do not share
 production Redis. Never commit secrets or include them in build logs.
