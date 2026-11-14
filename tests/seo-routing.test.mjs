@@ -114,7 +114,7 @@ test('crawler policy permits JS/CSS and structured data has only supported langu
 
 test('sitemap excludes personal watchlists and query duplicates; favorites are noindex', async () => {
   const sitemap = load('app/sitemap.ts', { '@/lib/seo/site': site, '@/lib/markets/stocks': catalog }).default();
-  assert.equal(sitemap.length, (15 + 9 + 120) * 6);
+  assert.equal(sitemap.length, (15 + 10 + 122) * 6);
   assert.ok(sitemap.every(item => !item.url.includes('?') && !item.url.endsWith('/favorites')));
   const favorites = load('app/[locale]/favorites/page.tsx', { '@/lib/seo/static-metadata': staticMetadata });
   const meta = await favorites.generateMetadata({ params: Promise.resolve({ locale: 'es' }) });

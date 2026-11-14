@@ -65,3 +65,14 @@ test('legacy overall-only snapshots never invent category movement and ties are 
   const grouped = buildCategoryRankings(ranked, catalog, { B: 1 });
   assert.deepEqual(grouped.US.map(item => [item.symbol, item.rank, item.rankChange]), [['A', 1, null], ['B', 2, null]]);
 });
+
+test('Chinese category reassignment retains measured views without old category ranks', () => {
+  const catalog = [{ symbol: 'BABA', category: 'CN' }, { symbol: 'CAMBRICON', category: 'CN', sector: 'Semiconductors' }, { symbol: 'KSTR', category: 'ETF', sector: 'Semiconductors' }];
+  const ranked = aggregateRankings([{ BABA: 8, CAMBRICON: 5, KSTR: 3 }], null, new Set(catalog.map(item => item.symbol)));
+  const grouped = buildCategoryRankings(ranked, catalog, { 'US:BABA': 1, 'SPECIAL:CAMBRICON': 1 });
+  assert.deepEqual(grouped.CN.map(item => [item.symbol, item.views, item.rank, item.previousRank]), [['BABA', 8, 1, null], ['CAMBRICON', 5, 2, null]]);
+  assert.deepEqual(grouped.US, []);
+  assert.deepEqual(grouped.SPECIAL, []);
+  assert.deepEqual(grouped.ETF.map(item => item.symbol), ['KSTR']);
+  assert.deepEqual(grouped.SEMICONDUCTOR.map(item => item.symbol), ['CAMBRICON', 'KSTR']);
+});

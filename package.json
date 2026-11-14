@@ -6,13 +6,17 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "build:cloudflare": "opennextjs-cloudflare build && opennextjs-cloudflare populateCache local",
+    "preview:cloudflare": "wrangler dev",
+    "deploy:cloudflare": "wrangler deploy"
   },
   "dependencies": {
     "@base-ui/react": "^1.5.0",
     "@dnd-kit/core": "^6.3.1",
     "@dnd-kit/sortable": "^10.0.0",
     "@dnd-kit/utilities": "^3.2.2",
+    "@opennextjs/cloudflare": "1.20.17",
     "@upstash/redis": "^1.38.0",
     "@vercel/blob": "^2.4.0",
     "class-variance-authority": "^0.7.1",
@@ -20,7 +24,7 @@
     "framer-motion": "^12.40.0",
     "lightweight-charts": "^5.2.0",
     "lucide-react": "^1.17.0",
-    "next": "16.2.7",
+    "next": "16.4.6",
     "next-intl": "^4.13.0",
     "react": "19.2.4",
     "react-dom": "19.2.4",
@@ -34,9 +38,10 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
-    "eslint-config-next": "16.2.7",
+    "eslint-config-next": "16.4.6",
     "tailwindcss": "^4",
     "typescript": "^5",
+    "wrangler": "4.162.0",
     "ws": "^8.21.0"
   }
 }

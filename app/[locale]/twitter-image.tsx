@@ -1,6 +1,7 @@
+import { metadataLogo } from '@/lib/metadata-logo';
 import { ImageResponse } from 'next/og';
 
-export const runtime = 'edge';
+export const runtime = 'nodejs';
 
 export const size = {
   width: 1200,
@@ -19,7 +20,7 @@ export default async function Image({ params }: { params: Promise<{ locale: stri
       ? '야간 시세 | 주말 시세 | 휴일 시세'
       : 'Overnight Prices | Weekend Prices | Holiday Prices';
 
-  const logoUrl = `${process.env.NEXT_PUBLIC_SITE_URL || 'https://www.nightticker.com'}/nightticker-logo-transparent-512.png`;
+  const logoUrl = metadataLogo;
 
   return new ImageResponse(
     (

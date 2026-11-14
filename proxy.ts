@@ -6,6 +6,7 @@ import { canonicalMarketPath } from './lib/seo/site';
 const localize = createMiddleware({ locales, defaultLocale, localePrefix: 'as-needed', localeDetection: true });
 export default function proxy(request: NextRequest) {
   const pathname = request.nextUrl.pathname;
+  if (pathname === '/apple-icon') return NextResponse.next();
   // Removing an explicit default-language prefix is stable URL normalization,
   // including static documents; locale negotiation remains temporary.
   const englishPath = /^\/en(?:\/|$)/i.test(pathname) ? pathname.replace(/^\/en(?:\/|$)/i, '/') : null;

@@ -915,7 +915,7 @@
     "kind": "commodity",
     "exchange": "",
     "unit": "gallon",
-    "description": "HO (DIESEL) references the USD price of one U.S. gallon of New York Harbor ultra-low sulfur diesel (ULSD).",
+    "description": "DIESEL references the USD price of 1 U.S. gallon of New York Harbor ultra-low sulfur diesel (ULSD).",
     "topic": "diesel",
     "source": "specification"
   },
@@ -1103,6 +1103,27 @@
     "description": "SNXX references 1 share of the Tradr 2X Long SNDK Daily ETF (Cboe BZX: SNXX), quoted in USD. The fund seeks daily investment results, before fees and expenses, of 200% of the daily performance of Sandisk Corporation common stock (Nasdaq: SNDK); it does not seek that objective over periods longer than one trading day.",
     "topic": "fund-SNXX",
     "source": "specification",
+    "dailyLeverage": 2
+  },
+  "TTWO": {
+    "country": "US",
+    "kind": "equity",
+    "exchange": "Nasdaq: TTWO",
+    "unit": "share",
+    "description": "TTWO references Take-Two Interactive Software, Inc. common stock (Nasdaq: TTWO), quoted in USD. Take-Two develops, publishes, and markets interactive entertainment through Rockstar Games, 2K, and Zynga.",
+    "topic": "gaming",
+    "source": "issuer",
+    "sourceUrl": "https://www.take2games.com/ir"
+  },
+  "MUU": {
+    "country": "US",
+    "kind": "leveraged-etf",
+    "exchange": "Nasdaq: MUU · Nasdaq: MU",
+    "unit": "share",
+    "description": "MUU references the Direxion Daily MU Bull 2X Shares ETF (Nasdaq: MUU), quoted in USD. The fund seeks 200% of the daily performance of Micron Technology, Inc. common stock (Nasdaq: MU), before fees and expenses. Daily resetting and compounding mean longer-term returns can differ from twice the return of MU.",
+    "topic": "fund-MUU",
+    "source": "fund",
+    "sourceUrl": "https://finance.yahoo.com/quote/MUU/profile/",
     "dailyLeverage": 2
   }
 }

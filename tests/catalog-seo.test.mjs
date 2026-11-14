@@ -29,6 +29,7 @@ const productInfo = loadModule('lib/markets/product-info.ts', {
 const guide = loadModule('lib/seo/reference-guide.ts', { './site': site });
 const removed = ['uranium', 'aluminium', 'dollar-index', 'vix', 'corn', 'wheat', 'krw', 'h100', 'bovespa'];
 const locales = ['en', 'ko', 'ja', 'zh', 'pt', 'es'];
+const approvedMarkets = JSON.parse(fs.readFileSync('tests/fixtures/xyz-markets-2026-11-14.json', 'utf8'));
 const page = loadModule('app/[locale]/stock/[slug]/page.tsx', {
   '@/lib/markets/stocks': catalog,
   '@/lib/seo/site': site,
@@ -48,12 +49,12 @@ function collect(node, predicate, result = []) {
   return result;
 }
 
-test('catalog has 120 unique active markets and excludes nine unsupported markets', () => {
-  assert.equal(catalog.stocks.length, 120);
+test('catalog has 122 unique active markets and excludes nine unsupported markets', () => {
+  assert.equal(catalog.stocks.length, 122);
   assert.equal(catalog.archivedStocks, undefined);
   assert.equal(catalog.allStocks, undefined);
   for (const key of ['symbol', 'slug', 'hyperliquidSymbol']) {
-    assert.equal(new Set(catalog.stocks.map(stock => stock[key])).size, 120, `unique ${key}`);
+    assert.equal(new Set(catalog.stocks.map(stock => stock[key])).size, 122, `unique ${key}`);
   }
   for (const stock of catalog.stocks) {
     assert.match(stock.slug, /^[a-z0-9]+(?:-[a-z0-9]+)*$/);
@@ -72,9 +73,28 @@ test('catalog has 120 unique active markets and excludes nine unsupported market
   for (const slug of removed) assert.equal(catalog.getStockBySlug(slug), undefined);
 });
 
+test('catalog matches every active market in the reviewed upstream snapshot', () => {
+  assert.deepEqual(Array.from(catalog.stocks, stock => stock.symbol).sort(), approvedMarkets.active.slice().sort());
+  for (const symbol of approvedMarkets.retired) assert.equal(catalog.getStockBySymbol(symbol), undefined);
+  const chinese = ['BABA', 'CAMBRICON', 'CXMT', 'GIGADEV', 'MINIMAX', 'SHEIN', 'UNITREE', 'ZHIPU'];
+  assert.deepEqual(Array.from(catalog.getStocksByCategory('CN'), stock => stock.symbol).sort(), chinese);
+  assert.equal(catalog.getStockBySymbol('KSTR').category, 'ETF');
+  assert.equal(catalog.getStockBySymbol('TSM').category, 'US');
+  assert.equal(catalog.getStockBySymbol('MUU').category, 'ETF');
+  assert.equal(catalog.getStockBySymbol('TTWO').category, 'US');
+});
+
+test('index names follow supplier references while existing detail URLs remain available', () => {
+  for (const [symbol, name, slug] of [['XYZ100', 'XYZ100', 'nasdaq-100'], ['KR200', 'Korea 200', 'kospi-200'], ['JP225', 'Japan 225', 'nikkei-225']]) {
+    const market = catalog.getStockBySymbol(symbol);
+    assert.equal(market.name, name);
+    assert.equal(catalog.getStockBySlug(slug), market);
+  }
+});
+
 test('all active detail pages have matching multilingual canonical and hreflang', async () => {
   const params = await page.generateStaticParams();
-  assert.equal(params.length, 120 * 6);
+  assert.equal(params.length, 122 * 6);
   for (const stock of catalog.stocks) {
     for (const locale of locales) {
       const metadata = await page.generateMetadata({ params: Promise.resolve({ locale, slug: stock.slug }) });
@@ -100,6 +120,12 @@ test('sitemap includes every active language URL and excludes unsupported detail
     assert.ok(urls.has(`https://www.nightticker.com${prefix}/stock/${stock.slug}`));
   }
   for (const slug of removed) assert.ok(!sitemap.some(entry => entry.url.endsWith(`/stock/${slug}`)));
+  for (const locale of locales) {
+    const prefix = locale === 'en' ? '' : `/${locale}`;
+    assert.ok(urls.has(`https://www.nightticker.com${prefix}/category/cn`));
+    assert.ok(urls.has(`https://www.nightticker.com${prefix}/stock/take-two-interactive`));
+    assert.ok(urls.has(`https://www.nightticker.com${prefix}/stock/muu`));
+  }
   assert.ok(sitemap.every(entry => !('lastModified' in entry) && !('changeFrequency' in entry) && !('priority' in entry)), 'unproven revision dates and crawl-frequency hints are omitted');
 });
 

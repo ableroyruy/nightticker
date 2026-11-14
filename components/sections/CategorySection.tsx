@@ -48,6 +48,7 @@ export function CategorySection({ market, assets, limit = 10 }: CategorySectionP
               market === 'ETF' && 'bg-teal-500',
               market === 'COMMODITY' && 'bg-amber-500',
               market === 'FX' && 'bg-cyan-500',
+              market === 'CN' && 'bg-orange-500',
               market === 'SPECIAL' && 'bg-pink-500',
               market === 'SEMICONDUCTOR' && 'bg-violet-500'
             )}
