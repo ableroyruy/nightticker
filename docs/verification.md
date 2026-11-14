@@ -1,5 +1,10 @@
 # CDN and Indian category follow-up — 2026-11-14
 
+- Deployed application source: main `21b5e6355a00a76708e5e3105cef5de590b8fcc5` (PR #2). Production build `c682a828-df80-4524-85db-2004c89f4adb` succeeded. Secret-only promotion version `84fd6e45-db2a-4473-8a40-f04e685587d3` runs the same code.
+- Existing Upstash database `nightticker` was authenticated with the existing Google session; existing ranking keys were confirmed and the full REST credentials transferred directly to Cloudflare secret bindings without logging or committing them. Production ranking returns a healthy snapshot with all 11 category groups; sequential reads show MISS then HIT.
+- Public Cloudflare and Google DNS resolvers return Cloudflare addresses, the zone and SSL certificate are active, HTTPS www returns 200 through the new edge, and apex preserves the path in its 308 to www. Some recursive resolvers still cache the former Vercel delegation; local DNS cache flushing does not force an upstream resolver to refresh. Former Vercel DNS compatibility edits were blocked by its existing account suspension, so those records remain unchanged.
+- Production market metadata and candle endpoints show MISS then HIT. Hashed JavaScript and public logo cache headers were checked separately.
+
 - Reviewed all four remaining SPECIAL entries against supplier specifications and pre-IPO status. RELIANCE and converted JIO move to IN; live pre-IPO ANT and OURA remain SPECIAL. Country menus, filters, badges, rankings, favorites migration and six-language metadata include India. Sitemap now has 888 canonical entries.
 - Public API edge cache honors remaining API freshness: quotes/prices at most 3s, metadata 60s, candles 120s, healthy ranking snapshots at most 30m. Writes, credentials, partial/error/stale/degraded/private responses bypass cache. Query and Worker version isolate cache entries; client address forwarding is normalized at the Cloudflare edge.
 - Local workerd verifies MISS then HIT for quotes, metadata and candles; degraded rankings bypass caching. Quote requests measured 338ms then 6ms. Hashed static files receive one-year immutable browser caching; logos/icons/banners receive one day in browsers and 30 days on CDN.
@@ -14,7 +19,7 @@
 - Existing Vercel project confirmed via GitHub deployment status: `able-s-projects1/nightticker`, source `40e734c3aecf439f2475bf48161443d2edad3973`, serves `www.nightticker.com`. Vercel is paused for Function Invocations until 2026-12-11.
 - Existing Cloudflare target confirmed: `nightticker.lemoningz55.workers.dev`, account ID `b3d3658581bd5bc5dfe0d9f411c3a9c3`, connected to `ableroyruy/nightticker` main. Its existing automatic OpenNext build succeeded; the paused local vinext experiment is not part of this release.
 - Explicit Cloudflare config replaces automatic migration, with isolated preview bindings and read-only static prerender cache. Local workerd checks pass for CN, TTWO, MUU, sitemap, social images, Apple icon and apex-to-www 308 redirect. Dry-run Worker gzip is 2,619 KiB, below the free-plan 3 MiB limit.
-- Published via merged PR #1 at main `8510895f490678de10ca9a1537347f9cdd14b0a4`; Cloudflare production build `a129883f-82e8-40e5-aa0f-d30b0ad01228` succeeded. Zone is active and its universal SSL certificate is active. HTTPS on www returns 200 through Cloudflare; apex is configured to redirect to www. Existing Upstash credentials still require authenticated access before ranking storage can be connected.
+- Published via merged PR #1 at main `8510895f490678de10ca9a1537347f9cdd14b0a4`; Cloudflare production build `a129883f-82e8-40e5-aa0f-d30b0ad01228` succeeded. Zone is active and its universal SSL certificate is active. HTTPS on www returns 200 through Cloudflare; apex is configured to redirect to www. The original Upstash database was subsequently connected through Worker secrets; see the CDN follow-up evidence above.
 
 # Verification — 2026-11-01
 
