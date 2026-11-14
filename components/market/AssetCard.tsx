@@ -36,6 +36,7 @@ const marketGradients: Record<MarketType, string> = {
   ETF: 'from-teal-500/10 via-teal-600/5 to-transparent',
   COMMODITY: 'from-amber-500/10 via-orange-600/5 to-transparent',
   FX: 'from-cyan-500/10 via-cyan-600/5 to-transparent',
+  CN: 'from-orange-500/10 via-red-600/5 to-transparent',
   SPECIAL: 'from-pink-500/10 via-rose-600/5 to-transparent',
   SEMICONDUCTOR: 'from-violet-500/10 via-purple-600/5 to-transparent',
 };
@@ -49,6 +50,7 @@ const marketAccentBorders: Record<MarketType, string> = {
   ETF: 'group-hover:border-teal-500/40 group-hover:shadow-teal-500/10',
   COMMODITY: 'group-hover:border-amber-500/40 group-hover:shadow-amber-500/10',
   FX: 'group-hover:border-cyan-500/40 group-hover:shadow-cyan-500/10',
+  CN: 'group-hover:border-orange-500/40 group-hover:shadow-orange-500/10',
   SPECIAL: 'group-hover:border-pink-500/40 group-hover:shadow-pink-500/10',
   SEMICONDUCTOR: 'group-hover:border-violet-500/40 group-hover:shadow-violet-500/10',
 };
@@ -62,6 +64,7 @@ const marketGlowColors: Record<MarketType, string> = {
   ETF: 'shadow-teal-500/5',
   COMMODITY: 'shadow-amber-500/5',
   FX: 'shadow-cyan-500/5',
+  CN: 'shadow-orange-500/5',
   SPECIAL: 'shadow-pink-500/5',
   SEMICONDUCTOR: 'shadow-violet-500/5',
 };
@@ -108,6 +111,7 @@ function AssetCardInner({
     ETF: 'bg-teal-500/20 text-teal-400 border-teal-500/30',
     COMMODITY: 'bg-amber-500/20 text-amber-400 border-amber-500/30',
     FX: 'bg-cyan-500/20 text-cyan-400 border-cyan-500/30',
+    CN: 'bg-orange-500/20 text-orange-400 border-orange-500/30',
     SPECIAL: 'bg-pink-500/20 text-pink-400 border-pink-500/30',
     SEMICONDUCTOR: 'bg-violet-500/20 text-violet-400 border-violet-500/30',
   };

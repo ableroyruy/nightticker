@@ -75,7 +75,8 @@
     "COMMODITY": "コモディティ",
     "FX": "通貨",
     "SPECIAL": "特別",
-    "SEMICONDUCTOR": "半導体"
+    "SEMICONDUCTOR": "半導体",
+    "CN": "中国株"
   },
   "marketBadge": {
     "KR": "韓国",
@@ -86,7 +87,8 @@
     "COMMODITY": "商品",
     "FX": "通貨",
     "SPECIAL": "特別",
-    "SEMICONDUCTOR": "半導体"
+    "SEMICONDUCTOR": "半導体",
+    "CN": "中国"
   },
   "stockDetail": {
     "overnight": "夜間",

@@ -75,7 +75,8 @@
     "COMMODITY": "원자재",
     "FX": "통화",
     "SPECIAL": "특별",
-    "SEMICONDUCTOR": "반도체"
+    "SEMICONDUCTOR": "반도체",
+    "CN": "중국 주식"
   },
   "marketBadge": {
     "KR": "한국",
@@ -86,7 +87,8 @@
     "COMMODITY": "원자재",
     "FX": "통화",
     "SPECIAL": "특수",
-    "SEMICONDUCTOR": "반도체"
+    "SEMICONDUCTOR": "반도체",
+    "CN": "중국"
   },
   "stockDetail": {
     "overnight": "야간",

@@ -33,9 +33,9 @@ function collect(node, predicate, result = []) {
   return result;
 }
 
-test('reviewed product content covers all 120 active markets in all six locales', () => {
-  assert.equal(stocks.length, 120);
-  assert.equal(Object.keys(facts).length, 120);
+test('reviewed product content covers all 122 active markets in all six locales', () => {
+  assert.equal(stocks.length, 122);
+  assert.equal(Object.keys(facts).length, 122);
   for (const item of stocks) {
     assert.ok(item.description.length > 50, `${item.symbol} keeps full supplier text`);
     for (const locale of locales) {
@@ -56,10 +56,10 @@ test('reviewed product content covers all 120 active markets in all six locales'
   }
 });
 
-test('country and product metadata are independent of legacy SPECIAL navigation keys', () => {
+test('Chinese equities move to CN while other international equities remain SPECIAL', () => {
   const expected = { MINIMAX: 'HK', ZHIPU: 'HK', CXMT: 'CN', CAMBRICON: 'CN', GIGADEV: 'CN', UNITREE: 'CN', RELIANCE: 'IN', JIO: 'IN' };
   for (const [symbol, country] of Object.entries(expected)) {
-    assert.equal(stock(symbol).category, 'SPECIAL', 'favorite and navigation category remains stable');
+    assert.equal(stock(symbol).category, ['CN', 'HK'].includes(country) ? 'CN' : 'SPECIAL');
     const product = info.getProductInfo(stock(symbol), 'ko');
     assert.equal(product.countryCode, country);
     assert.equal(product.kind, 'equity');
@@ -79,7 +79,7 @@ test('ADS ratios, pre-IPO status, daily leverage and FX units cannot be confused
     assert.ok(product.sourceUrl.endsWith('pre-ipo-specification-index'));
     assert.ok(product.notes.length > 0);
   }
-  for (const [symbol, leverage] of Object.entries({ SOXL: 3, KORU: 3, SNXX: 2 })) {
+  for (const [symbol, leverage] of Object.entries({ SOXL: 3, KORU: 3, SNXX: 2, MUU: 2 })) {
     assert.equal(info.getProductFacts(symbol).dailyLeverage, leverage);
     for (const locale of locales) assert.ok(info.getProductInfo(stock(symbol), locale).notes.some(note => note.includes(String(leverage))));
   }

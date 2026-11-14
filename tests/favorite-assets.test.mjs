@@ -18,3 +18,14 @@ test('malformed storage cannot introduce assets and normalization is idempotent'
   const value = normalizeFavoriteAssets([{ symbol: 'NVDA', addedAt: NaN }, { symbol: {} }], catalog, 100);
   assert.deepEqual(normalizeFavoriteAssets(value, catalog, 200), value);
 });
+
+test('Chinese category migration preserves saved favorites and their original order', () => {
+  const updated = [
+    { symbol: 'BABA', category: 'CN', name: 'Alibaba', nameKo: '알리바바', slug: 'alibaba' },
+    { symbol: 'CAMBRICON', category: 'CN', name: 'Cambricon', nameKo: '캠브리콘', slug: 'cambricon' },
+  ];
+  const saved = [{ symbol: 'BABA', market: 'US', addedAt: 10 }, { symbol: 'CAMBRICON', market: 'SPECIAL', addedAt: 20 }];
+  const restored = normalizeFavoriteAssets(saved, updated);
+  assert.deepEqual(restored.map(item => [item.symbol, item.market, item.addedAt]), [['BABA', 'CN', 10], ['CAMBRICON', 'CN', 20]]);
+  assert.deepEqual(normalizeFavoriteAssets(restored, updated), restored);
+});

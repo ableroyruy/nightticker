@@ -13,7 +13,7 @@ export interface MarketDataProvider {
   isAvailable(): Promise<boolean>;
 }
 
-export type StockCategory = 'US' | 'KR' | 'JP' | 'INDEX' | 'ETF' | 'COMMODITY' | 'FX' | 'SPECIAL' | 'SEMICONDUCTOR';
+export type StockCategory = 'US' | 'KR' | 'CN' | 'JP' | 'INDEX' | 'ETF' | 'COMMODITY' | 'FX' | 'SPECIAL' | 'SEMICONDUCTOR';
 
 export type StockSector =
   | 'BigTech'

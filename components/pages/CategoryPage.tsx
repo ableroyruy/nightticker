@@ -13,6 +13,7 @@ import { Building2, BarChart3, Coins, DollarSign, Cpu } from 'lucide-react';
 const categoryIcons: Record<StockCategory, React.ElementType> = {
   US: Building2,
   KR: Building2,
+  CN: Building2,
   JP: Building2,
   INDEX: BarChart3,
   ETF: BarChart3,

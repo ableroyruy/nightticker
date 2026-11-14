@@ -12,6 +12,7 @@ export interface ProductFacts {
   description: string;
   topic: string;
   source: string;
+  sourceUrl?: string;
   adsRatio?: number;
   dailyLeverage?: number;
   convertedFrom?: string;
@@ -64,12 +65,12 @@ const units: Record<string, string[]> = {
   'index-points': ['Index points', '지수 포인트', '指数ポイント', '指数点', 'Pontos do índice', 'Puntos del índice'],
 };
 export const productLabels = {
-  en: { heading: 'About this market', country: 'Underlying region', type: 'Product type', underlying: 'Underlying', exchange: 'Underlying listing', unit: 'Price unit', source: 'Supplier specification', original: 'Full supplier description (English)', note: 'Prices reference Hyperliquid derivatives. They do not convey ownership of the underlying asset.' },
-  ko: { heading: '종목·상품 정보', country: '기초자산 지역', type: '상품 유형', underlying: '기초자산', exchange: '기초자산 상장시장', unit: '가격 단위', source: '공급자 상품 명세', original: '공급자 전체 설명 (영문)', note: 'Hyperliquid 파생상품의 참고가격이며, 기초자산 소유권을 의미하지 않습니다.' },
-  ja: { heading: '銘柄・商品情報', country: '原資産の地域', type: '商品区分', underlying: '原資産', exchange: '原資産の上場市場', unit: '価格単位', source: '提供元の商品仕様', original: '提供元の説明全文（英語）', note: 'Hyperliquidデリバティブの参考価格であり、原資産の所有権を示すものではありません。' },
-  zh: { heading: '标的与产品信息', country: '标的资产地区', type: '产品类型', underlying: '标的资产', exchange: '标的上市市场', unit: '价格单位', source: '提供方产品规格', original: '提供方完整说明（英文）', note: '此为Hyperliquid衍生品参考价格，不代表标的资产的所有权。' },
-  pt: { heading: 'Informações do ativo e produto', country: 'Região do subjacente', type: 'Tipo de produto', underlying: 'Ativo subjacente', exchange: 'Cotação do subjacente', unit: 'Unidade do preço', source: 'Especificação do fornecedor', original: 'Descrição completa do fornecedor (inglês)', note: 'Preços de referência de derivativos Hyperliquid. Não conferem propriedade do ativo subjacente.' },
-  es: { heading: 'Información del activo y producto', country: 'Región del subyacente', type: 'Tipo de producto', underlying: 'Activo subyacente', exchange: 'Cotización del subyacente', unit: 'Unidad del precio', source: 'Especificación del proveedor', original: 'Descripción completa del proveedor (inglés)', note: 'Precios de referencia de derivados Hyperliquid. No otorgan propiedad del activo subyacente.' },
+  en: { heading: 'About this market', country: 'Underlying region', type: 'Product type', underlying: 'Underlying', exchange: 'Underlying listing', unit: 'Price unit', source: 'Product reference', original: 'Full product description (English)', note: 'Prices reference Hyperliquid derivatives. They do not convey ownership of the underlying asset.' },
+  ko: { heading: '종목·상품 정보', country: '기초자산 지역', type: '상품 유형', underlying: '기초자산', exchange: '기초자산 상장시장', unit: '가격 단위', source: '상품 정보 출처', original: '상품 전체 설명 (영문)', note: 'Hyperliquid 파생상품의 참고가격이며, 기초자산 소유권을 의미하지 않습니다.' },
+  ja: { heading: '銘柄・商品情報', country: '原資産の地域', type: '商品区分', underlying: '原資産', exchange: '原資産の上場市場', unit: '価格単位', source: '商品情報の参照元', original: '商品説明全文（英語）', note: 'Hyperliquidデリバティブの参考価格であり、原資産の所有権を示すものではありません。' },
+  zh: { heading: '标的与产品信息', country: '标的资产地区', type: '产品类型', underlying: '标的资产', exchange: '标的上市市场', unit: '价格单位', source: '产品信息来源', original: '完整产品说明（英文）', note: '此为Hyperliquid衍生品参考价格，不代表标的资产的所有权。' },
+  pt: { heading: 'Informações do ativo e produto', country: 'Região do subjacente', type: 'Tipo de produto', underlying: 'Ativo subjacente', exchange: 'Cotação do subjacente', unit: 'Unidade do preço', source: 'Referência do produto', original: 'Descrição completa do produto (inglês)', note: 'Preços de referência de derivativos Hyperliquid. Não conferem propriedade do ativo subjacente.' },
+  es: { heading: 'Información del activo y producto', country: 'Región del subyacente', type: 'Tipo de producto', underlying: 'Activo subyacente', exchange: 'Cotización del subyacente', unit: 'Unidad del precio', source: 'Referencia del producto', original: 'Descripción completa del producto (inglés)', note: 'Precios de referencia de derivados Hyperliquid. No otorgan propiedad del activo subyacente.' },
 };
 export function productLocale(locale: string): ProductLocale {
   return languages.includes(locale as ProductLocale) ? locale as ProductLocale : 'en';
@@ -159,7 +160,7 @@ export function getProductInfo(stock: Stock, requestedLocale: string) {
     locale, name, heading: `${name} · ${productLabels[locale].heading}`,
     overview, country, productType, underlying: `${name} (${stock.symbol})`, exchange, quoteUnit, notes,
     sourceDescription: stock.description || fact.description,
-    sourceUrl: `https://docs.trade.xyz/perpetuals/specifications-and-schedules/${fact.source === 'pre-ipo' ? 'pre-ipo-specification-index' : 'specification-index'}`,
+    sourceUrl: fact.sourceUrl ?? `https://docs.trade.xyz/perpetuals/specifications-and-schedules/${fact.source === 'pre-ipo' ? 'pre-ipo-specification-index' : 'specification-index'}`,
     kind: fact.kind, countryCode: fact.country,
   };
 }

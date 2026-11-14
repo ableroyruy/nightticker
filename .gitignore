@@ -23,6 +23,7 @@ yarn-error.log*
 
 # Vercel
 .vercel
+.playwright-mcp/
 
 # IDE
 .idea/

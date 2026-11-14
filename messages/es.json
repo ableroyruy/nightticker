@@ -75,7 +75,8 @@
     "COMMODITY": "Materias Primas",
     "FX": "Divisas",
     "SPECIAL": "Especial",
-    "SEMICONDUCTOR": "Semiconductores"
+    "SEMICONDUCTOR": "Semiconductores",
+    "CN": "Acciones Chinas"
   },
   "marketBadge": {
     "KR": "Corea",
@@ -86,7 +87,8 @@
     "COMMODITY": "Commodity",
     "FX": "Divisa",
     "SPECIAL": "Especial",
-    "SEMICONDUCTOR": "Semiconductor"
+    "SEMICONDUCTOR": "Semiconductor",
+    "CN": "China"
   },
   "stockDetail": {
     "overnight": "Nocturno",
