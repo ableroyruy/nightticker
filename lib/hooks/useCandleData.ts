@@ -86,16 +86,27 @@ export function useCandleData(symbol: string, enabled = true): CandleState {
   });
   useEffect(() => {
     let cancelled = false;
+    let inFlight = false;
+    let retry: ReturnType<typeof setTimeout> | undefined;
     async function load() {
-      if (!enabled || document.visibilityState === 'hidden') return;
-      const result = await fetchCandles(sym);
-      if (!cancelled) setState(stateFor(result));
+      if (cancelled || inFlight || !enabled || document.visibilityState === 'hidden') return;
+      clearTimeout(retry);
+      inFlight = true;
+      try {
+        const result = await fetchCandles(sym);
+        if (!cancelled) {
+          setState(stateFor(result));
+          // An initial timeout/partial batch must not leave an empty chart on
+          // screen for the full five-minute normal refresh interval.
+          const failed = result.error && result.error !== 'No chart data';
+          retry = setTimeout(() => { void load(); }, failed ? 10000 : 300000);
+        }
+      } finally { inFlight = false; }
     }
     Promise.resolve().then(() => { if (!cancelled) { setState(stateFor()); void load(); } });
-    const interval = setInterval(() => { void load(); }, 300000);
     const onVisible = () => { if (document.visibilityState === 'visible') void load(); };
     document.addEventListener('visibilitychange', onVisible);
-    return () => { cancelled = true; clearInterval(interval); document.removeEventListener('visibilitychange', onVisible); };
+    return () => { cancelled = true; clearTimeout(retry); document.removeEventListener('visibilitychange', onVisible); };
   }, [sym, enabled]);
   return state;
 }
