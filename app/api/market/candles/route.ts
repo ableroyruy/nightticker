@@ -43,8 +43,12 @@ export async function GET(request: NextRequest) {
   let stale = false;
   let timestamp = Date.now();
   let failed = false;
-  for (const result of entries) {
-    if (result.status === 'rejected') { failed = true; continue; }
+  for (const [index, result] of entries.entries()) {
+    if (result.status === 'rejected') {
+      console.warn('[market-candles]', { symbol: symbols[index], reason: result.reason instanceof Error ? result.reason.message : 'Upstream request failed' });
+      failed = true;
+      continue;
+    }
     data[result.value.symbol] = result.value.entry.data;
     stale ||= result.value.entry.stale;
     timestamp = Math.min(timestamp, result.value.entry.timestamp);
