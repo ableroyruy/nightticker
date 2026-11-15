@@ -201,7 +201,7 @@ export function MiniChart({
 
   return (
     <figure role="group" aria-label={labels.chart} className={cn('m-0 min-w-0 pointer-events-none', className)} style={autoResize ? { width: '100%' } : { width }}>
-      <figcaption className={cn('mb-1 text-muted-foreground', detail ? 'flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 text-xs' : 'whitespace-nowrap text-[10px] leading-tight')}>
+      <figcaption className={cn('mb-1 text-muted-foreground', detail ? 'flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 text-xs' : 'px-1 pt-0.5 whitespace-nowrap text-[10px] leading-tight')}>
         {detail ? <><span>{labels.detail}</span>{quoteUnit && <span className="min-w-0 break-words text-[11px]">{quoteUnit}</span>}</> : labels.compact}
       </figcaption>
       <div className="relative overflow-hidden" style={containerStyle}>
