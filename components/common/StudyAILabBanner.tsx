@@ -19,13 +19,13 @@ export function StudyAILabBanner({ variant }: { variant: keyof typeof banners })
   const banner = banners[variant];
 
   return (
-    <aside aria-label="Study AI Lab 도서 소개" className="px-4 py-6">
+    <aside aria-label="Study AI Lab 도서 소개" className="py-6">
       <a
         href="https://www.studyailab.com/"
         target="_blank"
         rel="noopener noreferrer"
         aria-label={`${banner.caption} (새 탭에서 열기)`}
-        className="group mx-auto block w-full"
+        className="group block w-full"
         style={{ maxWidth: banner.width }}
       >
         <Image
@@ -36,7 +36,7 @@ export function StudyAILabBanner({ variant }: { variant: keyof typeof banners })
           sizes={`(max-width: ${banner.width + 32}px) calc(100vw - 32px), ${banner.width}px`}
           className="h-auto w-full rounded-xl border border-border transition-opacity group-hover:opacity-90"
         />
-        <span className="mt-3 block text-center text-sm text-muted-foreground transition-colors group-hover:text-foreground">
+        <span className="mt-3 block text-sm text-muted-foreground transition-colors group-hover:text-foreground">
           {banner.caption}
         </span>
       </a>

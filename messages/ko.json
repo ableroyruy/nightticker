@@ -214,7 +214,9 @@
     "viewSourceMarket": "소스 마켓 보기",
     "exploreDetails": "상세 정보 보기",
     "priceUnavailable": "가격정보 갱신중",
-    "loading": "로딩 중..."
+    "loading": "로딩 중...",
+    "changeBasis": "등락: 24시간 기준가 대비",
+    "changeBasisDescription": "변동폭과 변동률은 현재 Hyperliquid XYZ 참고 시세와 공급자의 24시간 기준가를 비교한 값입니다. 정규장 전일 종가 대비 값과 다를 수 있습니다."
   },
   "table": {
     "name": "종목명",

@@ -169,12 +169,12 @@ export function HomePage() {
             <div className="container">{renderSectionContent(sectionId)}</div>
           </div>
           {locale === 'ko' && sectionId === 'US' && (
-            <StudyAILabBanner variant="investing" />
+            <div className="container"><StudyAILabBanner variant="investing" /></div>
           )}
           </Fragment>
         ))}
 
-        {locale === 'ko' && <StudyAILabBanner variant="investingGuide" />}
+        {locale === 'ko' && <div className="container"><StudyAILabBanner variant="investingGuide" /></div>}
 
         {/* Compliance Notice */}
         <div className="container py-8">

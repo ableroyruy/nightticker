@@ -95,6 +95,7 @@ export function PopularSearchesPage() {
         {rankingStatus === 'degraded' && <p role="status" className="rounded-xl border border-amber-500/20 bg-amber-500/10 px-4 py-3 text-sm text-muted-foreground">{labels.degraded}</p>}
 
         <section aria-labelledby="ranking-heading" aria-busy={loading} className="space-y-3">
+          <p className="px-1 text-xs text-muted-foreground" title={tMarket('changeBasisDescription')}>{tMarket('changeBasis')}</p>
           <div className="flex flex-wrap items-center justify-between gap-2 px-1">
             <h2 id="ranking-heading" className="text-lg font-semibold">{scopeLabel(scope)}</h2>
             {!loading && displayRankings.length > 0 && <span className="text-xs text-muted-foreground">{labels.count}: {displayRankings.length.toLocaleString(locale)} · {rankedViews.toLocaleString(locale)} {labels.views}</span>}

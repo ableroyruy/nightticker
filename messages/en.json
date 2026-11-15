@@ -214,7 +214,9 @@
     "viewSourceMarket": "View Source Market",
     "exploreDetails": "Explore Market Details",
     "priceUnavailable": "Updating price...",
-    "loading": "Loading..."
+    "loading": "Loading...",
+    "changeBasis": "Change vs. 24h reference",
+    "changeBasisDescription": "Changes compare the current Hyperliquid XYZ reference quote with the provider’s 24-hour reference price. They may differ from changes versus the previous regular-session close."
   },
   "table": {
     "name": "Name",

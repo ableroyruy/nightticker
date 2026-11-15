@@ -214,7 +214,9 @@
     "viewSourceMarket": "Ver Mercado de Origen",
     "exploreDetails": "Explorar Detalles",
     "priceUnavailable": "Actualizando precio...",
-    "loading": "Cargando..."
+    "loading": "Cargando...",
+    "changeBasis": "Cambio vs. referencia de 24h",
+    "changeBasisDescription": "Los cambios comparan la cotización de referencia actual de Hyperliquid XYZ con el precio de referencia de 24 horas del proveedor. Pueden diferir del cambio respecto al cierre anterior de la sesión regular."
   },
   "table": {
     "name": "Nombre",

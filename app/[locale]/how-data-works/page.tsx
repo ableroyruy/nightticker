@@ -20,6 +20,7 @@ export default async function HowDataWorksPage({ params }: Props) {
 
   const t = await getTranslations('pages.howDataWorks');
   const tInfo = await getTranslations('infoPages.howDataWorks');
+  const tMarket = await getTranslations('market');
 
   return (
     <div className="container py-8 space-y-8">
@@ -42,6 +43,11 @@ export default async function HowDataWorksPage({ params }: Props) {
         <section>
           <h2>{tInfo('referencePrices')}</h2>
           <p>{tInfo('referencePricesContent')}</p>
+        </section>
+
+        <section>
+          <h2>{tMarket('changeBasis')}</h2>
+          <p>{tMarket('changeBasisDescription')}</p>
         </section>
 
         <section>
