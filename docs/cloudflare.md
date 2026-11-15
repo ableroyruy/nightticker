@@ -47,3 +47,17 @@ healthy ranking snapshots up to 30m. Errors, partial/stale/degraded data, privat
 responses, authorization and POST view recording bypass caching. HTML is kept
 out of this cache because locale cookies and RSC navigation affect responses.
 `X-Nightticker-CDN: HIT|MISS|BYPASS` makes API verification visible.
+
+## Candle request isolation
+
+Candle requests keep their own upstream concurrency limit (five) and never wait
+on another HTTP request's promises or semaphore callbacks. Only completed candle
+snapshots are shared in isolate memory: fresh for two minutes, delayed fallback
+for at most ten minutes. The existing CDN still shares successful batch responses.
+A global queue/shared in-flight cache previously stranded overlapping requests
+and produced Cloudflare 1101: “the Worker's code had hung and would never generate
+a response.” Client retries alone could not fix this failure.
+
+`tests/candle-api.test.mjs` holds one request's upstream work indefinitely and
+requires an overlapping request to finish independently. Test this behavior when
+changing the concurrency limit or restoring request coalescing.
