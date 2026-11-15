@@ -30,6 +30,7 @@ let lastMessage = 0;
 let connectionStarted = 0;
 let metaTimestamp = 0;
 let lastMetaAttempt = 0;
+let metaRetryDelay = 60000;
 let generation = 0;
 let baselines: Record<string, number | null> = {};
 
@@ -51,24 +52,32 @@ async function refresh() {
   const timeout = setTimeout(() => abort.abort(), 10000);
   request = (async () => {
     try {
-      const response = await fetch('/api/market/ticker', { signal: abort.signal });
+      // Live allMids already supplies prices. A separate HTTP price failure must
+      // not prevent refreshing the reference prices used for 24h changes.
+      const metaOnly = socket?.readyState === WebSocket.OPEN && lastMessage > 0 && Date.now() - lastMessage < 45000;
+      const response = await fetch(metaOnly ? '/api/market/meta' : '/api/market/ticker', { signal: abort.signal, cache: 'no-store' });
       if (!response.ok) throw new Error('Market data temporarily unavailable');
-      const data: Record<string, TickerData> = await response.json();
+      const data = await response.json() as Record<string, TickerData> | Record<string, number | null>;
       if (generation !== current || !listeners.size) return;
       const stamp = Number(response.headers.get('X-Data-Timestamp'));
-      const metaStamp = Number(response.headers.get('X-Meta-Timestamp'));
-      if (!Number.isFinite(stamp) || stamp <= 0 || Date.now() - stamp > 60000) throw new Error('Market data is delayed');
+      const metaStamp = metaOnly ? stamp : Number(response.headers.get('X-Meta-Timestamp'));
+      if (!Number.isFinite(stamp) || stamp <= 0 || Date.now() - stamp > (metaOnly ? 300000 : 60000)) throw new Error('Market data is delayed');
       metaTimestamp = Number.isFinite(metaStamp) && metaStamp > 0 ? metaStamp : 0;
-      baselines = Object.fromEntries(Object.entries(data).map(([symbol, value]) => [symbol, value.prevDayPx]));
+      baselines = Object.fromEntries(Object.entries(data).map(([symbol, value]) => {
+        const baseline = metaOnly ? value : (value as TickerData).prevDayPx;
+        return [symbol, typeof baseline === 'number' && Number.isFinite(baseline) && baseline > 0 ? baseline : null];
+      }));
+      metaRetryDelay = Date.now() - metaTimestamp < 60000 ? 60000 : 10000;
       // Never replace a newer WebSocket quote with an older HTTP cache snapshot.
-      const live = lastMessage > stamp;
-      const source = live ? snapshot.tickers : data;
+      const live = metaOnly || lastMessage > stamp;
+      const source = live ? snapshot.tickers : data as Record<string, TickerData>;
       const tickers: Record<string, TickerData> = {};
       for (const [symbol, value] of Object.entries(source)) {
         if (allowed.has(symbol) && Number.isFinite(value.price) && value.price > 0) tickers[symbol] = ticker(value.price, baselines[symbol] ?? null);
       }
       publish({ tickers, lastUpdate: live ? snapshot.lastUpdate : new Date(stamp), status: live && socket?.readyState === WebSocket.OPEN ? 'connected' : 'disconnected', error: live ? null : 'Waiting for live prices' });
     } catch {
+      metaRetryDelay = 10000;
       if (generation === current && listeners.size && Date.now() - lastMessage > 45000) publish({ ...snapshot, status: 'disconnected', error: 'Market data temporarily unavailable' });
     } finally {
       clearTimeout(timeout);
@@ -112,12 +121,18 @@ function connect() {
     if (listeners.size) retry = setTimeout(() => { retry = null; connect(); }, 3000);
   };
 }
+function onVisibilityChange() {
+  if (document.visibilityState !== 'visible') return;
+  void refresh();
+  connect();
+}
 function stop() {
   generation++;
   controller?.abort(); controller = null; request = null;
   if (timer) clearInterval(timer);
   if (retry) clearTimeout(retry);
   timer = null; retry = null;
+  if (typeof document !== 'undefined') document.removeEventListener('visibilitychange', onVisibilityChange);
   const ws = socket; socket = null;
   if (ws) { ws.onclose = null; ws.close(); }
   publish({ ...snapshot, status: 'disconnected' });
@@ -128,8 +143,9 @@ function subscribe(listener: () => void) {
   if (!timer) {
     if (snapshot.lastUpdate && Date.now() - snapshot.lastUpdate.getTime() >= 60000) snapshot = EMPTY;
     void refresh(); connect();
+    if (typeof document !== 'undefined') document.addEventListener('visibilitychange', onVisibilityChange);
     timer = setInterval(() => {
-      if (Date.now() - lastMetaAttempt >= 60000) void refresh();
+      if (Date.now() - lastMetaAttempt >= metaRetryDelay) void refresh();
       if (socket?.readyState === WebSocket.CONNECTING && Date.now() - connectionStarted > 15000) socket.close();
       if (socket?.readyState === WebSocket.OPEN) {
         socket.send(JSON.stringify({ method: 'ping' }));
