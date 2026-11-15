@@ -23,6 +23,7 @@ export function PriceChange({
   className,
   hideCurrency = false,
 }: PriceChangeProps) {
+  const t = useTranslations('market');
 
   if (value == null || !Number.isFinite(value)) {
     return <span className="text-muted-foreground">—</span>;
@@ -49,6 +50,8 @@ export function PriceChange({
 
   return (
     <span
+      title={t('changeBasisDescription')}
+      aria-label={`${formattedValue} · ${t('changeBasis')}`}
       className={cn(
         'inline-flex items-center gap-0.5 tabular-nums font-medium',
         sizeClasses[size],

@@ -214,7 +214,9 @@
     "viewSourceMarket": "查看数据来源",
     "exploreDetails": "查看详情",
     "priceUnavailable": "价格更新中...",
-    "loading": "加载中..."
+    "loading": "加载中...",
+    "changeBasis": "涨跌：相对24小时基准价",
+    "changeBasisDescription": "涨跌额和涨跌幅比较当前Hyperliquid XYZ参考报价与数据提供方的24小时基准价，可能与相对上一常规交易时段收盘价的涨跌不同。"
   },
   "table": {
     "name": "名称",

@@ -18,6 +18,7 @@ export function ConnectionStatus({
   className,
 }: ConnectionStatusProps) {
   const t = useTranslations('connection');
+  const tMarket = useTranslations('market');
   const locale = useLocale();
 
   const statusConfig = {
@@ -47,7 +48,7 @@ export function ConnectionStatus({
   return (
     <div
       className={cn(
-        'inline-flex items-center gap-2 text-xs',
+        'inline-flex flex-wrap items-center gap-2 text-xs',
         config.className,
         className
       )}
@@ -79,6 +80,9 @@ export function ConnectionStatus({
           {formatLastUpdated(lastUpdate, locale)}
         </span>
       )}
+      <span className="text-muted-foreground" title={tMarket('changeBasisDescription')}>
+        · {tMarket('changeBasis')}
+      </span>
     </div>
   );
 }

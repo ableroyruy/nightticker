@@ -214,7 +214,9 @@
     "viewSourceMarket": "ソース市場を見る",
     "exploreDetails": "詳細を見る",
     "priceUnavailable": "価格更新中...",
-    "loading": "読み込み中..."
+    "loading": "読み込み中...",
+    "changeBasis": "騰落：24時間基準価格比",
+    "changeBasisDescription": "騰落額と騰落率は、現在のHyperliquid XYZ参考価格と提供元の24時間基準価格を比較しています。通常取引の前日終値比とは異なる場合があります。"
   },
   "table": {
     "name": "銘柄名",
